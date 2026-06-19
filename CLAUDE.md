@@ -1,0 +1,115 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+HeroKana is a **client-only PWA for learning Japanese kana, words, and sentences**. No backend, no
+accounts — all state lives in `localStorage`. Deliberately small and hand-rolled.
+
+## Documentation map
+
+- CLAUDE.md (this file): stack, architecture, conventions, hard constraints. Always loaded.
+- docs/design-system.md: aesthetic decisions, tokens, component patterns. Read before any UI work.
+- docs/status.md: current baseline, what works, what is in progress, what is next. Read at the start of any feature work.
+- docs/decisions.md: log of significant choices and ruled-out approaches. Read at the start of any feature work to avoid relitigating settled decisions.
+
+## Session rules
+
+- At the start of feature work, read docs/status.md and docs/decisions.md.
+- At the end of any session where features changed or decisions were made, run /wrapup before stopping.
+- Keep all documentation tight and accurate. Do not document the obvious.
+
+## Stack
+
+- **React 18.3** + **ReactDOM 18.3** — UI. No router, no state library (two React contexts only).
+- **Vite 6** + `@vitejs/plugin-react` 4.3 — build/dev.
+- **vite-plugin-pwa 1.3** (Workbox) — installable, offline, prompt-based updates.
+- **sharp 0.35** (dev only) — icon generation script.
+- Styling is **inline `style={}` objects** reading theme tokens, plus a tiny `src/styles.css`. No CSS framework.
+- Fonts via Google Fonts: **Outfit** (UI) + **Zen Maru Gothic** (Japanese).
+
+## Commands
+
+```bash
+npm run dev      # Vite dev server (http://localhost:5173)
+npm run build    # production build to dist/
+npm run preview  # serve the built dist/
+node scripts/make-icons.mjs   # regenerate PWA icons from public/assets/app-icon.svg
+```
+
+**No test runner, linter, or type checker is configured** — verification is manual in the browser.
+
+## Directory structure
+
+```
+index.html              Entry; pre-paint theme script + static splash
+vite.config.js          Vite + PWA manifest/workbox config
+dev.cmd                 Preview-launcher shim (space-in-path workaround)
+scripts/make-icons.mjs  Icon generation (sharp)
+public/assets/          SVG icons, cat mascot stickers, cat-loading.mp4
+src/
+  main.jsx              Mounts providers + App + UpdatePrompt/WhatsNew/Splash
+  App.jsx               Screen router + Android back handling + onboarding gate
+  data.js               All course content + profile personalisation (~1100 lines)
+  questions.js          buildQuestions() — turns a session into question objects
+  store.jsx             ProgressProvider / useProgress — progress + XP (localStorage)
+  theme.jsx             ThemeProvider / useTheme — light/dark palettes + tokens
+  release.js            VERSION + RELEASE_NOTES (drives WhatsNew)
+  styles.css            Global resets + animation keyframes
+  Splash.jsx, UpdatePrompt.jsx, WhatsNew.jsx
+  components/chrome.jsx Shared UI: Shell, BottomNav, Modal, Ring, Cat, ThemeToggle
+  screens/              Home, Lesson, Result, Practice, Profile, Onboarding, SentenceBasics
+```
+
+## Architecture in one pass
+
+**Content (`data.js`) drives everything.** `CHAPTERS` is the course spine; chapters are either *kana*
+(units have a `romaji` array; glyphs from `HIRA`/`KATA`) or *banked* (`phrase`/`sentence`/`complex`,
+keys of `BANKS`; units are themes of `{jp,romaji,en}` items). Read banks via **`bankFor(id)`**, never
+`BANKS` directly — it injects profile-personalised Sentences units.
+
+**`questions.js`** turns a `session` descriptor into question objects via `buildQuestions(session,
+progress)`, dispatching on `session.kind` (`unit`/`custom`/`numbers`/`foundations`/`mode`).
+
+**`store.jsx`** owns all learner progress (localStorage `hk-progress-v2`) behind `useProgress()`;
+`completeLesson` is the only write path.
+
+**`App.jsx`** is the screen router (a `useState` screen object) plus an onboarding gate, and wires
+Android hardware-back via a buffered `history.pushState` entry.
+
+**`theme.jsx`** provides light/dark tokens and live `theme-color` updates; **`Shell`** (in `chrome.jsx`)
+is the phone-width app frame every screen renders into.
+
+See [docs/content-model.md](docs/content-model.md) for the full data model and
+[docs/design-system.md](docs/design-system.md) for the visual system.
+
+## Conventions
+
+- **Components** are function components with hooks; screens default-export a wrapper that renders
+  their body inside `Shell`. JSX files use `.jsx`.
+- **Styling** reads tokens from `useTheme()` (`const { t } = useTheme()`); never hardcode a hex except
+  `#fff` on filled accent buttons. Reuse the patterns in `chrome.jsx` (cards, segmented controls,
+  buttons) rather than inventing new ones.
+- **Japanese text** always uses the `JP` font family; UI text uses `DISPLAY`.
+- **Persistence** goes through the providers; don't read/write `hk-progress-*` from screens. Storage
+  keys are prefixed `hk-`.
+- **Naming** — camelCase for functions/vars, UPPER_SNAKE for module-level constants/content tables,
+  PascalCase for components. Comments explain *why* (especially platform workarounds), not *what*.
+- Interactive elements get the `hk-press` class for the tactile press animation.
+
+## Hard constraints — never do this
+
+- **Never add streaks, daily goals, or loss-aversion mechanics.** Calm, low-pressure learning is a
+  product principle ([decisions.md](docs/decisions.md)).
+- **Keep the cat mascot to the app icon and results screen** (the intended rule; note the existing
+  onboarding/splash usage flagged in [design-system.md](docs/design-system.md) — don't extend it further
+  without an owner decision).
+- **Never reorder `CHAPTERS` or units.** Progress is stored as positional index arrays; reordering
+  silently corrupts existing learners' data. Append instead.
+- **Don't set the service worker to `skipWaiting`/auto-update.** Updates are prompt-gated so the app is
+  never swapped out mid-lesson (see `vite.config.js` + `UpdatePrompt.jsx`).
+- **Don't introduce a backend, accounts, or a sync layer** without an explicit decision — the app is
+  intentionally fully client-side.
+- **Don't re-enable Vite `server.fs.strict` or remove `dev.cmd`** — they work around the space in this
+  machine's project path (`C:\Users\Nebula PC\herokana`). See [decisions.md](docs/decisions.md).
+- **Don't reach for a router, state library, or CSS framework** for incremental features; match the
+  existing hand-rolled idiom.
