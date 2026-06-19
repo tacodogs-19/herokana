@@ -1,0 +1,171 @@
+import React from "react";
+import { useTheme, JP, DISPLAY } from "../theme.jsx";
+import { useProgress } from "../store.jsx";
+import { CHAPTERS } from "../data";
+import { Shell, Ring, ThemeToggle, Modal } from "../components/chrome.jsx";
+
+function ProfileBody({ onEditProfile, onReset }) {
+  const { t } = useTheme();
+  const p = useProgress();
+  const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
+  const days = ["M", "T", "W", "T", "F", "S", "S"];
+  const maxW = Math.max(...p.weekBars, 1);
+  const [confirmReset, setConfirmReset] = React.useState(false);
+
+  const SettingRow = ({ label, sub, danger, onClick }) => (
+    <button onClick={onClick} className="hk-press"
+      style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
+        background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14.5, fontWeight: 700, color: danger ? t.wrong : t.ink, fontFamily: DISPLAY }}>{label}</div>
+        {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
+      </div>
+      <span style={{ color: t.faint, fontSize: 18, flexShrink: 0 }}>›</span>
+    </button>
+  );
+
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
+        <div style={{ flex: 1 }} />
+        <ThemeToggle />
+      </header>
+
+      {/* overall + level */}
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>YOUR PROGRESS</p>
+      <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+        <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <Ring size={88} stroke={9} pct={p.overallPct} color={t.primary} track={t.sunk}>
+            <div style={{ textAlign: "center", lineHeight: 1 }}>
+              <div style={{ fontSize: 23, fontWeight: 800, color: t.ink }}>{p.overallPct}<span style={{ fontSize: 12 }}>%</span></div>
+            </div>
+          </Ring>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{p.totalDone}/{p.totalUnits} units</div>
+            <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600 }}>syllabary mapped</div>
+          </div>
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "14px 15px", flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: t.sub }}>Level</span>
+              <span style={{ width: 30, height: 30, borderRadius: 9, background: t.goldSoft, color: t.gold, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{p.level}</span>
+            </div>
+            <div style={{ fontSize: 21, fontWeight: 800, color: t.ink, margin: "4px 0 8px" }}>{p.xp} XP</div>
+            <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden" }}>
+              <div style={{ width: `${xpPct}%`, height: "100%", borderRadius: 4, background: t.gold }} />
+            </div>
+            <p style={{ margin: "6px 0 0", fontSize: 10.5, color: t.faint }}>{p.xpToNext - p.xp} XP to Level {p.level + 1}</p>
+          </div>
+          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "12px 15px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: t.sub }}>Accuracy</span>
+            <span style={{ fontSize: 19, fontWeight: 800, color: t.done }}>{p.accuracy}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* weekly activity */}
+      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: t.ink, whiteSpace: "nowrap" }}>This week</span>
+          <span style={{ fontSize: 12, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 9, height: 78 }}>
+          {p.weekBars.map((v, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", justifyContent: "flex-end" }}>
+              <div style={{ width: "100%", height: `${(v / maxW) * 100}%`, minHeight: 6, borderRadius: 6,
+                background: i === p.todayIdx ? t.primary : t.primarySoft }} />
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: i === p.todayIdx ? t.primary : t.faint }}>{days[i]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* per-chapter */}
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>BY CHAPTER</p>
+      <div style={{ display: "grid", gap: 10, marginBottom: 72 }}>
+        {CHAPTERS.map((c, i) => {
+          const st = p.chapterState(i);
+          const cpct = Math.round((p.done[i] / c.units.length) * 100);
+          const accent = st === "done" ? t.done : st === "current" ? t.primary : t.faint;
+          return (
+            <div key={c.id} style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "13px 15px",
+              display: "flex", alignItems: "center", gap: 13 }}>
+              <span style={{ width: 38, height: 38, borderRadius: 11, background: st === "locked" ? t.sunk : st === "done" ? t.doneSoft : t.primarySoft,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: st === "locked" ? t.faint : accent }}>{c.units[0].jp}</span>
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: t.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: t.sub, flexShrink: 0, marginLeft: 8 }}>{p.done[i]}/{c.units.length}</span>
+                </div>
+                <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden" }}>
+                  <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: accent }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* settings */}
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>SETTINGS</p>
+      <div style={{ display: "grid", gap: 10 }}>
+        {/* Hard mode — unlocks once the whole track is complete */}
+        {p.trackComplete ? (
+          <button onClick={() => p.setHard(!p.hard)} className="hk-press"
+            style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
+              background: p.hard ? t.primarySoft : t.surface, border: `1.5px solid ${p.hard ? t.primary : t.line}`, textAlign: "left" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
+              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
+                {p.hard ? `Words & sentences · ${p.hardDoneTotal}/${p.bankedTotal} re-mastered` : "Replay words & sentences — English answers, no hints"}
+              </div>
+            </div>
+            <span style={{ width: 44, height: 26, borderRadius: 13, flexShrink: 0, position: "relative",
+              background: p.hard ? t.primary : t.line, transition: "background 160ms" }}>
+              <span style={{ position: "absolute", top: 3, left: p.hard ? 21 : 3, width: 20, height: 20, borderRadius: "50%",
+                background: "#fff", transition: "left 160ms", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }} />
+            </span>
+          </button>
+        ) : (
+          <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
+            background: t.surface, border: `1.5px solid ${t.line}`, opacity: 0.7 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
+              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>Finish the whole track to unlock</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.faint} strokeWidth="2.2" style={{ flexShrink: 0 }}><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+          </div>
+        )}
+        <SettingRow label="Edit your details" sub="Name, age, pets and more — personalises your sentences" onClick={onEditProfile} />
+        <SettingRow label="Reset progress" sub="Clears chapter progress · keeps your XP and level" danger onClick={() => setConfirmReset(true)} />
+      </div>
+
+      {confirmReset && (
+        <Modal onDismiss={() => setConfirmReset(false)}>
+          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px", boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset all progress?</div>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
+              Every chapter goes back to zero. Your {p.xp} XP and Level {p.level} stay.
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              <button onClick={() => setConfirmReset(false)} className="hk-press"
+                style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
+                  color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>Cancel</button>
+              <button onClick={() => { onReset(); setConfirmReset(false); }} className="hk-press"
+                style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
+                  color: t.wrong, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>Reset progress</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+export default function Profile({ onNav, onEditProfile, onReset }) {
+  return <Shell active="Profile" onNav={onNav}><ProfileBody onEditProfile={onEditProfile} onReset={onReset} /></Shell>;
+}
