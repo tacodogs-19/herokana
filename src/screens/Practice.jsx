@@ -3,7 +3,7 @@ import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS, NUMBER_GROUPS } from "../data";
 import { Shell, ThemeToggle } from "../components/chrome.jsx";
-import SentenceBasics from "./SentenceBasics.jsx";
+import { useJaVoice } from "../speech.js";
 
 const PModeIcon = ({ name, c }) => {
   if (name === "shuffle") return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /></svg>;
@@ -35,8 +35,9 @@ const DIFFICULTIES = [
   { id: "hard", label: "Hard", hint: "Type the answer" },
 ];
 const ROUND_SIZES = [5, 10, 15, 20];
+const MODE_COUNT = 10; // the one-tap practice modes use a fixed round size — no picker
 
-function PracticeBody({ onStart }) {
+function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   const { t } = useTheme();
   const progress = useProgress();
   const [picked, setPicked] = React.useState(() => loadSessionSet("hk-prac-chapters"));
@@ -53,10 +54,13 @@ function PracticeBody({ onStart }) {
     return "romaji";
   });
   const [numGroups, setNumGroups] = React.useState(() => loadSessionSet("hk-prac-numbers"));
-  const [showBasics, setShowBasics] = React.useState(false);
   const [tab, setTab] = React.useState(() => {
     try { const v = localStorage.getItem("hk-prac-tab"); if (v === "alpha" || v === "words" || v === "numbers") return v; } catch (e) {}
     return "words";
+  });
+  const [modeCategory, setModeCategory] = React.useState(() => {
+    try { const v = localStorage.getItem("hk-prac-mode-cat"); if (v === "alpha" || v === "words" || v === "numbers") return v; } catch (e) {}
+    return "alpha";
   });
   React.useEffect(() => { try { sessionStorage.setItem("hk-prac-chapters", JSON.stringify([...picked])); } catch (e) {} }, [picked]);
   React.useEffect(() => {
@@ -67,6 +71,7 @@ function PracticeBody({ onStart }) {
   React.useEffect(() => { try { localStorage.setItem("hk-prac-dir", dir); } catch (e) {} }, [dir]);
   React.useEffect(() => { try { localStorage.setItem("hk-prac-tab", tab); } catch (e) {} }, [tab]);
   React.useEffect(() => { try { sessionStorage.setItem("hk-prac-numbers", JSON.stringify([...numGroups])); } catch (e) {} }, [numGroups]);
+  React.useEffect(() => { try { localStorage.setItem("hk-prac-mode-cat", modeCategory); } catch (e) {} }, [modeCategory]);
 
   const toggleNum = (id) => setNumGroups((p) => {
     const n = new Set(p);
@@ -91,12 +96,15 @@ function PracticeBody({ onStart }) {
   const effective = [...picked].filter((i) => inTab(i) && (!BANKS[CHAPTERS[i].id] || themes[CHAPTERS[i].id].size > 0));
   const needThemes = [...picked].some((i) => inTab(i) && BANKS[CHAPTERS[i].id] && themes[CHAPTERS[i].id].size === 0);
 
+  const hasVoice = useJaVoice();
   const weakCount = Object.keys(progress.wrong).length;
+
   const modes = [
     { id: "review", icon: "shuffle", title: "Quick review", sub: "Mix what you know", color: t.primary, soft: t.primarySoft },
-    { id: "weak", icon: "target", title: "Weak spots", sub: weakCount ? `${weakCount} tricky kana` : "Replay your misses", color: t.wrong, soft: t.wrongSoft },
+    { id: "weak", icon: "target", title: "Weak spots", sub: weakCount ? `${weakCount} tricky ${weakCount === 1 ? "item" : "items"}` : "Replay your misses", color: t.wrong, soft: t.wrongSoft },
     { id: "speed", icon: "speed", title: "Speed round", sub: "Beat the clock", color: t.gold, soft: t.goldSoft },
-    { id: "listen", icon: "listen", title: "Listening", sub: "Hear & choose", color: t.done, soft: t.doneSoft },
+    // Listening needs the OS Japanese voice — disable it on devices without one
+    { id: "listen", icon: "listen", title: "Listening", sub: hasVoice ? "Hear & choose" : "Needs a Japanese voice", color: t.done, soft: t.doneSoft, off: !hasVoice },
   ];
 
   const numReady = tab === "numbers" && numGroups.size > 0;
@@ -159,19 +167,82 @@ function PracticeBody({ onStart }) {
   );
 
   return (
-    <>
     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
-      <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+        <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Practice</h1>
         <div style={{ flex: 1 }} />
         <ThemeToggle />
       </header>
 
-      {/* Build a custom set */}
-      <p style={{ margin: "0 0 6px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>BUILD A CUSTOM SET</p>
-      <p style={{ margin: "0 0 12px", fontSize: 12.5, color: t.faint }}>
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>REFERENCE</p>
+      {/* Reference sheets — passive look-up, not drills */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+        <button onClick={onOpenChart} className="hk-press"
+          style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
+            borderRadius: 18, cursor: "pointer", background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
+            alignItems: "center", justifyContent: "center" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M9 3v18M3 9h18M3 15h18M15 3v18" /></svg>
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Kana chart</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>Look up any kana &amp; hear it</div>
+          </div>
+          <span style={{ color: t.faint, fontSize: 17, flexShrink: 0 }}>›</span>
+        </button>
+        <button onClick={onOpenVerbChart} className="hk-press"
+          style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
+            borderRadius: 18, cursor: "pointer", background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
+            alignItems: "center", justifyContent: "center" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h10M4 18h13" /></svg>
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Verb list</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>Common verbs &amp; conjugation forms</div>
+          </div>
+          <span style={{ color: t.faint, fontSize: 17, flexShrink: 0 }}>›</span>
+        </button>
+      </div>
+
+      {/* Practice modes — the one-tap path, front and centre */}
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE MODES</p>
+      <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
+        {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "numbers", label: "Numbers" }].map((tb) => {
+          const on = modeCategory === tb.id;
+          return (
+            <button key={tb.id} onClick={() => setModeCategory(tb.id)} className="hk-press"
+              style={{ flex: 1, padding: "9px 4px", borderRadius: 9, border: "none", cursor: "pointer",
+                background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
+                boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                fontSize: 13, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
+              {tb.label}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: "grid", gap: 11, gridTemplateColumns: "1fr 1fr", marginBottom: 0 }}>
+        {modes.map((m) => (
+          <button key={m.id} onClick={() => !m.off && onStart({ kind: "mode", mode: m.id, count: MODE_COUNT, category: modeCategory })} disabled={m.off} className="hk-press"
+            style={{ textAlign: "left", background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 18, padding: "14px 14px 15px",
+              cursor: m.off ? "default" : "pointer", opacity: m.off ? 0.55 : 1 }}>
+            <span style={{ display: "flex", width: 40, height: 40, borderRadius: 12, background: m.soft, alignItems: "center", justifyContent: "center", marginBottom: 11 }}>
+              <PModeIcon name={m.icon} c={m.color} />
+            </span>
+            <div style={{ fontSize: 15, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>{m.title}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, marginTop: 2, fontFamily: DISPLAY }}>{m.sub}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Build a custom set — the deliberate path for drilling exact
+          chapters/themes at a chosen difficulty. */}
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>BUILD A CUSTOM SET</p>
+      <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.faint }}>
         {tab === "numbers" ? "Pick the number ranges to practise." : "Pick the chapters to draw questions from."}
       </p>
+      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "16px 16px 18px" }}>
       <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = tab === tb.id;
@@ -272,6 +343,24 @@ function PracticeBody({ onStart }) {
               {banked && on && (
                 <div className="hk-reveal" style={{ padding: "10px 4px 2px 8px" }}>
                   <p style={{ margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>THEMES</p>
+                  {c.id === "sentence" && (
+                    <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                      {[
+                        { label: "Sentence basics", onClick: onOpenBasics,
+                          icon: <><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></> },
+                        { label: "Grammar drill", onClick: () => onStart({ kind: "foundations", count }),
+                          icon: <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /> },
+                      ].map((b) => (
+                        <button key={b.label} onClick={b.onClick} className="hk-press"
+                          style={{ flex: 1, minWidth: 0, padding: "10px 8px", borderRadius: 12, cursor: "pointer",
+                            background: t.line, border: "none", color: t.sub, fontFamily: DISPLAY, fontSize: 12, fontWeight: 700,
+                            display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{b.icon}</svg>
+                          {b.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                     {(() => {
                       const allOn = sel.size === c.units.length;
@@ -299,31 +388,6 @@ function PracticeBody({ onStart }) {
                     })}
                   </div>
 
-                  {/* sentences-only: getting-started helpers */}
-                  {c.id === "sentence" && (
-                    <>
-                      <p style={{ margin: "16px 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>GETTING STARTED</p>
-                      <button onClick={() => onStart({ kind: "foundations", count })} className="hk-press"
-                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, textAlign: "left", marginBottom: 9,
-                          background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 14, padding: "12px 14px", cursor: "pointer" }}>
-                        <span style={{ display: "flex", width: 34, height: 34, borderRadius: 10, background: t.primarySoft, alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5.5A2 2 0 0 1 6 4h5v15H6a2 2 0 0 0-2 1z" /><path d="M20 5.5A2 2 0 0 0 18 4h-5v15h5a2 2 0 0 1 2 1z" /></svg>
-                        </span>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Sentence foundations</div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 1, fontFamily: DISPLAY }}>Particles, word order & endings</div>
-                        </div>
-                        <span style={{ color: t.faint, fontSize: 17, flexShrink: 0 }}>›</span>
-                      </button>
-                      <button onClick={() => setShowBasics(true)} className="hk-press"
-                        style={{ width: "100%", padding: "11px", borderRadius: 13, cursor: "pointer",
-                          background: t.primarySoft, border: "none", color: t.primary, fontFamily: DISPLAY, fontSize: 13, fontWeight: 800,
-                          display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>
-                        See the sentence basics overview
-                      </button>
-                    </>
-                  )}
                 </div>
               )}
             </div>
@@ -331,7 +395,7 @@ function PracticeBody({ onStart }) {
         })}
       </div>
 
-      {/* Round length — applies to custom sets and modes */}
+      {/* Round length — applies to the custom set */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, whiteSpace: "nowrap" }}>Questions per round</span>
         <div style={{ flex: 1, display: "flex", background: t.sunk, borderRadius: 12, padding: 3 }}>
@@ -356,27 +420,11 @@ function PracticeBody({ onStart }) {
           boxShadow: canStart ? t.glow(t.primary) : "none" }}>
         {startLabel}
       </button>
-
-      {/* Modes */}
-      <p style={{ margin: "72px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE MODES</p>
-      <div style={{ display: "grid", gap: 11, gridTemplateColumns: "1fr 1fr" }}>
-        {modes.map((m) => (
-          <button key={m.id} onClick={() => onStart({ kind: "mode", mode: m.id, count })} className="hk-press"
-            style={{ textAlign: "left", background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 18, padding: "14px 14px 15px", cursor: "pointer" }}>
-            <span style={{ display: "flex", width: 40, height: 40, borderRadius: 12, background: m.soft, alignItems: "center", justifyContent: "center", marginBottom: 11 }}>
-              <PModeIcon name={m.icon} c={m.color} />
-            </span>
-            <div style={{ fontSize: 15, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>{m.title}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, marginTop: 2, fontFamily: DISPLAY }}>{m.sub}</div>
-          </button>
-        ))}
-      </div>
+      </div>{/* end custom set card */}
     </div>
-    {showBasics && <SentenceBasics onClose={() => setShowBasics(false)} />}
-    </>
   );
 }
 
-export default function Practice({ onNav, onStart }) {
-  return <Shell active="Practice" onNav={onNav}><PracticeBody onStart={onStart} /></Shell>;
+export default function Practice({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
+  return <Shell active="Practice" onNav={onNav}><PracticeBody onStart={onStart} onOpenChart={onOpenChart} onOpenVerbChart={onOpenVerbChart} onOpenBasics={onOpenBasics} /></Shell>;
 }

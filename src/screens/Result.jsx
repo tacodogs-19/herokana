@@ -4,7 +4,7 @@ import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { Shell, Cat } from "../components/chrome.jsx";
 
-function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, onFinish }) {
+function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, onFinish, onReadingGrad }) {
   const { t } = useTheme();
   const progress = useProgress();
   const acc = Math.round((correct / total) * 100);
@@ -17,9 +17,10 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   // store is already updated by the time this renders; hard lessons track hardDone
   const newDone = isUnit ? (session.hard ? progress.hardDone : progress.done)[session.chapterIdx] : 0;
   const cpct = isUnit ? Math.round((newDone / chapter.units.length) * 100) : 0;
+  const isGraduation = isUnit && passed && session.chapterIdx === CHAPTERS.length - 1 && newDone >= chapter.units.length;
 
-  const Tile = ({ label, value, color }) => (
-    <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "13px 10px", textAlign: "center" }}>
+  const Tile = ({ label, value, color, i }) => (
+    <div className="hk-tile-enter" style={{ '--i': i, flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "13px 10px", textAlign: "center" }}>
       <div style={{ fontSize: 22, fontWeight: 800, color: color || t.ink, lineHeight: 1 }}>{value}</div>
       <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 4 }}>{label}</div>
     </div>
@@ -28,23 +29,25 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   return (
     <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", textAlign: "center", overflowY: "auto" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-        <Cat mood={passed ? "celebrate" : "sad"} size={150} style={{ marginBottom: 2 }} />
+        <Cat mood={passed ? "celebrate" : "sad"} size={150} style={{ marginBottom: 2 }} className="hk-scale-in" />
         <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 800, color: passed ? t.done : t.primary }}>
-          {passed ? (isUnit ? "UNIT COMPLETE" : "PRACTICE COMPLETE") : "KEEP PRACTISING"}
+          {passed ? (isGraduation ? "COURSE COMPLETE" : isUnit ? "UNIT COMPLETE" : "PRACTICE COMPLETE") : "KEEP PRACTISING"}
         </p>
         <h1 style={{ margin: "2px 0 0", fontSize: 27, fontWeight: 800, color: t.ink, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
-          {passed ? "You nailed it!" : "Almost there!"}
+          {isGraduation ? "You can read Japanese." : (passed ? "You nailed it!" : "Almost there!")}
         </h1>
         <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>
           {isUnit
-            ? <><span style={{ fontFamily: JP, fontWeight: 700 }}>{unit.jp}</span> &nbsp;{chapter.name} · {unit.label}</>
+            ? (isGraduation
+                ? "All 7 chapters done. Time to use it."
+                : <><span style={{ fontFamily: JP, fontWeight: 700 }}>{unit.jp}</span> &nbsp;{chapter.name} · {unit.label}</>)
             : `Practice session · ${total} questions`}
         </p>
 
         <div style={{ display: "flex", gap: 10, width: "100%", marginTop: 18 }}>
-          <Tile label="XP earned" value={`+${xp}`} color={t.gold} />
-          <Tile label="Accuracy" value={`${acc}%`} color={passed ? t.done : t.wrong} />
-          <Tile label="Correct" value={`${correct}/${total}`} />
+          <Tile label="XP earned" value={`+${xp}`} color={t.gold} i={0} />
+          <Tile label="Accuracy" value={`${acc}%`} color={passed ? t.done : t.wrong} i={1} />
+          <Tile label="Correct" value={`${correct}/${total}`} i={2} />
         </div>
 
         {isUnit && (
@@ -62,19 +65,33 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
 
       <div style={{ display: "grid", gap: 10, flexShrink: 0, marginTop: 16 }}>
         {isUnit ? (
-          <>
-            {!passed && (
-              <button onClick={onReview} className="hk-press" style={{ width: "100%", padding: "15px", borderRadius: 16,
-                border: `1.5px solid ${t.line}`, background: t.surface, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
-                Try again
+          isGraduation ? (
+            <>
+              <button onClick={onReadingGrad} className="hk-press" style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none",
+                background: t.done, color: "#fff", fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, cursor: "pointer",
+                boxShadow: t.glow(t.done) }}>
+                Explore Scenes →
               </button>
-            )}
-            <button onClick={onDone} className="hk-press" style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none",
-              background: t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, cursor: "pointer",
-              boxShadow: t.glow(t.primary) }}>
-              {passed ? "Continue →" : "Back to home"}
-            </button>
-          </>
+              <button onClick={onDone} className="hk-press" style={{ width: "100%", padding: "15px", borderRadius: 16,
+                border: "none", background: t.sunk, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
+                Back to home
+              </button>
+            </>
+          ) : (
+            <>
+              {!passed && (
+                <button onClick={onReview} className="hk-press" style={{ width: "100%", padding: "15px", borderRadius: 16,
+                  border: "none", background: t.sunk, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
+                  Try again
+                </button>
+              )}
+              <button onClick={onDone} className="hk-press" style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none",
+                background: passed ? t.done : t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, cursor: "pointer",
+                boxShadow: passed ? t.glow(t.done) : t.glow(t.primary) }}>
+                {passed ? "Continue →" : "Back to home"}
+              </button>
+            </>
+          )
         ) : (
           <>
             {/* practice rounds: another round with the same settings, or finish */}
@@ -84,7 +101,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
               Keep going →
             </button>
             <button onClick={onFinish} className="hk-press" style={{ width: "100%", padding: "15px", borderRadius: 16,
-              border: `1.5px solid ${t.line}`, background: t.surface, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
+              border: "none", background: t.sunk, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
               Finish
             </button>
           </>
@@ -97,3 +114,4 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
 export default function Result(props) {
   return <Shell nav={false}><ResultBody {...props} /></Shell>;
 }
+

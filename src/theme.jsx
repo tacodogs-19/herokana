@@ -2,7 +2,7 @@ import React from "react";
 
 // Palettes lifted verbatim from the design handoff (core.jsx).
 export const LIGHT = {
-  bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#EEF1F7", raise: "#FFFFFF",
+  bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#E8EBF4", raise: "#FFFFFF",
   ink: "#1E2540", sub: "#71789A", faint: "#AAB0C6",
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
   primarySoft: "#E9EEFC", done: "#27A567", doneSoft: "#E4F5EC",
@@ -19,6 +19,7 @@ export const DARK = {
 };
 
 export const DISPLAY = "'Outfit', system-ui, sans-serif";
+const glow = (c) => `0 3px 8px -3px ${c}73`;
 export const JP = "'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', serif";
 
 const ThemeCtx = React.createContext({ t: LIGHT, mode: "light", setMode: () => {} });
@@ -34,8 +35,30 @@ function initialMode() {
     : "light";
 }
 
+// Full-screen cover shown during theme transitions so Chrome never sees the
+// WebView surface while the status bar is repainting — same principle as Splash.
+function ThemeCover({ bg }) {
+  const [visible, setVisible] = React.useState(true);
+  React.useEffect(() => {
+    const id = setTimeout(() => setVisible(false), 80);
+    return () => clearTimeout(id);
+  }, []);
+  if (!visible) return null;
+  return (
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh",
+      zIndex: 9999, background: bg, pointerEvents: "none" }} />
+  );
+}
+
 export function ThemeProvider({ children }) {
   const [mode, setMode] = React.useState(initialMode);
+  const [cover, setCover] = React.useState(null); // bg color to flash on switch
+  const switchMode = React.useCallback((next) => {
+    const bg = next === "dark" ? DARK.bg : LIGHT.bg;
+    setCover(bg);
+    setMode(next);
+  }, []);
+
   React.useEffect(() => {
     try { localStorage.setItem("hk-theme", mode); } catch (e) {}
     const bg = mode === "dark" ? DARK.bg : LIGHT.bg;
@@ -43,21 +66,20 @@ export function ThemeProvider({ children }) {
     const r = document.documentElement;
     r.style.setProperty("--hk-bg", bg);
     r.style.setProperty("--hk-ink", ink);
-    r.style.background = bg;        // html element — covers the status-bar inset
-    r.style.colorScheme = mode;
+    r.style.background = bg;
     document.body.style.background = bg;
-    // Replace the theme-color meta node (not just mutate it) so Chrome re-reads
-    // it and recolors the Android standalone status bar on a live theme toggle,
-    // instead of leaving the old colour until the next launch.
-    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
-    const meta = document.createElement("meta");
-    meta.setAttribute("name", "theme-color");
+    r.style.colorScheme = mode;
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "theme-color"); document.head.appendChild(meta); }
     meta.setAttribute("content", bg);
-    document.head.appendChild(meta);
   }, [mode]);
-  const t = mode === "dark" ? { ...DARK } : { ...LIGHT };
-  // Soft button shadow — the design's default after "reduce the glow" feedback.
-  t.glow = (c) => `0 3px 8px -3px ${c}73`;
-  const value = React.useMemo(() => ({ t, mode, setMode }), [mode]);
-  return <ThemeCtx.Provider value={value}>{children}</ThemeCtx.Provider>;
+
+  const t = mode === "dark" ? { ...DARK, glow } : { ...LIGHT, glow };
+  const value = React.useMemo(() => ({ t, mode, setMode: switchMode }), [mode, switchMode]);
+  return (
+    <ThemeCtx.Provider value={value}>
+      {children}
+      {cover && <ThemeCover key={cover + mode} bg={cover} />}
+    </ThemeCtx.Provider>
+  );
 }

@@ -29,6 +29,27 @@ There are **two kinds**, distinguished by whether the chapter `id` is a key in `
 > tolerates length changes on load (new chapters start at 0, removed ones are trimmed) but cannot
 > detect reordering. Append rather than reorder when possible.
 
+## Reading packs (Read the Real World)
+
+Separate from `CHAPTERS`/`BANKS`: [`reading.js`](../src/reading.js) holds `READING_PACKS`, the packs
+shown in the Scenes tab. Each pack: `{ id, place, label, jp, blurb, words: [{ jp, romaji, en, where }] }`
+(`where` is the "you'd see this where" hint). The **whole tab** unlocks once the `READING_UNLOCK`
+chapter (`"phrase"` — Words & phrases) is complete (`readingUnlocked`, reusing positional
+`progress.done`); packs don't gate individually. `buildReadingSession(pack)` builds a round of
+`SESSION` (8) words (distractors are other meanings from the same pack). Content is real and curated;
+Konbini carries 14 words so its rounds vary, the others sit at 8. Swap word lists in without code changes.
+
+### Dialogues (Conversations)
+
+[`dialogue.js`](../src/dialogue.js) holds `DIALOGUES`, audio comprehension exchanges keyed to a pack via
+`packId`. Each: `{ id, packId, title, lines: [{ who: "staff"|"you", jp, romaji, en, check? }] }`. A line
+with `check: { ask?, distractors[] }` becomes a "What are they asking?" 4-choice beat (answer is the
+line's `en`); other lines are guided context. `prepareDialogue(d)` precomputes shuffled options;
+`dialoguesForPack(id)` / `checkCount(d)` are the lookups. Difficulty is the `SUPPORT` ladder
+(guided/listen/ear) applied by [`Dialogue.jsx`](../src/screens/Dialogue.jsx), not separate content.
+Spoken via Web Speech TTS. Real content — one dialogue per pack (eight), each with two `variants` for
+replay variety (`prepareDialogue` picks one at random).
+
 ## Profile & personalised sentences
 
 Onboarding ([`Onboarding.jsx`](../src/screens/Onboarding.jsx)) collects a profile saved under
@@ -99,7 +120,12 @@ the same bank's flattened pool so phrase questions get phrase-like wrong answers
   hard: boolean,       // hard mode on/off
   xp, answered, correctAns,
   week: { [iso-date]: lessonsCompleted },
-  wrong: { "prompt|answer": missCount } }
+  wrong: { "prompt|answer": missCount },
+  reading: { [packId]: {           // reading-fluency times (v1.6.0, additive)
+    words: { [jp]: { best, last, reads } },  // ms per word
+    plays: number, bestAvgMs: number } },
+  dialogues: { [dialogueId]: {     // audio dialogue results (v1.7.0, additive)
+    plays: number, bestPct: number, clearedLevel: number } } }  // clearedLevel = SUPPORT idx, -1 = none
 ```
 
 - **Pass threshold:** a unit counts as complete at **≥80% correct** (`Math.ceil(total*0.8)`).
@@ -108,7 +134,11 @@ the same bank's flattened pool so phrase questions get phrase-like wrong answers
 - **Hard mode** applies only to banked chapters (kana are auto-complete in the hard view) and advances
   the separate `hardDone` track. It unlocks once `trackComplete` (every unit done). Hard sessions =
   medium difficulty + English answers, for extra XP.
-- **Reset** (`resetProgress`) zeroes learning progress but **keeps XP and level** by design.
+- **Reset** (`resetProgress`) zeroes learning progress but **keeps XP and level** by design. (It also
+  clears `reading`, since `seed()` includes it — re-locked packs would reset anyway.)
+- **Reading writer:** `recordReading(packId, plays)` (plays = `[{ jp, ms, correct }]`) is the only path
+  that touches `reading`; it never touches the kana progress arrays. `reading.js` derives unlock state
+  (`packUnlocked`) and slow words (`slowWords`) from this.
 - The derived value from `useProgress()` also computes `currentChapterIdx`, per-chapter
   `chapterState(i)` (`done`/`current`/`locked`), `overallPct`, `accuracy`, `weekBars`, etc.
 

@@ -2,25 +2,87 @@
 html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 button, input { font-family: inherit; }
 
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);          /* strong ease-out for UI enters/press */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);        /* iOS-like sheet curve */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);       /* confident, decisive — nav + entrances */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);      /* smooth — state changes, overlays */
+}
+
 .hk-scroll-x { overflow-x: auto; scrollbar-width: none; }
 .hk-scroll-x::-webkit-scrollbar { display: none; }
 
-.hk-press { transition: transform 120ms ease, filter 120ms ease; }
+.hk-press { transition: transform 120ms var(--ease-out); }
 .hk-press:active { transform: scale(0.97); }
 
 @keyframes hkFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes hkBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 
-.hk-reveal { animation: hkReveal 240ms ease both; }
-@keyframes hkReveal { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+.hk-reveal { animation: hkReveal 240ms var(--ease-out-expo) both; }
+@keyframes hkReveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
 .hk-grow { width: 0; animation: hkGrow 750ms cubic-bezier(.3,.8,.3,1) forwards; }
 @keyframes hkGrow { to { width: var(--to); } }
 
-.hk-pop { animation: hkPop 340ms cubic-bezier(.2,1.5,.4,1) both; }
-@keyframes hkPop { from { transform: translate(38%,-38%) scale(0); } to { transform: translate(38%,-38%) scale(1); } }
+/* feedback badge: grows from a visible shape, never from scale(0) */
+.hk-pop { animation: hkPop 360ms var(--ease-out-expo) both; }
+@keyframes hkPop {
+  from { opacity: 0; transform: translate(38%,-38%) scale(0.4); }
+  to   { opacity: 1; transform: translate(38%,-38%) scale(1); }
+}
+
+/* modal card scales from its center; bottom sheet rises from the edge it lives on */
+@keyframes hkPopIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes hkSheetIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: none; } }
+@keyframes hkEnter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* wrong-answer shake on the prompt card */
+.hk-shake { animation: hkShake 400ms var(--ease-out) both; }
+@keyframes hkShake {
+  0%   { transform: translateX(0); }
+  18%  { transform: translateX(-7px); }
+  36%  { transform: translateX(6px); }
+  54%  { transform: translateX(-4px); }
+  72%  { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+/* answer option entrance — staggered via --i custom property */
+.hk-opt-enter {
+  animation: hkOptIn 300ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+@keyframes hkOptIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* correct answer pulse swell */
+.hk-correct { animation: hkCorrect 320ms var(--ease-out-quart) both; }
+@keyframes hkCorrect {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* result screen: cat scale entrance */
+.hk-scale-in { animation: hkScaleIn 480ms var(--ease-out-expo) both; }
+@keyframes hkScaleIn {
+  from { opacity: 0; transform: scale(0.78); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* result screen: tile stagger — same --i pattern as options */
+.hk-tile-enter {
+  animation: hkTileIn 340ms var(--ease-out-expo) both;
+  animation-delay: calc(80ms + var(--i, 0) * 70ms);
+}
+@keyframes hkTileIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .hk-grow { width: var(--to); }
 }

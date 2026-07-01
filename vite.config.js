@@ -11,16 +11,29 @@ export default defineConfig({
       // A new build installs in the background and WAITS — it only activates
       // after the user accepts the "new version available" prompt. Without
       // skipWaiting the update is never applied silently.
-      workbox: { skipWaiting: false, clientsClaim: false },
+      workbox: {
+        skipWaiting: false,
+        clientsClaim: false,
+        // Don't intercept /.well-known/ — Android's asset link verifier fetches
+        // assetlinks.json as a plain HTTP request (not via the SW), but excluding
+        // it here also lets the file load correctly in a browser for verification.
+        navigateFallbackDenylist: [/^\/.well-known\//, /^\/privacy/],
+      },
       manifest: {
+        id: "/",
         name: "HeroKana",
         short_name: "HeroKana",
         description: "Learn Japanese kana, one focused unit at a time",
         start_url: "/",
         display: "standalone",
-        background_color: "#0b1121",
-        // matches the app background so Chrome doesn't draw a divider
-        // line under the status bar in the installed app
+        orientation: "portrait",
+        dir: "ltr",
+        lang: "en",
+        categories: ["education"],
+        prefer_related_applications: false,
+        background_color: "#0e4fb0",
+        // Light default; the runtime swaps the live theme-color meta per theme so
+        // the standalone status bar matches the app in both light and dark.
         theme_color: "#F3F5FA",
         icons: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
@@ -33,4 +46,5 @@ export default defineConfig({
   // The preview launcher starts the dev server via an 8.3 short path
   // (C:\Users\NEBULA~1), which Vite's strict fs allowlist rejects.
   server: { fs: { strict: false } },
+  test: { environment: "node" },
 });

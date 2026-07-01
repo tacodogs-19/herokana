@@ -21,8 +21,6 @@
           r.style.setProperty("--hk-ink", ink);
           r.style.background = bg;
           r.style.colorScheme = m;
-          var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute("content", bg);
         } catch (e) {}
       })();
     </script>
@@ -44,16 +42,16 @@
       #hk-splash {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; gap: 14px;
-        background: #f7f7f7;
+        background: #0e4fb0;
       }
       #hk-splash video { width: 200px; height: 200px; object-fit: contain; }
       #hk-splash .hk-wordmark {
         font-family: "Outfit", system-ui, sans-serif; font-size: 21px;
-        font-weight: 800; letter-spacing: -0.02em; color: #1e2540;
+        font-weight: 800; letter-spacing: -0.02em; color: #fff;
       }
       #hk-splash .hk-loading {
         font-family: "Outfit", system-ui, sans-serif; font-size: 13px;
-        font-weight: 600; letter-spacing: 0.04em; color: #71789a;
+        font-weight: 600; letter-spacing: 0.04em; color: rgba(255,255,255,0.6);
       }
     </style>
     <div id="root">

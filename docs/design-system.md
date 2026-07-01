@@ -129,6 +129,10 @@ Defined in [`src/styles.css`](../src/styles.css). All of it respects
   weight 800, `t.glow(accent)`, `.hk-press`. Disabled → `sunk` bg + `faint` text, no shadow.
 - **Secondary button** — `surface` bg, `1.5px line` border, `ink` text. Destructive variant uses
   `wrong` text on the same surface.
+- **Soft entry pill** — `primarySoft` bg, no border, `primary` text, radius 13, weight 800, icon + label.
+  The quiet tier below a primary CTA (e.g. the Sentences card's "Read the basics" / "Practice particles").
+  **One filled CTA per card** — keep these visibly lighter, and when there are two, pair them on one
+  `flex` row (`gap 8`, `flex:1`) rather than stacking full-width bars, so neither competes with the CTA.
 - **Segmented control** — `sunk` track, radius 12, 3px padding; the active segment is a `surface`
   pill with a tiny `rgba(0,0,0,0.12)` shadow. Used for difficulty, answer-language, round size, tabs.
 - **Selectable chip / list row** — `surface`→`primarySoft` bg and `line`→`primary` border on select,
@@ -141,23 +145,17 @@ Defined in [`src/styles.css`](../src/styles.css). All of it respects
 
 ## Mascot rules
 
-The cat sticker set lives in `public/assets/cat-*.svg` plus `cat-loading.mp4`. The product owner's
-rule (and the comment in `chrome.jsx`) is: **the cat appears only on the app icon and the result
-screen.** Moods are addressed via `<Cat mood="…">` → `general`/`celebrate`/`sad`/`load`/`run`/
-`smash`/`point`/`crossed`.
+The cat sticker set lives in `public/assets/cat-*.svg` plus `cat-loading.mp4`. The rule is:
+**the cat appears only on the app icon, the splash, onboarding, and the result screen.** Don't
+extend it to mid-flow UI (lesson cards, home screen, settings, etc.). Moods addressed via
+`<Cat mood="…">` → `general`/`celebrate`/`sad`/`load`/`run`/`smash`/`point`/`crossed`.
 
 ## Divergences from intended design (flagged)
 
 These are places where the shipped code does not match the stated design intent. Decide
 deliberately before "fixing" — they may be intentional drift.
 
-1. **Cat appears beyond icon + results.** Despite the "icon and results only" rule, the cat is also
-   used in [`Onboarding.jsx`](../src/screens/Onboarding.jsx) (a different mood per wizard step) and as
-   the `cat-loading.mp4` video on the splash ([`Splash.jsx`](../src/Splash.jsx) and the static splash
-   in [`index.html`](../index.html)). The `chrome.jsx` comment still asserts results-only. Either the
-   rule has informally expanded to "onboarding + splash + results" or these are violations — confirm
-   with the owner and update the rule or the screens.
-2. **`manifest.theme_color` is hardcoded to the light `bg` (`#F3F5FA`).** The runtime overrides the
+1. **`manifest.theme_color` is hardcoded to the light `bg` (`#F3F5FA`).** The runtime overrides the
    live `theme-color` meta per theme, so an installed dark-mode user still gets a correct status bar
    after launch, but the manifest value itself doesn't reflect dark mode. Cosmetic; noted for accuracy.
 3. **`hkBreathe` keyframe is defined but unused** in `styles.css` — dead token, harmless.

@@ -57,7 +57,7 @@ src/
   styles.css            Global resets + animation keyframes
   Splash.jsx, UpdatePrompt.jsx, WhatsNew.jsx
   components/chrome.jsx Shared UI: Shell, BottomNav, Modal, Ring, Cat, ThemeToggle
-  screens/              Home, Lesson, Result, Practice, Profile, Onboarding, SentenceBasics
+  screens/              Home, Lesson, Result, Practice, Profile, Onboarding, Basics (kana/sentence)
 ```
 
 ## Architecture in one pass
@@ -100,9 +100,8 @@ See [docs/content-model.md](docs/content-model.md) for the full data model and
 
 - **Never add streaks, daily goals, or loss-aversion mechanics.** Calm, low-pressure learning is a
   product principle ([decisions.md](docs/decisions.md)).
-- **Keep the cat mascot to the app icon and results screen** (the intended rule; note the existing
-  onboarding/splash usage flagged in [design-system.md](docs/design-system.md) — don't extend it further
-  without an owner decision).
+- **Keep the cat mascot to the app icon, splash, onboarding, and results screen.** Don't extend it
+  to mid-flow UI (lesson cards, home, settings). See [design-system.md](docs/design-system.md).
 - **Never reorder `CHAPTERS` or units.** Progress is stored as positional index arrays; reordering
   silently corrupts existing learners' data. Append instead.
 - **Don't set the service worker to `skipWaiting`/auto-update.** Updates are prompt-gated so the app is

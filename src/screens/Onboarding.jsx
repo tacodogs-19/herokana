@@ -150,7 +150,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
 
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
-          <Cat key={cur.cat} mood={cur.cat} size={132} style={{ animation: "hkReveal 280ms ease both" }} />
+          <Cat key={cur.cat} mood={cur.cat} size={132} style={{ animation: "hkReveal 280ms var(--ease-out) both" }} />
         </div>
         <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>
           ABOUT YOU · {step + 1} OF {steps.length}

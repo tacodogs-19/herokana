@@ -15,7 +15,7 @@ export default function Splash() {
 
   if (!show) return null;
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "#f7f7f7",
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 3000, background: "#f7f7f7",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14,
       opacity: fading ? 0 : 1, transition: "opacity 380ms ease", pointerEvents: fading ? "none" : "auto" }}>
       <video src="/assets/cat-loading.mp4" autoPlay loop muted playsInline

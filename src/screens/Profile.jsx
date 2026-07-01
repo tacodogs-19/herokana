@@ -1,8 +1,8 @@
 import React from "react";
-import { useTheme, JP, DISPLAY } from "../theme.jsx";
+import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { CHAPTERS } from "../data";
 import { Shell, Ring, ThemeToggle, Modal } from "../components/chrome.jsx";
+import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t } = useTheme();
@@ -11,6 +11,16 @@ function ProfileBody({ onEditProfile, onReset }) {
   const days = ["M", "T", "W", "T", "F", "S", "S"];
   const maxW = Math.max(...p.weekBars, 1);
   const [confirmReset, setConfirmReset] = React.useState(false);
+  const [restore, setRestore] = React.useState(null); // { ok, parsed, exportedAt, version } | { ok:false, error }
+  const fileRef = React.useRef(null);
+
+  const onPickFile = (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ""; // allow re-picking the same file
+    if (!file) return;
+    file.text().then((text) => setRestore(inspectBackup(text)))
+      .catch(() => setRestore({ ok: false, error: "Couldn't read that file." }));
+  };
 
   const SettingRow = ({ label, sub, danger, onClick }) => (
     <button onClick={onClick} className="hk-press"
@@ -26,7 +36,8 @@ function ProfileBody({ onEditProfile, onReset }) {
 
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
-      <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+        <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
         <div style={{ flex: 1 }} />
         <ThemeToggle />
@@ -36,14 +47,29 @@ function ProfileBody({ onEditProfile, onReset }) {
       <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>YOUR PROGRESS</p>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
         <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-          <Ring size={88} stroke={9} pct={p.overallPct} color={t.primary} track={t.sunk}>
-            <div style={{ textAlign: "center", lineHeight: 1 }}>
-              <div style={{ fontSize: 23, fontWeight: 800, color: t.ink }}>{p.overallPct}<span style={{ fontSize: 12 }}>%</span></div>
-            </div>
-          </Ring>
+          {(() => {
+            const hardPct = p.bankedTotal > 0 ? Math.round((p.hardDoneTotal / p.bankedTotal) * 100) : 0;
+            return (
+              <Ring size={88} stroke={9} pct={p.overallPct} color={p.hard ? t.sunk : t.primary} track={t.sunk}
+                pct2={p.hard ? hardPct : undefined} color2={t.gold}>
+                <div style={{ textAlign: "center", lineHeight: 1 }}>
+                  {p.hard ? (
+                    <>
+                      <div style={{ fontSize: 23, fontWeight: 800, color: t.gold }}>{hardPct}<span style={{ fontSize: 12 }}>%</span></div>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: t.gold, letterSpacing: "0.06em", marginTop: 2 }}>HARD</div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 23, fontWeight: 800, color: t.ink }}>{p.overallPct}<span style={{ fontSize: 12 }}>%</span></div>
+                  )}
+                </div>
+              </Ring>
+            );
+          })()}
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{p.totalDone}/{p.totalUnits} units</div>
-            <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600 }}>syllabary mapped</div>
+            {p.hard
+              ? <div style={{ fontSize: 11.5, color: t.gold, fontWeight: 700 }}>hard {p.hardDoneTotal}/{p.bankedTotal} re-mastered</div>
+              : <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600 }}>syllabary mapped</div>}
           </div>
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -82,36 +108,8 @@ function ProfileBody({ onEditProfile, onReset }) {
         </div>
       </div>
 
-      {/* per-chapter */}
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>BY CHAPTER</p>
-      <div style={{ display: "grid", gap: 10, marginBottom: 72 }}>
-        {CHAPTERS.map((c, i) => {
-          const st = p.chapterState(i);
-          const cpct = Math.round((p.done[i] / c.units.length) * 100);
-          const accent = st === "done" ? t.done : st === "current" ? t.primary : t.faint;
-          return (
-            <div key={c.id} style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "13px 15px",
-              display: "flex", alignItems: "center", gap: 13 }}>
-              <span style={{ width: 38, height: 38, borderRadius: 11, background: st === "locked" ? t.sunk : st === "done" ? t.doneSoft : t.primarySoft,
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <span style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: st === "locked" ? t.faint : accent }}>{c.units[0].jp}</span>
-              </span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: t.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</span>
-                  <span style={{ fontSize: 12.5, fontWeight: 700, color: t.sub, flexShrink: 0, marginLeft: 8 }}>{p.done[i]}/{c.units.length}</span>
-                </div>
-                <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden" }}>
-                  <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: accent }} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       {/* settings */}
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>SETTINGS</p>
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>SETTINGS</p>
       <div style={{ display: "grid", gap: 10 }}>
         {/* Hard mode — unlocks once the whole track is complete */}
         {p.trackComplete ? (
@@ -140,9 +138,43 @@ function ProfileBody({ onEditProfile, onReset }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.faint} strokeWidth="2.2" style={{ flexShrink: 0 }}><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
           </div>
         )}
-        <SettingRow label="Edit your details" sub="Name, age, pets and more — personalises your sentences" onClick={onEditProfile} />
+        <SettingRow label="Edit your details" sub="Personalise your experience" onClick={onEditProfile} />
+        <SettingRow label="Back up progress" sub="Save a file you can keep or move to another device" onClick={downloadBackup} />
+        <SettingRow label="Restore from backup" sub="Load progress from a backup file" onClick={() => fileRef.current && fileRef.current.click()} />
         <SettingRow label="Reset progress" sub="Clears chapter progress · keeps your XP and level" danger onClick={() => setConfirmReset(true)} />
+        <input ref={fileRef} type="file" accept="application/json,.json" onChange={onPickFile} style={{ display: "none" }} />
       </div>
+
+      {restore && (
+        <Modal onDismiss={() => setRestore(null)}>
+          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px", boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+            {restore.ok ? (
+              <>
+                <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Restore this backup?</div>
+                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
+                  This replaces your current progress with the backup{restore.exportedAt ? ` from ${restore.exportedAt.slice(0, 10)}` : ""}. This can't be undone.
+                </div>
+                <div style={{ display: "grid", gap: 10 }}>
+                  <button onClick={() => setRestore(null)} className="hk-press"
+                    style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
+                      color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>Cancel</button>
+                  <button onClick={() => { applyBackup(restore.parsed); window.location.reload(); }} className="hk-press"
+                    style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
+                      color: t.ink, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>Restore &amp; reload</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Couldn't restore</div>
+                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>{restore.error}</div>
+                <button onClick={() => setRestore(null)} className="hk-press"
+                  style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
+                    color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>OK</button>
+              </>
+            )}
+          </div>
+        </Modal>
+      )}
 
       {confirmReset && (
         <Modal onDismiss={() => setConfirmReset(false)}>
