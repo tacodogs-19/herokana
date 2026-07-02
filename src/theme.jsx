@@ -69,9 +69,15 @@ export function ThemeProvider({ children }) {
     r.style.background = bg;
     document.body.style.background = bg;
     r.style.colorScheme = mode;
-    let meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "theme-color"); document.head.appendChild(meta); }
+    // Replace (never mutate) the meta node — mutating doesn't reliably trigger
+    // a status-bar repaint in Chrome, which leaves a stale bar colour/seam
+    // after an in-session theme switch. See design-system.md.
+    const old = document.querySelector('meta[name="theme-color"]');
+    if (old) old.remove();
+    const meta = document.createElement("meta");
+    meta.setAttribute("name", "theme-color");
     meta.setAttribute("content", bg);
+    document.head.appendChild(meta);
   }, [mode]);
 
   const t = mode === "dark" ? { ...DARK, glow } : { ...LIGHT, glow };
