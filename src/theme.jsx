@@ -22,18 +22,19 @@ export const DISPLAY = "'Outfit', system-ui, sans-serif";
 const glow = (c) => `0 3px 8px -3px ${c}73`;
 export const JP = "'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', serif";
 
-const ThemeCtx = React.createContext({ t: LIGHT, mode: "light", setMode: () => {} });
+const ThemeCtx = React.createContext({ t: LIGHT, mode: "light", setMode: () => {}, followsSystem: true, followSystem: () => {} });
 export const useTheme = () => React.useContext(ThemeCtx);
 
-function initialMode() {
+// hk-theme holds an explicit user choice; absence means "follow the device".
+function initialOverride() {
   try {
     const saved = localStorage.getItem("hk-theme");
     if (saved === "light" || saved === "dark") return saved;
   } catch (e) {}
-  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  return null;
 }
+const systemMode = () =>
+  window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
 // Full-screen cover shown during theme transitions so Chrome never sees the
 // WebView surface while the status bar is repainting — same principle as Splash.
@@ -51,16 +52,33 @@ function ThemeCover({ bg }) {
 }
 
 export function ThemeProvider({ children }) {
-  const [mode, setMode] = React.useState(initialMode);
+  const [override, setOverride] = React.useState(initialOverride);
+  const [system, setSystem] = React.useState(systemMode);
+  const mode = override || system;
   const [cover, setCover] = React.useState(null); // bg color to flash on switch
+
+  // Live-follow the device theme while no manual choice is pinned.
+  React.useEffect(() => {
+    const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+    if (!mq || !mq.addEventListener) return;
+    const onChange = (e) => setSystem(e.matches ? "dark" : "light");
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   const switchMode = React.useCallback((next) => {
-    const bg = next === "dark" ? DARK.bg : LIGHT.bg;
-    setCover(bg);
-    setMode(next);
+    setCover(next === "dark" ? DARK.bg : LIGHT.bg);
+    setOverride(next);
+    try { localStorage.setItem("hk-theme", next); } catch (e) {}
+  }, []);
+  const followSystem = React.useCallback(() => {
+    setCover(systemMode() === "dark" ? DARK.bg : LIGHT.bg);
+    setSystem(systemMode());
+    setOverride(null);
+    try { localStorage.removeItem("hk-theme"); } catch (e) {}
   }, []);
 
   React.useEffect(() => {
-    try { localStorage.setItem("hk-theme", mode); } catch (e) {}
     const bg = mode === "dark" ? DARK.bg : LIGHT.bg;
     const ink = mode === "dark" ? DARK.ink : LIGHT.ink;
     const r = document.documentElement;
@@ -81,7 +99,10 @@ export function ThemeProvider({ children }) {
   }, [mode]);
 
   const t = mode === "dark" ? { ...DARK, glow } : { ...LIGHT, glow };
-  const value = React.useMemo(() => ({ t, mode, setMode: switchMode }), [mode, switchMode]);
+  const value = React.useMemo(
+    () => ({ t, mode, setMode: switchMode, followsSystem: !override, followSystem }),
+    [mode, override, switchMode, followSystem]
+  );
   return (
     <ThemeCtx.Provider value={value}>
       {children}

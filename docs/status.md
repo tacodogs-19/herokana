@@ -55,7 +55,10 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **Profile** — overall %, level/XP, accuracy, weekly activity bars, hard-mode toggle (when unlocked),
   edit details, reset progress (keeps XP) with confirm dialog. (The per-chapter progress list was
   removed in v1.7.0 as redundant with Home's track — a richer progress snapshot may return on a subpage.)
-- **Theming** — hand-tuned light/dark, pre-paint resolution, live `theme-color` updates.
+- **Theming** — hand-tuned light/dark, pre-paint resolution, live `theme-color` updates. As of
+  v1.17.0 the app **follows the device theme live** unless the user pins a choice with the header
+  toggle; Profile → Settings → "Match device theme" un-pins (`hk-theme` present = pinned, absent =
+  follow system).
 - **PWA** — installable, offline via service worker, prompt-based updates (`UpdatePrompt`), one-time
   "What's new" after an update (`WhatsNew`), branded splash (static HTML + React handoff).
 - **Content** — Hiragana, Katakana, voiced, combination kana; 14 word/phrase themes; 11 sentence
