@@ -112,7 +112,12 @@ The app is a complete, shippable PWA. All core flows are implemented:
 
 - **Play Store launch prep** (2026-07-02) — listing assets ready, awaiting Console setup:
   - `store/play-listing.md` — all listing copy + Console form answers (data safety, rating, target audience).
-  - `store/feature-graphic.png` (1024×500) via new `scripts/store-assets.mjs` (needs dev server running).
+  - `store/feature-graphic.png` (1024×500) + `store/marketing/*.jpg` (captioned 1080×1920 frames of
+    each screenshot — upload these to Play, not the raw shots) via `scripts/store-assets.mjs`
+    (`npm run store-assets`; needs dev server + fresh `screenshots/`).
+  - `npm run shots` regenerates screenshots **and asserts each captured state** (per-shot
+    must/not text markers; exits non-zero on a wrong screen — this caught a real capture bug on
+    first run).
   - `screenshots/` regenerated at 1080×1920 (exactly 9:16 — Play rejects >2:1; don't revert the
     360×640@3x viewport in `scripts/screenshots.mjs`). Script now clears `hk-home-sel` on load
     (v1.16 persistence was pinning the focus card to chapter 0) and solves the vowels lesson for a

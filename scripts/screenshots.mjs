@@ -69,90 +69,6 @@ async function clickOption(p, excluded) {
   }, excluded);
 }
 
-async function waitForLesson(p) {
-  // "Check" only appears inside a lesson
-  await p.waitForFunction(
-    () => Array.from(document.querySelectorAll("button")).some((b) => b.textContent.includes("Check")),
-    { timeout: 8000 }
-  ).catch(() => {});
-  await sleep(400);
-}
-
-async function shot(name) {
-  await page.screenshot({ path: join(OUT, `${name}.jpg`), type: "jpeg", quality: 92 });
-  console.log(`✓ ${name}`);
-}
-
-// ── 1. Fresh home — START YOUR JOURNEY, Hiragana, dark ───────────────────────
-await load({ progress: mkProg([0,0,0,0,0,0,0]), hard: false });
-await shot("01-home");
-
-// ── 2. Kana lesson mid-question — answer revealed, mnemonic ──────────────────
-await load({ progress: mkProg([0,0,0,0,0,0,0]), hard: false });
-const clicked2 = await clickBtn(page, "Get Started");
-console.log("  Get Started clicked:", clicked2);
-await sleep(500);
-await waitForLesson(page);
-// Answer questions until one lands correct — a red "Not quite" is the wrong
-// look for a store listing.
-for (let i = 0; i < 8; i++) {
-  await clickOption(page, ["Continue", "Check", "Exit", "Finish", "Get Started"]);
-  await sleep(200);
-  await clickBtn(page, "Check");
-  await sleep(500);
-  const wrong = await page.evaluate(() => document.body.textContent.includes("Not quite"));
-  if (!wrong) break;
-  await clickBtn(page, "Continue");
-  await sleep(400);
-}
-await shot("02-kana-lesson");
-
-// ── 3. Words chapter home — Travel unit, theme chips ─────────────────────────
-// done: hira(10) kata(10) voiced(10) combo(22) phrase@1
-await load({
-  progress: mkProg([10,10,10,22,1,0,0], { xp:480, answered:120, correctAns:105 }),
-  hard: false,
-});
-await page.evaluate(() => window.scrollBy(0, 120));
-await sleep(200);
-await shot("03-words-travel");
-
-// ── 4. Sentences chapter home ─────────────────────────────────────────────────
-// done: all kana + phrase(14) done, sentence@1
-await load({
-  progress: mkProg([10,10,10,22,14,1,0], { xp:900, answered:220, correctAns:195 }),
-  hard: false,
-});
-await shot("04-sentences");
-
-// ── 5. Hard mode — kanji prompt (Weather unit, phrase index 9) ───────────────
-await load({
-  progress: mkProg([10,10,10,22,9,0,0], {
-    xp:550, answered:138, correctAns:120,
-    hardDone:[0,0,0,0,9,0,0], hard: true,
-  }),
-});
-await clickBtn(page, "Continue lesson", "Get Started"); await sleep(400);
-await waitForLesson(page);
-// Advance until a kanji (CJK) character appears as the prompt card content
-for (let i = 0; i < 15; i++) {
-  const hasKanji = await page.evaluate(() => {
-    const divs = Array.from(document.querySelectorAll("div[style]"));
-    return divs.some((d) => {
-      const t = d.textContent.trim();
-      return t.length >= 1 && t.length <= 4 && /[一-鿿]/.test(t);
-    });
-  });
-  if (hasKanji) break;
-  await clickOption(page, ["Continue", "Check", "Exit", "Finish"]);
-  await sleep(150);
-  await clickBtn(page, "Check", "Continue →");
-  await sleep(150);
-}
-await sleep(300);
-await shot("05-kanji-hard");
-
-// ── 6. Results screen — solve the vowels lesson correctly for a pass + cat ───
 const VOWELS = { "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o" };
 
 // Answer the current question correctly: find the big prompt glyph (JP font,
@@ -184,6 +100,113 @@ async function solveStep(p, dict) {
   }, dict);
 }
 
+async function waitForLesson(p) {
+  // "Check" only appears inside a lesson
+  await p.waitForFunction(
+    () => Array.from(document.querySelectorAll("button")).some((b) => b.textContent.includes("Check")),
+    { timeout: 8000 }
+  ).catch(() => {});
+  await sleep(400);
+}
+
+// Per-shot feature test: assert the rendered text proves we captured the right
+// screen state. The screenshot is still written on failure (for inspection),
+// but the run exits non-zero. innerText reflects CSS text-transform, so
+// markers match what's visible in the image.
+const failures = [];
+async function shot(name, { must = [], not = [] } = {}) {
+  const text = await page.evaluate(() => document.body.innerText);
+  const bad = [
+    ...must.filter((m) => !text.includes(m)).map((m) => `missing "${m}"`),
+    ...not.filter((m) => text.includes(m)).map((m) => `unexpected "${m}"`),
+  ];
+  await page.screenshot({ path: join(OUT, `${name}.jpg`), type: "jpeg", quality: 92 });
+  if (bad.length) {
+    failures.push(`${name}: ${bad.join(", ")}`);
+    console.log(`✗ ${name} — ${bad.join(", ")}`);
+  } else {
+    console.log(`✓ ${name}`);
+  }
+}
+
+// ── 1. Fresh home — START YOUR JOURNEY, Hiragana, dark ───────────────────────
+await load({ progress: mkProg([0,0,0,0,0,0,0]), hard: false });
+await shot("01-home", { must: ["START YOUR JOURNEY", "Hiragana", "Get Started"] });
+
+// ── 2. Kana lesson mid-question — answer revealed, mnemonic ──────────────────
+await load({ progress: mkProg([0,0,0,0,0,0,0]), hard: false });
+const clicked2 = await clickBtn(page, "Get Started");
+console.log("  Get Started clicked:", clicked2);
+await sleep(500);
+await waitForLesson(page);
+// Solve until a question lands correct — a red "Not quite" is the wrong look
+// for a store listing, and random first-option clicking can miss 8 in a row.
+for (let i = 0; i < 8; i++) {
+  await solveStep(page, VOWELS);
+  await sleep(200);
+  await clickBtn(page, "Check");
+  await sleep(500);
+  const ok = await page.evaluate(() => {
+    const t = document.body.innerText;
+    return t.includes("Continue →") && !t.includes("Not quite");
+  });
+  if (ok) break;
+  // Unsolvable question shape — answer anything and advance to the next one.
+  await clickOption(page, ["Continue", "Check", "Exit", "Finish", "Get Started"]);
+  await sleep(150);
+  await clickBtn(page, "Check"); await sleep(300);
+  await clickBtn(page, "Continue"); await sleep(400);
+}
+// Must be inside a lesson, on a *correct* answer's feedback state.
+await shot("02-kana-lesson", { must: ["HIRAGANA", "Continue →"], not: ["Not quite", "START YOUR JOURNEY"] });
+
+// ── 3. Words chapter home — Travel unit, theme chips ─────────────────────────
+// done: hira(10) kata(10) voiced(10) combo(22) phrase@1
+await load({
+  progress: mkProg([10,10,10,22,1,0,0], { xp:480, answered:120, correctAns:105 }),
+  hard: false,
+});
+await page.evaluate(() => window.scrollBy(0, 120));
+await sleep(200);
+await shot("03-words-travel", { must: ["CONTINUE LEARNING", "Words and phrases"] });
+
+// ── 4. Sentences chapter home ─────────────────────────────────────────────────
+// done: all kana + phrase(14) done, sentence@1
+await load({
+  progress: mkProg([10,10,10,22,14,1,0], { xp:900, answered:220, correctAns:195 }),
+  hard: false,
+});
+await shot("04-sentences", { must: ["CONTINUE LEARNING", "Sentences"] });
+
+// ── 5. Hard mode — kanji prompt (Weather unit, phrase index 9) ───────────────
+await load({
+  progress: mkProg([10,10,10,22,9,0,0], {
+    xp:550, answered:138, correctAns:120,
+    hardDone:[0,0,0,0,9,0,0], hard: true,
+  }),
+});
+await clickBtn(page, "Continue lesson", "Get Started"); await sleep(400);
+await waitForLesson(page);
+// Advance until a kanji (CJK) character appears as the prompt card content
+for (let i = 0; i < 15; i++) {
+  const hasKanji = await page.evaluate(() => {
+    const divs = Array.from(document.querySelectorAll("div[style]"));
+    return divs.some((d) => {
+      const t = d.textContent.trim();
+      return t.length >= 1 && t.length <= 4 && /[一-鿿]/.test(t);
+    });
+  });
+  if (hasKanji) break;
+  await clickOption(page, ["Continue", "Check", "Exit", "Finish"]);
+  await sleep(150);
+  await clickBtn(page, "Check", "Continue →");
+  await sleep(150);
+}
+await sleep(300);
+// Must be a hard-mode lesson question showing a kanji prompt.
+await shot("05-kanji-hard", { must: ["kanji"], not: ["CONTINUE LEARNING"] });
+
+// ── 6. Results screen — solve the vowels lesson correctly for a pass + cat ───
 await load({ progress: mkProg([0,0,0,0,0,0,0]) });
 await clickBtn(page, "Get Started"); await sleep(500);
 await waitForLesson(page);
@@ -196,7 +219,8 @@ for (let i = 0; i < 40; i++) {
   await sleep(250);
 }
 await sleep(600);
-await shot("06-results");
+// Must be the result screen with a genuine 100% pass from the solver.
+await shot("06-results", { must: ["XP earned", "Accuracy", "100%"] });
 
 // ── 7. Practice tab ───────────────────────────────────────────────────────────
 await load({
@@ -206,14 +230,19 @@ await load({
   hard: false,
 });
 await clickBtn(page, "Practice"); await sleep(500);
-await shot("07-practice");
+await shot("07-practice", { must: ["Kana chart", "Verb list", "Quick review"] });
 
 // ── 8. Home — mid-progress Words chapter ─────────────────────────────────────
 await load({
   progress: mkProg([10,10,10,22,7,0,0], { xp:720, answered:180, correctAns:160 }),
   hard: false,
 });
-await shot("08-home-progress");
+await shot("08-home-progress", { must: ["CONTINUE LEARNING", "Continue lesson"] });
 
 await browser.close();
-console.log("\nDone — screenshots/");
+if (failures.length) {
+  console.error(`\n${failures.length} state check(s) FAILED — screenshots are not store-ready.`);
+  process.exitCode = 1;
+} else {
+  console.log("\nAll state checks passed — screenshots/");
+}
