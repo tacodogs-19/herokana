@@ -141,14 +141,21 @@ The app is a complete, shippable PWA. All core flows are implemented:
 
 ## Known issues / risks
 
-- **Android 15+ TWA shows black status/gesture bars (seam against app bg) — not our bug, do not
-  re-investigate.** Apps targeting SDK 35+ are forced edge-to-edge and the wrapper's baked bar
-  colours are ignored; Chrome 135+ can draw the page under transparent bars (our
-  `viewport-fit=cover` + safe-area padding already support it) but Google is enabling it via a
-  gradual server-side rollout. Confirmed 2026-07-02 by toggling the edge-to-edge entries in
-  `chrome://flags` on a real device: bars blend perfectly. Heals automatically per-device as the
-  rollout lands; Android ≤14 devices honour the baked colours (set in package v2: light `#F3F5FA`,
-  dark `#0E1322`).
+- **TWA system-bar seams — external, do not re-investigate (confirmed on-device 2026-07-02).**
+  Two related behaviours, both outside our control:
+  1. *Launch bars on Android 15+*: SDK 35+ apps are forced edge-to-edge and baked bar colours are
+     ignored. Chrome 135+ draws the page under transparent bars (our `viewport-fit=cover` +
+     safe-area padding already support it) but ships via gradual server-side rollout — devices it
+     hasn't reached show black fallback bars. Verified: enabling the edge-to-edge entries in
+     `chrome://flags` makes launch bars blend perfectly. Android ≤14 honours the baked colours
+     (package v2: light `#F3F5FA`, dark `#0E1322`).
+  2. *In-session theme toggle*: a TWA's bar treatment is set once at launch. Any mid-session
+     theme-color change makes Chrome paint a protective status-bar strip that persists until the
+     activity relaunches (verified: strip stays regardless of theme; relaunching in a
+     system-matching theme clears it). No web/wrapper-side fix exists. Impact: only users who
+     toggle theme mid-session, only until next launch. `theme.jsx` still replaces (not mutates)
+     the meta node per design-system.md — correct for browser/PWA contexts even though TWAs
+     ignore it.
 
 - **Reading mode uses the cat** (per-word reveal + results) — sanctioned by the feature brief (see
   [decisions.md](decisions.md)). The rule now covers icon + splash + onboarding + results; reading
