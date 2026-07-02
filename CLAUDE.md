@@ -47,7 +47,7 @@ dev.cmd                 Preview-launcher shim (space-in-path workaround)
 scripts/make-icons.mjs  Icon generation (sharp)
 public/assets/          SVG icons, cat mascot stickers, cat-loading.mp4
 src/
-  main.jsx              Mounts providers + App + UpdatePrompt/WhatsNew/Splash
+  main.jsx              Mounts providers + App + UpdatePrompt/WhatsNew
   App.jsx               Screen router + Android back handling + onboarding gate
   data.js               All course content + profile personalisation (~1100 lines)
   questions.js          buildQuestions() — turns a session into question objects
@@ -55,7 +55,7 @@ src/
   theme.jsx             ThemeProvider / useTheme — light/dark palettes + tokens
   release.js            VERSION + RELEASE_NOTES (drives WhatsNew)
   styles.css            Global resets + animation keyframes
-  Splash.jsx, UpdatePrompt.jsx, WhatsNew.jsx
+  UpdatePrompt.jsx, WhatsNew.jsx
   components/chrome.jsx Shared UI: Shell, BottomNav, Modal, Ring, Cat, ThemeToggle
   screens/              Home, Lesson, Result, Practice, Profile, Onboarding, Basics (kana/sentence)
 ```

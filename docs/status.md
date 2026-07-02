@@ -60,7 +60,8 @@ The app is a complete, shippable PWA. All core flows are implemented:
   toggle; Profile → Settings → "Match device theme" un-pins (`hk-theme` present = pinned, absent =
   follow system).
 - **PWA** — installable, offline via service worker, prompt-based updates (`UpdatePrompt`), one-time
-  "What's new" after an update (`WhatsNew`), branded splash (static HTML + React handoff).
+  "What's new" after an update (`WhatsNew`), branded splash (static HTML only — the React splash
+  with its forced 2.2s hold was removed in v1.17.0; the static splash covers until React mounts).
 - **Content** — Hiragana, Katakana, voiced, combination kana; 14 word/phrase themes; 11 sentence
   themes; 4 complex-sentence themes; number ranges; grammar foundations. Every banked theme has 25+ items.
 - **Read the Real World** (v1.6.0) — reading-fluency mode in the **Scenes tab** (4th bottom-nav

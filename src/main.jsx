@@ -5,7 +5,6 @@ import { ProgressProvider } from "./store.jsx";
 import App from "./App.jsx";
 import UpdatePrompt from "./UpdatePrompt.jsx";
 import WhatsNew from "./WhatsNew.jsx";
-import Splash from "./Splash.jsx";
 import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -17,6 +16,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <WhatsNew />
       </ProgressProvider>
     </ThemeProvider>
-    <Splash />
   </React.StrictMode>
 );

@@ -4,4 +4,5 @@ export const VERSION = "1.17.0";
 
 export const RELEASE_NOTES = [
   `New in Settings: "Match device theme". HeroKana now follows your phone's light/dark setting automatically — live, the moment your phone switches. Tapping the sun/moon toggle pins your own choice; the new setting un-pins it.`,
+  `Faster launch — the loading screen no longer holds for two seconds. The app opens as soon as it's ready.`,
 ];
