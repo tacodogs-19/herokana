@@ -125,9 +125,19 @@ The app is a complete, shippable PWA. All core flows are implemented:
   - `public/privacy.html` — required-by-Play privacy policy (no-data-collected), served at
     `/privacy.html`; added to the SW `navigateFallbackDenylist`. **Not yet deployed** — needs a
     Netlify deploy before the URL goes into the Console.
-  - PWABuilder AAB in `Downloads\HeroKana - Google Play package` (+ backup in
-    `Documents\HeroKana-play-signing`) was generated *before* the current icon — regenerate on
-    pwabuilder.com with the existing `signing.keystore` before upload.
+  - **Signing keys (2026-07-02, confirmed against Play Console):**
+    - **Upload keystore of record:** `Documents\HeroKana-play-signing-v2\HeroKana - Google Play
+      package (1)\signing.keystore` (upload cert SHA-256 starts `AE:DE`). Every future AAB must be
+      signed with this key ("Use mine" on pwabuilder.com; passwords in the adjacent
+      `signing-key-info.txt`). Back it up off-machine. **Never commit it** — keystores live outside
+      the repo.
+    - The June keystore in `Documents\HeroKana-play-signing` / `Downloads` (cert `BB:9D…`) is
+      **obsolete** — it never signed anything Play accepted.
+    - Play App Signing re-signs releases with Google's key (`0B:0D…`); both `0B:0D` and `BB:9D`
+      fingerprints are in `public/assetlinks.json` + `public/.well-known/assetlinks.json`. The
+      `0B:0D` entry is the one that makes installed TWAs verify (full-screen, no URL bar).
+    - Play package id: `app.netlify.herokana.twa`. Version code must increase each upload
+      (v1 used code 1; next is 2).
 
 ## Known issues / risks
 
