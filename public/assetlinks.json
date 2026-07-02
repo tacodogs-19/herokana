@@ -3,6 +3,9 @@
       "target": {
         "namespace": "android_app",
         "package_name": "app.netlify.herokana.twa",
-        "sha256_cert_fingerprints": ["BB:9D:C3:06:22:A3:A4:7F:95:5B:A5:3B:7A:10:07:B6:85:59:8D:B7:66:08:47:BF:2A:C9:ED:73:33:2E:A2:42"]
+        "sha256_cert_fingerprints": [
+          "BB:9D:C3:06:22:A3:A4:7F:95:5B:A5:3B:7A:10:07:B6:85:59:8D:B7:66:08:47:BF:2A:C9:ED:73:33:2E:A2:42",
+          "0B:0D:AE:89:D8:A1:49:81:1F:F6:90:C3:DF:D1:1D:48:D6:0A:68:3E:22:9B:47:11:FA:7D:59:77:28:4C:29:C0"
+        ]
       }
     }]
