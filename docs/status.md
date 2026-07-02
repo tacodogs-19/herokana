@@ -141,6 +141,15 @@ The app is a complete, shippable PWA. All core flows are implemented:
 
 ## Known issues / risks
 
+- **Android 15+ TWA shows black status/gesture bars (seam against app bg) — not our bug, do not
+  re-investigate.** Apps targeting SDK 35+ are forced edge-to-edge and the wrapper's baked bar
+  colours are ignored; Chrome 135+ can draw the page under transparent bars (our
+  `viewport-fit=cover` + safe-area padding already support it) but Google is enabling it via a
+  gradual server-side rollout. Confirmed 2026-07-02 by toggling the edge-to-edge entries in
+  `chrome://flags` on a real device: bars blend perfectly. Heals automatically per-device as the
+  rollout lands; Android ≤14 devices honour the baked colours (set in package v2: light `#F3F5FA`,
+  dark `#0E1322`).
+
 - **Reading mode uses the cat** (per-word reveal + results) — sanctioned by the feature brief (see
   [decisions.md](decisions.md)). The rule now covers icon + splash + onboarding + results; reading
   mode's reveal moment sits closest to the sanctioned "results" use.
