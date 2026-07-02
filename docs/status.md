@@ -152,13 +152,15 @@ The app is a complete, shippable PWA. All core flows are implemented:
      hasn't reached show black fallback bars. Verified: enabling the edge-to-edge entries in
      `chrome://flags` makes launch bars blend perfectly. Android ≤14 honours the baked colours
      (package v2: light `#F3F5FA`, dark `#0E1322`).
-  2. *In-session theme toggle*: a TWA's bar treatment is set once at launch. Any mid-session
-     theme-color change makes Chrome paint a protective status-bar strip that persists until the
-     activity relaunches (verified: strip stays regardless of theme; relaunching in a
-     system-matching theme clears it). No web/wrapper-side fix exists. Impact: only users who
-     toggle theme mid-session, only until next launch. `theme.jsx` still replaces (not mutates)
-     the meta node per design-system.md — correct for browser/PWA contexts even though TWAs
-     ignore it.
+  2. *In-session theme toggle*: a TWA's bar treatment is set once at launch; toggling theme
+     mid-session leaves wrong/latched bars until the activity relaunches. **Exhaustively ruled
+     out as fixable (2026-07-02):** freezing the theme-color meta swap, the ThemeCover flash,
+     and even root `color-scheme` (each verified on-device) all still latched — Chrome derives
+     the latch from the rendered page itself. Page code has no lever; do not burn time here
+     again. Impact: only users who toggle mid-session, only until next launch, and today only
+     under Chrome's experimental edge-to-edge flags. `theme.jsx` keeps the TWA-gated skips for
+     the meta swap and cover flash (they're no-ops for TWA bars — pointless churn), while
+     `color-scheme` intentionally still updates everywhere (form controls/icon tint).
 
 - **Reading mode uses the cat** (per-word reveal + results) — sanctioned by the feature brief (see
   [decisions.md](decisions.md)). The rule now covers icon + splash + onboarding + results; reading

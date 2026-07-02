@@ -102,11 +102,7 @@ export function ThemeProvider({ children }) {
     r.style.setProperty("--hk-ink", ink);
     r.style.background = bg;
     document.body.style.background = bg;
-    // In the TWA, color-scheme is frozen at its pre-paint launch value: Chrome's
-    // edge-to-edge latches the system-bar treatment from it on change and never
-    // re-evaluates, leaving wrong-coloured bars for the rest of the session.
-    // (Inputs don't care — all controls are inline-styled from theme tokens.)
-    if (!isTwa) r.style.colorScheme = mode;
+    r.style.colorScheme = mode;
     // Replace (never mutate) the meta node — mutating doesn't reliably trigger
     // a status-bar repaint in Chrome, which leaves a stale bar colour/seam
     // after an in-session theme switch. See design-system.md.
