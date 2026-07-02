@@ -36,6 +36,22 @@ function initialOverride() {
 const systemMode = () =>
   window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
+// Running inside the Android TWA? The activity launches with an android-app://
+// referrer; remember it for the session since in-app reloads lose the referrer.
+// In a TWA the system bars ignore the theme-color meta, and mid-session
+// theme-signal churn makes Chrome paint a persistent status-bar strip — so we
+// skip the meta swap and the transition cover there. Browser/PWA unaffected.
+const isTwa = (() => {
+  try {
+    if (sessionStorage.getItem("hk-twa") === "1") return true;
+    if (document.referrer.startsWith("android-app://")) {
+      sessionStorage.setItem("hk-twa", "1");
+      return true;
+    }
+  } catch (e) {}
+  return false;
+})();
+
 // Full-screen cover shown during theme transitions so Chrome never sees the
 // WebView surface while the status bar is repainting — same principle as Splash.
 function ThemeCover({ bg }) {
@@ -67,12 +83,12 @@ export function ThemeProvider({ children }) {
   }, []);
 
   const switchMode = React.useCallback((next) => {
-    setCover(next === "dark" ? DARK.bg : LIGHT.bg);
+    if (!isTwa) setCover(next === "dark" ? DARK.bg : LIGHT.bg);
     setOverride(next);
     try { localStorage.setItem("hk-theme", next); } catch (e) {}
   }, []);
   const followSystem = React.useCallback(() => {
-    setCover(systemMode() === "dark" ? DARK.bg : LIGHT.bg);
+    if (!isTwa) setCover(systemMode() === "dark" ? DARK.bg : LIGHT.bg);
     setSystem(systemMode());
     setOverride(null);
     try { localStorage.removeItem("hk-theme"); } catch (e) {}
@@ -90,12 +106,16 @@ export function ThemeProvider({ children }) {
     // Replace (never mutate) the meta node — mutating doesn't reliably trigger
     // a status-bar repaint in Chrome, which leaves a stale bar colour/seam
     // after an in-session theme switch. See design-system.md.
-    const old = document.querySelector('meta[name="theme-color"]');
-    if (old) old.remove();
-    const meta = document.createElement("meta");
-    meta.setAttribute("name", "theme-color");
-    meta.setAttribute("content", bg);
-    document.head.appendChild(meta);
+    // Skipped in the TWA: bars ignore the meta there, and swapping it triggers
+    // Chrome's persistent protective status-bar strip.
+    if (!isTwa) {
+      const old = document.querySelector('meta[name="theme-color"]');
+      if (old) old.remove();
+      const meta = document.createElement("meta");
+      meta.setAttribute("name", "theme-color");
+      meta.setAttribute("content", bg);
+      document.head.appendChild(meta);
+    }
   }, [mode]);
 
   const t = mode === "dark" ? { ...DARK, glow } : { ...LIGHT, glow };
