@@ -1,4 +1,7 @@
 * { box-sizing: border-box; }
+/* the OS tap flash paints as a square over rounded tiles (Android Chrome);
+   .hk-press on every interactive element is the tap feedback instead */
+* { -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 button, input { font-family: inherit; }
 
@@ -82,7 +85,14 @@ button, input { font-family: inherit; }
   to   { opacity: 1; transform: none; }
 }
 
+/* kana chart: stroke-order draw (paths use pathLength=1) */
+.hk-stroke { animation: hkStroke 460ms ease forwards; }
+@keyframes hkStroke {
+  to { stroke-dashoffset: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .hk-grow { width: var(--to); }
+  .hk-stroke { animation-delay: 0ms !important; } /* whole glyph appears at once */
 }

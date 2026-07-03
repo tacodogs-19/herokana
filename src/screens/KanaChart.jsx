@@ -2,6 +2,29 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { HIRA, KATA, KANA_MNEMONICS } from "../data";
 import { speak, useJaVoice } from "../speech.js";
+import STROKES from "../strokes.json";
+
+// Animated stroke order (KanjiVG data, 109x109 viewBox). A faint full glyph
+// sits underneath as the guide; strokes draw in sequence. Tap to replay.
+function StrokeGlyph({ ch, size, ink, guide }) {
+  const ds = STROKES[ch] || [];
+  const [run, setRun] = React.useState(0);
+  return (
+    <svg key={run} width={size} height={size} viewBox="0 0 109 109" role="img"
+      aria-label={`Stroke order for ${ch}`}
+      onClick={(e) => { e.stopPropagation(); setRun((r) => r + 1); }}>
+      {ds.map((d, i) => (
+        <path key={`g${i}`} d={d} fill="none" stroke={guide} strokeWidth="4.5"
+          strokeLinecap="round" strokeLinejoin="round" />
+      ))}
+      {ds.map((d, i) => (
+        <path key={i} d={d} className="hk-stroke" fill="none" stroke={ink} strokeWidth="5"
+          strokeLinecap="round" strokeLinejoin="round" pathLength="1"
+          strokeDasharray="1" strokeDashoffset="1" style={{ animationDelay: `${i * 500}ms` }} />
+      ))}
+    </svg>
+  );
+}
 
 const ROWS = [
   ["a", "i", "u", "e", "o"],
@@ -74,6 +97,7 @@ export default function KanaChart({ onClose }) {
   const [active,    setActive]    = React.useState(null);
   const [cardIdx,   setCardIdx]   = React.useState(0);
   const [flipped,   setFlipped]   = React.useState(false);
+  const [strokes,   setStrokes]   = React.useState(false);
   const [hint,      setHint]      = React.useState(() => !localStorage.getItem(PREF_KEY));
 
   const map = kana === "hira" ? HIRA : KATA;
@@ -233,8 +257,12 @@ export default function KanaChart({ onClose }) {
                   background: t.surface, borderRadius: 26, border: `1.5px solid ${t.line}`,
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                   padding: "28px 28px 20px", gap: 12, boxShadow: `0 20px 44px -28px ${t.shadow}` }}>
-                  <span style={{ fontFamily: JP, fontSize: 96, fontWeight: 700, lineHeight: 1, color: t.ink }}>{map[rj]}</span>
-                  {mnemonic && (
+                  {strokes && STROKES[map[rj]]
+                    ? <StrokeGlyph ch={map[rj]} size={110} ink={t.ink} guide={t.line} />
+                    : <span style={{ fontFamily: JP, fontSize: 96, fontWeight: 700, lineHeight: 1, color: t.ink }}>{map[rj]}</span>}
+                  {strokes && STROKES[map[rj]] ? (
+                    <span style={{ fontSize: 14, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>Tap the glyph to replay</span>
+                  ) : mnemonic && (
                     <span style={{ fontSize: 14, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>{mnemonic}</span>
                   )}
                   <span style={{ fontSize: 11, fontWeight: 700, color: t.faint, letterSpacing: "0.08em", marginTop: 4 }}>TAP TO REVEAL</span>
@@ -257,6 +285,19 @@ export default function KanaChart({ onClose }) {
               </div>
             </div>
 
+            {/* Stroke-order toggle — single glyphs only (combos are two kana).
+                Slot stays laid out on combo cards so the nav row never shifts. */}
+            <button onClick={() => setStrokes((s) => !s)} className="hk-press"
+              disabled={!STROKES[map[rj]]} aria-hidden={!STROKES[map[rj]]}
+              style={{ padding: "7px 16px", borderRadius: 20,
+                cursor: STROKES[map[rj]] ? "pointer" : "default",
+                visibility: STROKES[map[rj]] ? "visible" : "hidden",
+                border: `1.5px solid ${strokes ? t.primary : t.line}`,
+                background: strokes ? t.primarySoft : t.surface, color: strokes ? t.primary : t.sub,
+                fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 700 }}>
+              {strokes ? "Hide stroke order" : "Show stroke order"}
+            </button>
+
             {/* Prev / counter / Next */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, width: "100%" }}>
               <button onClick={() => goCard(-1)} className="hk-press"
@@ -274,6 +315,13 @@ export default function KanaChart({ onClose }) {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>
               </button>
             </div>
+
+            {/* CC BY-SA attribution for the stroke data — slot is always laid out
+                so toggling strokes never shifts the card */}
+            <p aria-hidden={!strokes} style={{ margin: 0, height: 14, fontSize: 10, fontWeight: 600, color: t.faint,
+              opacity: strokes ? 1 : 0, transition: "opacity 160ms" }}>
+              Stroke order data: KanjiVG (CC BY-SA)
+            </p>
           </div>
         )}
       </div>

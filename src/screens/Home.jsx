@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, ThemeToggle, Modal } from "../components/chrome.jsx";
+import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
@@ -441,8 +441,6 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
           <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: t.wrong,
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
-        <div style={{ flex: 1 }} />
-        <ThemeToggle />
       </div>
 
       {progress.reviewDue > 0 && (

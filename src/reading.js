@@ -30,7 +30,7 @@ export const READING_PACKS = [
     place: "Station",
     label: "At the station",
     jp: "駅",
-    blurb: "Signs you'll read on the way through the gates.",
+    blurb: "Platforms, tickets and the way through the gates.",
     words: [
       { jp: "きっぷ", romaji: "kippu", en: "ticket", where: "ticket machine" },
       { jp: "えき", romaji: "eki", en: "station", where: "on the sign" },
@@ -213,10 +213,11 @@ export const READING_PACKS = [
 
 export const packById = (id) => READING_PACKS.find((p) => p.id === id);
 
-// The whole Reading tab unlocks once this chapter is complete. Tunable: point it
-// at an earlier chapter (e.g. "kata") to give beginners access sooner. Reuses
-// the existing positional progress — no parallel unlock system.
-export const READING_UNLOCK = "phrase"; // "Words and phrases"
+// The whole Reading tab unlocks once this chapter is complete. "combo" = all
+// four kana chapters done — the first moment every pack word is readable (all
+// packs use voiced + combination kana, most lean on katakana). Reuses the
+// existing positional progress — no parallel unlock system.
+export const READING_UNLOCK = "combo"; // "Combination sounds" (last kana chapter)
 
 export function readingUnlocked(progress) {
   // once the user has played any scene or dialogue, keep Scenes unlocked even
@@ -248,11 +249,20 @@ export const BAND_COPY = {
   slow: "Take another look",
 };
 
+// Words whose most recent read landed in the slow band — the re-drill pool.
+// rec is progress.reading[packId] (may be undefined for an unplayed pack).
+export function slowWords(pack, rec) {
+  const times = (rec && rec.words) || {};
+  return pack.words.filter((w) => times[w.jp] && times[w.jp].last > READING.READ_MS);
+}
+
 // Build a round of reading questions. Distractors are other meanings from the
 // same pack, mirroring how banked questions draw plausible same-bank options.
-export function buildReadingSession(pack) {
+// `only` (optional) restricts the round to a word subset (the slow re-drill);
+// distractors still draw from the whole pack so options stay plausible.
+export function buildReadingSession(pack, only) {
   const all = pack.words;
-  const words = shuffle(all).slice(0, READING.SESSION);
+  const words = shuffle(only && only.length ? only : all).slice(0, READING.SESSION);
   return words.map((w) => {
     const distractors = shuffle(all.filter((x) => x.en !== w.en)).slice(0, 3).map((x) => x.en);
     return { ...w, answer: w.en, options: shuffle([w.en, ...distractors]) };

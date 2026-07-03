@@ -1,7 +1,7 @@
 # HeroKana — Status & Baseline
 
 Snapshot of what exists so a fresh session can resume without re-deriving the baseline.
-**As of:** 2026-06-28 · **App version:** `1.15.0` (see [`src/release.js`](../src/release.js)).
+**As of:** 2026-07-03 · **App version:** `1.20.0` (see [`src/release.js`](../src/release.js)).
 
 > Update this file when the baseline changes — it is the "where are we" anchor after a `/clear`.
 
@@ -22,8 +22,11 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **Result** — pass/fail (cat mascot), XP/accuracy/correct tiles, chapter progress bar, contextual
   next actions (try again / continue / keep going / finish).
 - **Practice** — build-a-custom-set (Alphabet / Words / Numbers tabs, theme picker, difficulty,
-  answer language, round size) + four practice modes (Quick review, Weak spots, Speed, Listening) +
-  Sentence foundations and a basics overview.
+  answer language, round size) + four practice modes (Quick review, Weak spots, Speed, Listening)
+  scoped by an Alphabet / Words / Sentences / Numbers category tab (Words = phrase bank,
+  Sentences = sentence + complex banks, split 2026-07) + Sentence foundations and a basics overview.
+  Banked multiple-choice seeds same-first-letter distractors (2026-07) so answers can't be spotted by
+  scanning initials.
 - **Kana chart** (v1.9.0) — passive reference (not a drill) opened from a card at the top of Practice.
   Full-screen screen ([`KanaChart.jsx`](../src/screens/KanaChart.jsx)): gojūon grid built from
   `HIRA`/`KATA` (46 base + voiced + combinations — only kana the app teaches), hiragana/katakana toggle,
@@ -50,8 +53,39 @@ The app is a complete, shippable PWA. All core flows are implemented:
   `useJaVoice()`) replaces the three duplicated inline TTS helpers. The whole app now degrades when the
   device has no `ja-JP` voice instead of failing silently: Lesson hides "Hear it" and turns listening
   questions into readable ones; Practice's Listening mode tile is disabled ("Needs a Japanese voice");
-  Conversations show a notice in [`ReadingPack.jsx`](../src/screens/ReadingPack.jsx); the Kana chart
-  shows a "no sound" hint. (Recorded-clip fallback for hero content — "B-part-2" — still deferred.)
+  the Kana chart shows a "no sound" hint. (Conversations no longer need the device voice at all —
+  see "Recorded dialogue audio".)
+- **Recorded dialogue audio** (v1.20.0) — the deferred "B-part-2". Every dialogue line ships as a
+  bundled neural-TTS mp3 (`public/audio/`, ~1.3MB, two distinct voices: staff/you), generated at dev
+  time by [`scripts/make-audio.mjs`](../scripts/make-audio.mjs) (`npm run audio`, needs network;
+  idempotent, prunes stale clips, writes `src/audio-manifest.json`). At runtime `speakLine()` in
+  [`speech.js`](../src/speech.js) plays the clip (playbackRate follows the SUPPORT level) and falls
+  back to device TTS for unmanifested text. Clips are precached by the service worker (mp3 added to
+  `globPatterns`), so Conversations keep audio offline — and now work on devices with **no** ja-JP
+  voice, so the ReadingPack no-voice notice was removed. **After editing `dialogue.js`, re-run
+  `npm run audio` and commit the mp3s + manifest.**
+- **Kana mnemonics** — every kana (base, voiced, combinations) has a one-line memory hook in
+  `KANA_MNEMONICS` ([`data.js`](../src/data.js)), shown as the post-answer reveal on kana lesson
+  questions and on the Kana chart's flashcard view. (Shipped earlier; documented 2026-07-03.)
+- **First kanji chapter** (v1.20.0) — chapter 8, **appended** to `CHAPTERS` (id `kanji`): 23 N5-level
+  kanji in four small units (Numbers / Time / People / Signs in town), backed by a `KANJI` bank in
+  [`data.js`](../src/data.js) where `jp` *is* the kanji (so it's the prompt at every difficulty),
+  `romaji` is one common reading, `en` the meaning. Flows through `bankFor`/`itemIndex` untouched, so
+  lessons, SRS review, weak spots, hard mode, and the Practice builder's Words tab all picked it up
+  for free. Graduation is now **pinned to the `complex` chapter id** in
+  [`Result.jsx`](../src/screens/Result.jsx) (kanji is post-graduation bonus), and the Profile
+  hard-mode toggle also shows while hard is ON so appended chapters can't strand a learner in hard
+  mode ([`Profile.jsx`](../src/screens/Profile.jsx)).
+- **Stroke-order playback** (v1.20.0) — the Kana chart's card view has a "Show stroke order" pill:
+  the glyph redraws stroke by stroke (tap to replay), with a faint full-glyph guide underneath.
+  Data is KanjiVG paths (CC BY-SA, credited on-screen) bundled as `src/strokes.json` (~39KB, all 138
+  single-glyph kana) by [`scripts/make-strokes.mjs`](../scripts/make-strokes.mjs). Combination kana
+  (two glyphs) hide the pill. Reduced motion shows the finished glyph instantly. Passive reference
+  only — no graded writing (read-first stance holds).
+- **Progress snapshot subpage** (v1.20.0) — the richer snapshot deferred since v1.7:
+  [`Stats.jsx`](../src/screens/Stats.jsx), routed as `stats` from Profile → "See the full picture".
+  Per-chapter bars, review-pool shape (per-box counts + due now), per-pack Scenes reading stats and
+  conversations cleared. Read-only, calm framing, all derived from `hk-progress-v2`.
 - **Profile** — overall %, level/XP, accuracy, weekly activity bars, hard-mode toggle (when unlocked),
   edit details, reset progress (keeps XP) with confirm dialog. (The per-chapter progress list was
   removed in v1.7.0 as redundant with Home's track — a richer progress snapshot may return on a subpage.)
@@ -68,12 +102,14 @@ The app is a complete, shippable PWA. All core flows are implemented:
   tab, renamed from "Reading" in v1.7.0 once it grew to include conversations; internal screen/route
   names are still `reading*`). [`Reading.jsx`](../src/screens/Reading.jsx) hub +
   [`ReadingMode.jsx`](../src/screens/ReadingMode.jsx) drill, [`reading.js`](../src/reading.js). The tab
-  is locked (with progress toward the gate) until the
-  Words & phrases chapter is done, then lists eight packs across trip contexts (station, konbini,
+  is locked (with progress toward the gate) until the Combination sounds chapter is done (all four
+  kana chapters — moved earlier from Words & phrases in v1.19.0), then lists eight packs across trip contexts (station, konbini,
   restaurant, signs, paying, café, hotel, airport). Silent timing → per-word speed reveal (with the
   romaji shown so you can check your reading) and mascot reaction → results (avg s/word + Done; the
-  cat-run mascot). Speed bands are beginner-tuned (≤1.5s instant / 1.5–5s read / 5s+ slow). The hub is a
-  **2-column grid of scene tiles** (glyph + place + New/In-progress/Done status); tapping one opens a
+  cat-run mascot). Speed bands are beginner-tuned (≤1.5s instant / 1.5–5s read / 5s+ slow). The hub is a **trip itinerary rail**
+  (2026-07, replaced the 2-column tile grid): packs in trip order (airport → … → hotel) on a vertical
+  rail, the current stop expanded into a focus card with a words-read bar and Start/Continue CTA, other
+  stops as compact rows with New/In-progress/Done status; tapping any stop opens the
   **pack detail** ([`ReadingPack.jsx`](../src/screens/ReadingPack.jsx)) with the reading round + a
   Conversations list. Per-word times persist under `reading` in
   `hk-progress-v2`. Content is **real and curated** across all eight packs; new word lists swap into
@@ -110,6 +146,14 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **Verb list** (v1.15.0) — passive reference screen opened from a card in Practice (alongside Kana chart). Lists 29 common N5/N4 verbs across three groups: RU verbs (ichidan), U verbs (godan), and Irregular. Tap any verb row to expand 4 conjugation tiles (Polite / Past / Te-form / Negative) and hear it via TTS. Implemented as [`VerbChart.jsx`](../src/screens/VerbChart.jsx), routed via `App.jsx` (`verbChart`), with the entry point in [`Practice.jsx`](../src/screens/Practice.jsx) using an `onOpenVerbChart` prop.
 - **Kana row word reveal** (v1.14.0) — after each kana row lesson (all non-Review units in Hiragana, Katakana, Voiced, and Combination chapters), an unscored bonus card appears at the end of the lesson showing one real Japanese word the learner can already sound out. The card shows the word large (JP font), its reading broken into syllables, the English meaning, and a "Got it →" / "Finish →" button. Implemented as a `word_reveal` question type appended in `unitQuestions()` via a `KANA_ROW_WORDS` lookup table in [`questions.js`](../src/questions.js). The card is excluded from scoring and SRS pool — `correct/total` in the result screen reflect only the drilled kana questions.
 - **Scenes teaser on Complex Sentences card** (v1.13.0) — when the learner reaches Complex Sentences (chapter 6) and Reading is already unlocked, a full-width "Explore Scenes →" soft-pill appears beneath the main CTA in the focus card. Updates to "Scenes · N of 8 done" once packs have been played. Implemented as a third conditional strip in [`Home.jsx`](../src/screens/Home.jsx), following the hira and sentence strip patterns. Uses `readingUnlocked` + `READING_PACKS` from [`reading.js`](../src/reading.js).
+- **Scenes-unlock result screen** (v1.19.0) — passing the unit that completes the `READING_UNLOCK`
+  chapter (Combination sounds) shows a "SCENES UNLOCKED" label and a secondary "Explore Scenes →"
+  CTA in [`Result.jsx`](../src/screens/Result.jsx) (reuses the graduation `onReadingGrad` wiring),
+  since the earlier gate made the unlock a silent mid-course event.
+- **Slow-word re-drill** (v1.19.0) — the pack detail screen shows a "Read N slow words again →"
+  pill (below the reading card) when any word's last read was in the slow band; it starts a round
+  restricted to those words (`slowWords` + `buildReadingSession(pack, only)` in
+  [`reading.js`](../src/reading.js)). Clears itself once the words are re-read faster.
 - **Graduation result screen** (v1.13.0) — completing the final unit of Complex Sentences with a passing score now triggers a dedicated graduation state in [`Result.jsx`](../src/screens/Result.jsx): "COURSE COMPLETE" label, "You can read Japanese." title, "All 7 chapters done. Time to use it." subline, green "Explore Scenes →" primary CTA, "Back to home" secondary. Wired via `onReadingGrad` prop → `replace({ name: "reading" })` in [`App.jsx`](../src/App.jsx) so Back from Scenes skips the result card.
 
 ## In progress
@@ -173,9 +217,10 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **No automated tests, linter, or type checking.** Nothing guards regressions; all verification is
   manual in the browser. Positional chapter/unit indexing (see [content-model.md](content-model.md))
   is the highest-risk area to change without tests.
-- **TTS quality is device-dependent.** Pronunciation relies on the OS Japanese voice. As of v1.9.0 a
-  *missing* voice degrades gracefully (see "Graceful audio fallback"), but a present-but-*poor* voice
-  still sounds bad, and there's no bundled recorded fallback yet ("B-part-2").
+- **TTS quality is device-dependent — except Conversations.** Dialogue lines use bundled neural
+  clips (v1.20.0), which closed the sharpest exposure. Lesson "Hear it", Listening mode, the Kana
+  chart, and Verb list still rely on the OS Japanese voice, so a poor device voice still sounds bad
+  there.
 - **`manifest.theme_color` hardcoded to light bg** — cosmetic; runtime overrides it after launch.
 - **Dead keyframe** `hkBreathe` in `styles.css`.
 - **Build path quirk on this machine** — the project path has a space; `vite.config.js` sets
@@ -184,7 +229,10 @@ The app is a complete, shippable PWA. All core flows are implemented:
 
 ## Planned / likely next (not committed)
 
-No formal roadmap file exists. No current candidates — confirm with the owner before starting new work.
+The 2026-07-03 roadmap (competitor scan: Dr. Moku, Ringotan, WaniKani, KanaDojo) is **fully
+shipped** as of v1.20.0: kana mnemonics (pre-existing), recorded dialogue audio, First kanji
+chapter, stroke-order playback, progress snapshot. Natural follow-ons, uncommitted: more kanji
+units (append to the `kanji` bank), kanji in Scenes word lists, recorded audio beyond dialogues.
 
 ## Release procedure (reminder)
 

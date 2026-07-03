@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell, Cat } from "../components/chrome.jsx";
-import { packById, buildReadingSession, band, BAND_COPY } from "../reading.js";
+import { packById, buildReadingSession, slowWords, band, BAND_COPY } from "../reading.js";
 
 // Maneki-neko reaction by reading speed (the brief: paw up = fast, sleepy =
 // slow). Cat usage in this mode is sanctioned by the feature brief — see
@@ -11,13 +11,15 @@ const moodFor = (correct, b) => (!correct ? "sad" : b === "instant" ? "point" : 
 
 const fmt = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
-function ReadingBody({ packId, onExit }) {
+function ReadingBody({ packId, slow, onExit }) {
   const { t } = useTheme();
   const progress = useProgress();
   const pack = packById(packId);
 
-  // Round is fixed for the life of the screen.
-  const [session] = React.useState(() => buildReadingSession(pack));
+  // Round is fixed for the life of the screen. `slow` restricts it to the
+  // words whose last read was in the slow band (the re-drill).
+  const [session] = React.useState(() =>
+    buildReadingSession(pack, slow ? slowWords(pack, progress.reading[packId]) : null));
 
   const [i, setI] = React.useState(0);
   const [picked, setPicked] = React.useState(null);
@@ -176,6 +178,6 @@ function ReadingBody({ packId, onExit }) {
   );
 }
 
-export default function ReadingMode({ packId, onExit }) {
-  return <Shell nav={false}><ReadingBody packId={packId} onExit={onExit} /></Shell>;
+export default function ReadingMode({ packId, slow, onExit }) {
+  return <Shell nav={false}><ReadingBody packId={packId} slow={slow} onExit={onExit} /></Shell>;
 }

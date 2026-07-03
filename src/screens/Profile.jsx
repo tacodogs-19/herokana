@@ -1,10 +1,10 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, ThemeToggle, Modal } from "../components/chrome.jsx";
+import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
-function ProfileBody({ onEditProfile, onReset }) {
+function ProfileBody({ onEditProfile, onReset, onOpenStats }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
@@ -39,8 +39,6 @@ function ProfileBody({ onEditProfile, onReset }) {
       <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
         <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
-        <div style={{ flex: 1 }} />
-        <ThemeToggle />
       </header>
 
       {/* overall + level */}
@@ -92,7 +90,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </div>
 
       {/* weekly activity */}
-      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72 }}>
+      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: t.ink, whiteSpace: "nowrap" }}>This week</span>
           <span style={{ fontSize: 12, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
@@ -108,11 +106,17 @@ function ProfileBody({ onEditProfile, onReset }) {
         </div>
       </div>
 
+      <div style={{ marginBottom: 72 }}>
+        <SettingRow label="See the full picture" sub="Chapters, review pool and Scenes in detail" onClick={onOpenStats} />
+      </div>
+
       {/* settings */}
       <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>SETTINGS</p>
       <div style={{ display: "grid", gap: 10 }}>
-        {/* Hard mode — unlocks once the whole track is complete */}
-        {p.trackComplete ? (
+        {/* Hard mode — unlocks once the whole track is complete. Also shown while
+            hard is ON even if new appended chapters un-completed the track, so a
+            learner is never stuck in hard mode with no way to toggle off. */}
+        {(p.trackComplete || p.hard) ? (
           <button onClick={() => p.setHard(!p.hard)} className="hk-press"
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
               background: p.hard ? t.primarySoft : t.surface, border: `1.5px solid ${p.hard ? t.primary : t.line}`, textAlign: "left" }}>
@@ -138,22 +142,28 @@ function ProfileBody({ onEditProfile, onReset }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.faint} strokeWidth="2.2" style={{ flexShrink: 0 }}><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
           </div>
         )}
-        {/* Theme: pinned manual choice vs following the device setting */}
-        <button onClick={() => (followsSystem ? setMode(mode) : followSystem())} className="hk-press"
-          style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-            background: followsSystem ? t.primarySoft : t.surface, border: `1.5px solid ${followsSystem ? t.primary : t.line}`, textAlign: "left" }}>
+        {/* Theme: Auto follows the device; Light/Dark pins a manual choice */}
+        <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
+          background: t.surface, border: `1.5px solid ${t.line}` }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Match device theme</div>
+            <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Theme</div>
             <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
-              {followsSystem ? "Light and dark follow your phone's setting" : `Pinned to ${mode} — tap to follow your phone`}
+              {followsSystem ? "Following your phone's setting" : `Pinned to ${mode}`}
             </div>
           </div>
-          <span style={{ width: 44, height: 26, borderRadius: 13, flexShrink: 0, position: "relative",
-            background: followsSystem ? t.primary : t.line, transition: "background 160ms" }}>
-            <span style={{ position: "absolute", top: 3, left: followsSystem ? 21 : 3, width: 20, height: 20, borderRadius: "50%",
-              background: "#fff", transition: "left 160ms", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }} />
-          </span>
-        </button>
+          <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, flexShrink: 0 }}>
+            {[{ id: "auto", label: "Auto" }, { id: "light", label: "Light" }, { id: "dark", label: "Dark" }].map((o) => {
+              const on = followsSystem ? o.id === "auto" : o.id === mode;
+              return (
+                <button key={o.id} onClick={() => (o.id === "auto" ? followSystem() : setMode(o.id))} className="hk-press"
+                  style={{ padding: "7px 12px", borderRadius: 9, border: "none", cursor: "pointer",
+                    background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
+                    boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                    fontSize: 12.5, fontWeight: on ? 800 : 600 }}>{o.label}</button>
+              );
+            })}
+          </div>
+        </div>
         <SettingRow label="Edit your details" sub="Personalise your experience" onClick={onEditProfile} />
         <SettingRow label="Back up progress" sub="Save a file you can keep or move to another device" onClick={downloadBackup} />
         <SettingRow label="Restore from backup" sub="Load progress from a backup file" onClick={() => fileRef.current && fileRef.current.click()} />
@@ -214,6 +224,6 @@ function ProfileBody({ onEditProfile, onReset }) {
   );
 }
 
-export default function Profile({ onNav, onEditProfile, onReset }) {
-  return <Shell active="Profile" onNav={onNav}><ProfileBody onEditProfile={onEditProfile} onReset={onReset} /></Shell>;
+export default function Profile({ onNav, onEditProfile, onReset, onOpenStats }) {
+  return <Shell active="Profile" onNav={onNav}><ProfileBody onEditProfile={onEditProfile} onReset={onReset} onOpenStats={onOpenStats} /></Shell>;
 }

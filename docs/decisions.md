@@ -7,6 +7,92 @@ are not relitigated. Newest at the top. When you make a non-obvious call, add an
 
 ## Product / UX
 
+### First kanji is a post-graduation bonus chapter, not a course extension (v1.20.0)
+Appended as chapter 8 (`kanji` — append-only per the positional-identity rule). Key calls:
+- **`jp` is the kanji itself** in the `KANJI` bank, unlike other banks where `jp` is kana. The kanji
+  must be the prompt at *every* difficulty (it's the thing being learned), and `bankQuestion` prompts
+  `p.jp` on easy — so the glyph goes in `jp`, one common standalone reading in `romaji`, meaning in
+  `en`. No engine changes; SRS/weak-spots/hard-mode/Practice-builder support came free via
+  `bankFor`/`itemIndex`/generic `BANKS` checks.
+- **One reading per kanji, deliberately.** Multiple readings (音/訓) are real but out of scope for a
+  "first kanji" chapter; we teach the reading you'd use seeing the word alone (ひと for 人, えき for
+  駅). Full readings belong to a future kanji-proper treatment, if ever.
+- **Graduation stays at Complex Sentences** — `isGraduation` in
+  [`Result.jsx`](../src/screens/Result.jsx) is pinned to `chapter.id === "complex"` instead of "last
+  chapter", so appended chapters never move the "You can read Japanese" moment. Kanji completion is a
+  normal chapter finish.
+- **Appending un-completes the track for finished learners** (accepted): `trackComplete` (hard-mode
+  gate) now includes kanji, so completers see new content and the hard pill returns only after it.
+  The one sharp edge — being *stuck* in hard mode with the toggle hidden — is guarded: Profile shows
+  the toggle while `hard` is on even if the track is no longer complete.
+- **Small units on purpose** (5–6 glyphs): matches kana-row lesson length; distractors draw from the
+  whole 23-kanji bank.
+
+### Kana stroke order is a passive reference, not a writing drill (v1.20.0)
+The chart's card view gained a "Show stroke order" toggle: KanjiVG path data (bundled
+`src/strokes.json` via `scripts/make-strokes.mjs`, CC BY-SA — credited on-screen) animates each
+stroke with a faint full-glyph guide. **No canvas tracing, no grading** — the app's read-first stance
+(see `KANA_BASICS`) holds; this answers "how is that written?" curiosity without adding a writing
+skill tree. Combination kana are two glyphs and hide the toggle (their components have entries).
+Reduced motion collapses to the finished glyph. Upgrade path if users ask to *write*: tracing on a
+canvas over these same paths.
+
+### Progress snapshot returns as a subpage, not inline Profile rows (v1.20.0)
+The per-chapter list removed in v1.7 (redundant with Home's track) returns as the dedicated subpage
+that removal note anticipated: [`Stats.jsx`](../src/screens/Stats.jsx) (route `stats`, entry
+Profile → "See the full picture"). It earns its place by showing what Home *doesn't*: all chapters
+at once, the review pool's box distribution (the SRS is otherwise invisible until items are due),
+and per-pack reading speeds. Read-only and calm: no goals, no comparisons, no red.
+
+### Dialogue audio is bundled neural clips, not live TTS (v1.20.0)
+The known "TTS quality is device-dependent" risk was sharpest in Conversations (multi-line dialogue,
+our differentiator), so the long-deferred "B-part-2" shipped as: pre-generate every dialogue line
+with Microsoft Edge neural voices (`msedge-tts`, dev-dependency) via `scripts/make-audio.mjs`, bundle
+the mp3s (~1.3MB, 81 lines, deduped across variants, keyed by speaker+text hash), and play them via
+`speakLine()` in [`speech.js`](../src/speech.js) with device TTS as the fallback for any line not in
+the manifest. Key calls:
+- **Two real voices** (Nanami=staff, Keita=you) replace the pitch trick — speaker separation for free.
+- **Clips are build inputs, committed** — generation needs network; the app stays offline-first
+  because the service worker precaches mp3s (`globPatterns` gained `mp3`).
+- **SUPPORT levels map to `playbackRate`** (TTS rate + 0.15 → 0.9/1.0/1.1); one recording, three speeds,
+  same fading-scaffold model as before.
+- **The ReadingPack "no Japanese voice" gate was removed** — dialogues are fully clip-covered, so a
+  device without a ja-JP voice can now play Conversations (it was the only surface hard-gated on the
+  voice). Lesson/Practice/charts still gate on `useJaVoice` since they speak arbitrary content.
+- **Scope: dialogues only.** Lesson words and Scenes reading words stay on device TTS — hundreds of
+  items, and single-word utterances survive poor voices far better than sentences. Extend only if
+  evidence demands.
+- **Regeneration is a manual step**: after editing `dialogue.js`, run `npm run audio` and commit the
+  new mp3s + `src/audio-manifest.json`. Unmanifested lines fall back to TTS, so a missed run degrades
+  instead of breaking.
+
+### Scenes unlocks after the kana chapters, not after Words & phrases (v1.19.0)
+`READING_UNLOCK` moved from `"phrase"` to `"combo"` — the Scenes tab now opens when all four kana
+chapters are done instead of after the 14-unit Words chapter. Rationale: content analysis showed
+every pack needs voiced + combination kana and most lean on katakana, so "all kana done" is the
+first moment every scene word is readable — and at that moment *all eight* packs are readable.
+**Per-pack incremental gating was considered and ruled out:** it would collapse to the same single
+unlock moment in practice, add a parallel unlock system, and contradict the logged "itinerary
+suggests an order, it doesn't gate one" call. Scenes' framing shifts slightly from capstone reward
+to reading-practice ground; the existing untimed reveal (romaji + meaning) already supports
+first-encounter words, so no UI change was needed. One-line change, gate hint updates itself.
+**The unlock moment is announced on the result screen** — mid-course the unlock would otherwise be
+silent (the graduation CTA and Complex Sentences teaser only cover late-course discovery), so
+[`Result.jsx`](../src/screens/Result.jsx) shows a "SCENES UNLOCKED" label + secondary
+"Explore Scenes →" CTA when a passed unit completes the `READING_UNLOCK` chapter, mirroring the
+graduation idiom (including its accepted quirk: it re-shows on replays of the completed chapter).
+Watch items, deliberately not pre-tuned: speed bands may read harsh for post-kana learners
+(raise `READ_MS` if evidence says so), and Conversations are now reachable pre-grammar (Guided
+support + soft read-first sequencing carry it for now).
+**The slow-word re-drill returned (owner call, reversing the v1.6 trims):** with Scenes now a
+mid-course surface, slow reads need somewhere to resurface (reading times aren't in Review/SRS).
+It lives on the **pack detail screen** ([`ReadingPack.jsx`](../src/screens/ReadingPack.jsx)) — a
+"Read N slow words again →" pill under the reading card, shown only when a word's *last* read was
+in the slow band — not the hub or end screen, whose versions were trimmed as clutter.
+`slowWords(pack, rec)` + an optional `only` filter on `buildReadingSession` in
+[`reading.js`](../src/reading.js); distractors still draw from the whole pack. A fast re-read
+updates `last`, so the pill clears itself.
+
 ### Kana intro — an on-ramp on the first chapter, not an onboarding lecture
 The app dropped brand-new learners straight into "which sound is あ?" with no frame for *what kana is*
 (sounds not letters, two sets, recognition not handwriting) — the most-exposed gap, since Hiragana is
@@ -131,7 +217,8 @@ feature brief. Key calls:
   screen is now just the avg + Done (cat-run mascot), and each pack tile is a single button. Per-word
   times are still recorded in `reading` (the per-pack best average drives the "Best Xs / word" stat), so
   a re-drill surface can be reintroduced later without a data migration — `buildReadingSession` just
-  needs its word filter back.
+  needs its word filter back. **Reintroduced in v1.19.0** on the pack detail screen (a surface that
+  didn't exist when the old versions were trimmed) — see the Scenes-unlock entry.
 - **Mascot extended to this mode — sanctioned by the brief.** This overrides the "icon + results only"
   rule in [CLAUDE.md](../CLAUDE.md)/[design-system.md](design-system.md) for reading mode specifically.
   The maneki-neko hosts the per-word reveal and the results screen (reusing existing moods), kept to
@@ -143,6 +230,19 @@ feature brief. Key calls:
 - **Real content, clean shape.** Word lists are real and curated (Konbini at reference depth, others
   at 8); each pack is `{ id, place, label, jp, blurb, words:[{ jp, romaji, en, where }] }` so new lists
   swap in without code changes. (Gating is global via `READING_UNLOCK`, not a per-pack field.)
+
+### Scenes hub is a trip itinerary, not a tile grid (2026-07)
+The Scenes hub ([`Reading.jsx`](../src/screens/Reading.jsx)) renders the eight packs as one vertical
+journey — airport → station → signs → konbini → café → restaurant → paying → hotel — on a rail, with
+the "current" stop (a tapped scene — remembered per session in `hk-scenes-sel` — else the first
+started-but-unfinished pack, else the first fresh one) expanded into a focus card (glyph, blurb,
+words-read bar, Start/Continue/Revisit CTA). Replaced the uniform 2-column tile grid, which was the
+one hub with no hierarchy or focal point. **Tapping a stop expands it in place** (animated morph,
+320ms ease-out-quart, per-property transitions, per-stop rail segments so the line never overshoots
+the end nodes); only the focus card's CTA navigates to the pack. Untouched scenes carry no status
+label — absence means "not started"; only In progress/Done are labelled. `TRIP_ORDER` is **display
+order only** — progress stays keyed by pack id, so reordering it is safe (unlike `CHAPTERS`). The
+itinerary suggests an order, it doesn't gate one (calm-over-urgency applies).
 
 ### Audio dialogue "Conversations" (v1.7.0) — comprehension MVP
 Audio dialogues live inside the reading packs (tapping a pack now opens a detail screen with the
@@ -204,21 +304,24 @@ avoids a hard gate on first run.
 ### Distractors can't be solved by first-letter spotting
 Kana multiple-choice (`withKanaOptions`) deliberately seeds options that share the answer's initial
 (or row, for irregular romaji like chi/tsu) so learners must actually recognise the glyph. Banked
-distractors are drawn from the same bank so wrong answers are plausibly similar. Don't replace this
-with random sampling.
+multiple-choice (`bankQuestion`) does the same since 2026-07: up to two of the three distractors share
+the answer's first letter (in whichever language is being answered), falling back to plain same-bank
+sampling when the bank lacks same-letter items. Don't replace either with random sampling.
 
 ### Lenient typed answers
 Hard/typed questions normalise case, spacing, and punctuation and accept **either** romaji or English.
 Rationale: test recall of meaning, not exact transcription or input-method quirks.
 
-### Practice modes are kana-only — except Weak spots (v1.8.0)
-Quick review, Speed and Listening draw only from learned kana (banked chapters excluded), falling back
-to the first hiragana row if nothing is learned. Custom sets and the Numbers tab cover deliberate
-banked/number practice. **Weak spots is the exception:** it replays every recorded miss — kana *and*
-banked (words/sentences/numbers) — ranked by miss count, then tops up with learned kana to fill the
-round. The misses were always recorded in `progress.wrong`; before v1.8.0 the mode silently dropped the
-banked ones (it reconstructed only from the kana pool). Reconstruction now goes through the shared
-`itemIndex`/`resolveKey` helpers in [`questions.js`](../src/questions.js) (also used by Review).
+### Practice modes are category-scoped (v1.8.0, categories extended 2026-07)
+The one-tap modes run within a category tab — **Alphabet / Words / Sentences / Numbers**
+(`modeQuestions` in [`questions.js`](../src/questions.js)). Words draws from the `phrase` bank only;
+Sentences from the `sentence` + `complex` banks — split so learners can drill vocabulary and full
+sentences separately. Alphabet draws from learned kana, falling back to the first hiragana row if
+nothing is learned. **Weak spots is scoped to the active category:** it replays recorded misses
+belonging to that category's pool, ranked by miss count, topped up from the pool to fill the round
+(reconstruction via the shared `itemIndex`/`resolveKey` helpers, also used by Review). The custom-set
+builder keeps its own three tabs (Alphabet / Words / Numbers) — the words-vs-sentences split is a
+modes-section concern only; the builder already separates banked chapters explicitly.
 
 **Weak spots vs Review** — both surface misses but answer different needs: Weak spots is on-demand
 ("drill what trips me up *now*", ranked by frequency, no scheduling); Review is calm spaced resurfacing

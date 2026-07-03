@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS, NUMBER_GROUPS } from "../data";
-import { Shell, ThemeToggle } from "../components/chrome.jsx";
+import { Shell } from "../components/chrome.jsx";
 import { useJaVoice } from "../speech.js";
 
 const PModeIcon = ({ name, c }) => {
@@ -59,7 +59,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
     return "words";
   });
   const [modeCategory, setModeCategory] = React.useState(() => {
-    try { const v = localStorage.getItem("hk-prac-mode-cat"); if (v === "alpha" || v === "words" || v === "numbers") return v; } catch (e) {}
+    try { const v = localStorage.getItem("hk-prac-mode-cat"); if (v === "alpha" || v === "words" || v === "sentences" || v === "numbers") return v; } catch (e) {}
     return "alpha";
   });
   React.useEffect(() => { try { sessionStorage.setItem("hk-prac-chapters", JSON.stringify([...picked])); } catch (e) {} }, [picked]);
@@ -171,8 +171,6 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
         <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Practice</h1>
-        <div style={{ flex: 1 }} />
-        <ThemeToggle />
       </header>
 
       <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>REFERENCE</p>
@@ -209,7 +207,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       {/* Practice modes — the one-tap path, front and centre */}
       <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE MODES</p>
       <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
-        {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "numbers", label: "Numbers" }].map((tb) => {
+        {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = modeCategory === tb.id;
           return (
             <button key={tb.id} onClick={() => setModeCategory(tb.id)} className="hk-press"

@@ -3,7 +3,7 @@ import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell, Cat } from "../components/chrome.jsx";
 import { dialogueById, prepareDialogue, SUPPORT } from "../dialogue.js";
-import { speak as ttsSpeak, useSpeechRecognition, useRecorder, looseMatch, toKana } from "../speech.js";
+import { speakLine, stopSpeech, useSpeechRecognition, useRecorder, looseMatch, toKana } from "../speech.js";
 
 // Small speaker icon for the audio-only (text hidden) state.
 const SpeakerIcon = ({ c, size = 18 }) => (
@@ -76,9 +76,11 @@ function DialogueBody({ dialogueId, onExit }) {
   const answered = picked != null;
   const correct = answered && picked === line.en;
 
-  // two "voices" (pitch) so the two speakers' turns are distinct
+  // bundled clips (two neural voices) with device TTS as the fallback
   const speak = React.useCallback((text, who) =>
-    ttsSpeak(text, { rate: level.rate, pitch: who === "you" ? 1.25 : 0.95 }), [level]);
+    speakLine(text, { who, rate: level.rate }), [level]);
+
+  React.useEffect(() => stopSpeech, []); // leaving mid-line stops the audio
 
   // Auto-play the active line; keep the newest bubble in view.
   React.useEffect(() => {
@@ -89,7 +91,7 @@ function DialogueBody({ dialogueId, onExit }) {
   }, [idx, phase]); // eslint-disable-line
 
   // Changing the support level restarts the run (scaffolding can't change mid-way).
-  const setLevel = (li) => { setLevelIdx(li); setIdx(0); setPicked(null); setResults([]); setPhase("play"); speechSynthesis.cancel(); };
+  const setLevel = (li) => { setLevelIdx(li); setIdx(0); setPicked(null); setResults([]); setPhase("play"); stopSpeech(); };
 
   const choose = (opt) => {
     if (answered) return;
@@ -103,7 +105,7 @@ function DialogueBody({ dialogueId, onExit }) {
       const got = results.filter((r) => r.correct).length;
       const pct = checks ? Math.round((got / checks) * 100) : 100;
       progress.recordDialogue(d.id, { pct, levelIdx });
-      speechSynthesis.cancel();
+      stopSpeech();
       setPhase("done");
       return;
     }

@@ -34,8 +34,8 @@ There are **two kinds**, distinguished by whether the chapter `id` is a key in `
 Separate from `CHAPTERS`/`BANKS`: [`reading.js`](../src/reading.js) holds `READING_PACKS`, the packs
 shown in the Scenes tab. Each pack: `{ id, place, label, jp, blurb, words: [{ jp, romaji, en, where }] }`
 (`where` is the "you'd see this where" hint). The **whole tab** unlocks once the `READING_UNLOCK`
-chapter (`"phrase"` — Words & phrases) is complete (`readingUnlocked`, reusing positional
-`progress.done`); packs don't gate individually. `buildReadingSession(pack)` builds a round of
+chapter (`"combo"` — the last kana chapter, i.e. all kana done) is complete (`readingUnlocked`,
+reusing positional `progress.done`); packs don't gate individually. `buildReadingSession(pack)` builds a round of
 `SESSION` (8) words (distractors are other meanings from the same pack). Content is real and curated;
 Konbini carries 14 words so its rounds vary, the others sit at 8. Swap word lists in without code changes.
 

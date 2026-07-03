@@ -1,4 +1,4 @@
-import { CHAPTERS, HIRA, KATA, BANKS, bankFor, NUMBER_GROUPS, FOUNDATIONS, KANA_MNEMONICS } from "./data";
+import { CHAPTERS, HIRA, KATA, BANKS, bankFor, NUMBER_GROUPS, FOUNDATIONS, KANA_MNEMONICS } from "./data.js";
 
 // One real word per kana row — keyed by unit.jp. Shown as an unscored reveal
 // card at the end of the lesson so the learner reads something meaningful
@@ -116,7 +116,23 @@ function bankQuestion(p, difficulty, pool, dirOverride) {
     furigana: useKanji ? p.jp : null, // reading shown under kanji prompt
   };
   if (q.input) q.answers = [p.romaji, p.en];
-  else q.options = shuffle([p[dir], ...shuffle(pool.filter((x) => x[dir] !== p[dir])).slice(0, 3).map((x) => x[dir])]);
+  else {
+    // Like withKanaOptions: up to two distractors share the answer's first
+    // letter so the round can't be solved by scanning initials, with the
+    // plain pool as fallback when the bank has too few same-letter items.
+    const rest = [...new Set(pool.filter((x) => x[dir] !== p[dir]).map((x) => x[dir]))];
+    const first = p[dir][0].toLowerCase();
+    const opts = [];
+    const take = (arr, max) => {
+      for (const v of shuffle(arr)) {
+        if (opts.length >= max) break;
+        if (!opts.includes(v)) opts.push(v);
+      }
+    };
+    take(rest.filter((v) => v[0].toLowerCase() === first), 2);
+    take(rest, 3);
+    q.options = shuffle([p[dir], ...opts]);
+  }
   return q;
 }
 
@@ -186,10 +202,12 @@ export function modeQuestions(mode, progress, count = 10, category = "alpha") {
     return qs;
   }
 
-  if (category === "words") {
+  if (category === "words" || category === "sentences") {
+    // words = the phrase bank; sentences = the sentence + complex banks
+    const bankIds = category === "words" ? ["phrase"] : ["sentence", "complex"];
     const pool = [];
     CHAPTERS.forEach((c, ci) => {
-      if (!BANKS[c.id]) return;
+      if (!bankIds.includes(c.id)) return;
       const bank = bankFor(c.id);
       const flat = bank.flat();
       const done = progress.done[ci] || 0;
@@ -198,9 +216,10 @@ export function modeQuestions(mode, progress, count = 10, category = "alpha") {
     });
     if (mode === "weak") {
       const idx = itemIndex();
-      const numberKeys = new Set(NUMBER_GROUPS.flatMap((g) => g.items.flatMap((p) => [`${p.jp}|${p.romaji}`, `${p.jp}|${p.en}`])));
-      const ranked = Object.entries(progress.wrong).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter((k) => !numberKeys.has(k));
-      const weak = ranked.map((k) => resolveKey(k, idx)).filter((q) => q && q.type === "phrase");
+      // only misses belonging to this category's banks
+      const inPool = new Set(pool.flatMap(({ p }) => [`${p.jp}|${p.romaji}`, `${p.jp}|${p.en}`]));
+      const ranked = Object.entries(progress.wrong).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter((k) => inPool.has(k));
+      const weak = ranked.map((k) => resolveKey(k, idx)).filter(Boolean);
       const have = new Set(weak.map((q) => `${q.prompt}|${q.answer}`));
       const fill = shuffle(pool).map(({ p, flat }) => bankQuestion(p, "easy", flat)).filter((q) => !have.has(`${q.prompt}|${q.answer}`));
       return [...weak, ...fill].slice(0, count);

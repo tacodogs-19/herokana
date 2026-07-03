@@ -14,6 +14,9 @@ export default defineConfig({
       workbox: {
         skipWaiting: false,
         clientsClaim: false,
+        // Dialogue clips (public/audio/*.mp3, ~1.3MB) must precache so
+        // Conversations keep their audio offline.
+        globPatterns: ["**/*.{js,css,html,svg,png,mp3}"],
         // Don't intercept /.well-known/ — Android's asset link verifier fetches
         // assetlinks.json as a plain HTTP request (not via the SW), but excluding
         // it here also lets the file load correctly in a browser for verification.

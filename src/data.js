@@ -104,6 +104,15 @@ export const CHAPTERS = [
       { jp: "繋", label: "Connected ideas", romaji: [] },
       { jp: "理", label: "Reasons", romaji: [] },
     ] },
+  // Appended 2026-07 (append-only — see decisions.md on positional identity).
+  // Post-graduation bonus: graduation stays pinned to "complex" in Result.jsx.
+  { id: "kanji", name: "First kanji", caption: "The kanji you'll see everywhere.",
+    units: [
+      { jp: "一", label: "Numbers", romaji: [] },
+      { jp: "日", label: "Time", romaji: [] },
+      { jp: "人", label: "People", romaji: [] },
+      { jp: "駅", label: "Signs in town", romaji: [] },
+    ] },
 ];
 
 export const PHRASE_IDX = CHAPTERS.findIndex((c) => c.id === "phrase");
@@ -1136,8 +1145,47 @@ export const COMPLEX = [
   ],
 ];
 
+// First kanji — one unit per CHAPTERS "kanji" unit, in order. Unlike the other
+// banks, `jp` is the kanji itself (it's the thing being learned, so it is the
+// prompt at every difficulty); `romaji` is ONE common reading — the one you'd
+// use reading the word alone (see decisions.md) — and `en` the core meaning.
+// Small units on purpose: five or six glyphs is a kana-row-sized lesson.
+export const KANJI = [
+  [ // Numbers — prices, floors, platforms
+    { jp: "一", romaji: "ichi", en: "one" },
+    { jp: "二", romaji: "ni", en: "two" },
+    { jp: "三", romaji: "san", en: "three" },
+    { jp: "十", romaji: "juu", en: "ten" },
+    { jp: "百", romaji: "hyaku", en: "hundred" },
+    { jp: "千", romaji: "sen", en: "thousand" },
+  ],
+  [ // Time — timetables, opening hours
+    { jp: "日", romaji: "nichi", en: "day / sun" },
+    { jp: "月", romaji: "getsu", en: "month / moon" },
+    { jp: "時", romaji: "ji", en: "o'clock / time" },
+    { jp: "分", romaji: "fun", en: "minute" },
+    { jp: "今", romaji: "ima", en: "now" },
+    { jp: "年", romaji: "toshi", en: "year" },
+  ],
+  [ // People
+    { jp: "人", romaji: "hito", en: "person" },
+    { jp: "男", romaji: "otoko", en: "man" },
+    { jp: "女", romaji: "onna", en: "woman" },
+    { jp: "子", romaji: "ko", en: "child" },
+    { jp: "友", romaji: "tomo", en: "friend" },
+  ],
+  [ // Signs in town — the Scenes vocabulary, now in kanji
+    { jp: "駅", romaji: "eki", en: "station" },
+    { jp: "出口", romaji: "deguchi", en: "exit" },
+    { jp: "入口", romaji: "iriguchi", en: "entrance" },
+    { jp: "円", romaji: "en", en: "yen" },
+    { jp: "店", romaji: "mise", en: "shop" },
+    { jp: "水", romaji: "mizu", en: "water" },
+  ],
+];
+
 // Banked chapters draw their lessons from a bank instead of the kana tables.
-export const BANKS = { phrase: PHRASES, sentence: SENTENCES, complex: COMPLEX };
+export const BANKS = { phrase: PHRASES, sentence: SENTENCES, complex: COMPLEX, kanji: KANJI };
 
 // Numbers — practice-only, grouped the way Japanese numbers are usually taught:
 // the 1-10 base, the teens, the tens, hundreds (with 300/600/800 sound changes),

@@ -2,6 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
+import { READING_UNLOCK } from "../reading.js";
 import { Shell, Cat } from "../components/chrome.jsx";
 
 function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, onFinish, onReadingGrad }) {
@@ -17,7 +18,13 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   // store is already updated by the time this renders; hard lessons track hardDone
   const newDone = isUnit ? (session.hard ? progress.hardDone : progress.done)[session.chapterIdx] : 0;
   const cpct = isUnit ? Math.round((newDone / chapter.units.length) * 100) : 0;
-  const isGraduation = isUnit && passed && session.chapterIdx === CHAPTERS.length - 1 && newDone >= chapter.units.length;
+  // Pinned to the Complex Sentences chapter (not the last chapter) so appended
+  // bonus chapters — First kanji onward — never move the graduation moment.
+  const isGraduation = isUnit && passed && chapter.id === "complex" && newDone >= chapter.units.length;
+  // Completing the READING_UNLOCK chapter opens the Scenes tab — announce it here,
+  // since the unlock otherwise happens silently mid-course. Like isGraduation, this
+  // also shows on replays of a completed chapter's units; accepted for simplicity.
+  const isScenesUnlock = isUnit && passed && !isGraduation && chapter.id === READING_UNLOCK && newDone >= chapter.units.length;
 
   const Tile = ({ label, value, color, i }) => (
     <div className="hk-tile-enter" style={{ '--i': i, flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "13px 10px", textAlign: "center" }}>
@@ -31,7 +38,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <Cat mood={passed ? "celebrate" : "sad"} size={150} style={{ marginBottom: 2 }} className="hk-scale-in" />
         <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 800, color: passed ? t.done : t.primary }}>
-          {passed ? (isGraduation ? "COURSE COMPLETE" : isUnit ? "UNIT COMPLETE" : "PRACTICE COMPLETE") : "KEEP PRACTISING"}
+          {passed ? (isGraduation ? "COURSE COMPLETE" : isScenesUnlock ? "SCENES UNLOCKED" : isUnit ? "UNIT COMPLETE" : "PRACTICE COMPLETE") : "KEEP PRACTISING"}
         </p>
         <h1 style={{ margin: "2px 0 0", fontSize: 27, fontWeight: 800, color: t.ink, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
           {isGraduation ? "You can read Japanese." : (passed ? "You nailed it!" : "Almost there!")}
@@ -39,7 +46,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
         <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>
           {isUnit
             ? (isGraduation
-                ? "All 7 chapters done. Time to use it."
+                ? "The whole course, done. First kanji await."
                 : <><span style={{ fontFamily: JP, fontWeight: 700 }}>{unit.jp}</span> &nbsp;{chapter.name} · {unit.label}</>)
             : `Practice session · ${total} questions`}
         </p>
@@ -90,6 +97,12 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
                 boxShadow: passed ? t.glow(t.done) : t.glow(t.primary) }}>
                 {passed ? "Continue →" : "Back to home"}
               </button>
+              {isScenesUnlock && (
+                <button onClick={onReadingGrad} className="hk-press" style={{ width: "100%", padding: "15px", borderRadius: 16,
+                  border: "none", background: t.sunk, color: t.ink, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800, cursor: "pointer" }}>
+                  Explore Scenes →
+                </button>
+              )}
             </>
           )
         ) : (

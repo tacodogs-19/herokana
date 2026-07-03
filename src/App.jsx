@@ -12,6 +12,7 @@ import ReadingPack from "./screens/ReadingPack.jsx";
 import ReadingMode from "./screens/ReadingMode.jsx";
 import Dialogue from "./screens/Dialogue.jsx";
 import KanaChart from "./screens/KanaChart.jsx";
+import Stats from "./screens/Stats.jsx";
 import VerbChart from "./screens/VerbChart.jsx";
 import Basics from "./screens/Basics.jsx";
 
@@ -103,9 +104,10 @@ export default function App() {
   const startReview = () => go({ name: "lesson", session: { kind: "review" } });
   const startChapterReview = (ci) => go({ name: "lesson", session: { kind: "chapter-review", chapterIdx: ci } });
   const openPack = (packId) => go({ name: "readingPack", packId });
-  const startReading = (packId) => go({ name: "readingDrill", packId });
+  const startReading = (packId, slow) => go({ name: "readingDrill", packId, slow });
   const startDialogue = (dialogueId, packId) => go({ name: "dialogue", dialogueId, packId });
   const openKanaChart = () => go({ name: "kanaChart" });
+  const openStats = () => go({ name: "stats" });
   const openVerbChart = () => go({ name: "verbChart" });
   const openBasics = () => go({ name: "sentenceBasics" });
   const openKanaBasics = () => go({ name: "kanaBasics" });
@@ -144,11 +146,13 @@ export default function App() {
         onReadingGrad={() => replace({ name: "reading" })} />
     );
   else if (scr.name === "profile")
-    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} />;
+    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} onOpenStats={openStats} />;
   else if (scr.name === "practice")
     content = <Practice onNav={nav} onStart={startPractice} onOpenChart={openKanaChart} onOpenVerbChart={openVerbChart} onOpenBasics={openBasics} />;
   else if (scr.name === "kanaChart")
     content = <KanaChart onClose={goBack} />;
+  else if (scr.name === "stats")
+    content = <Stats onClose={goBack} />;
   else if (scr.name === "verbChart")
     content = <VerbChart onClose={goBack} />;
   else if (scr.name === "sentenceBasics")
@@ -163,7 +167,7 @@ export default function App() {
     content = <ReadingPack packId={scr.packId} onNav={nav} onBack={goBack}
       onStartReading={startReading} onStartDialogue={startDialogue} />;
   else if (scr.name === "readingDrill")
-    content = <ReadingMode key={scr.packId} packId={scr.packId} onExit={goBack} />;
+    content = <ReadingMode key={`${scr.packId}${scr.slow ? "-slow" : ""}`} packId={scr.packId} slow={scr.slow} onExit={goBack} />;
   else if (scr.name === "dialogue")
     content = <Dialogue key={scr.dialogueId} dialogueId={scr.dialogueId} onExit={goBack} />;
   else

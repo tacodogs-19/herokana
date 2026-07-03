@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { saveProfile, COUNTRIES, HOBBIES } from "../data";
-import { Shell, ThemeToggle, Cat } from "../components/chrome.jsx";
+import { Shell, Cat } from "../components/chrome.jsx";
 
 // First-run (and editable) questionnaire — one question per page, skippable at
 // any stage. Answers personalise the Sentences "About me" and "Likes" units.
@@ -137,7 +137,6 @@ function OnboardingBody({ initial, onDone, registerBack }) {
         <div style={{ flex: 1 }} />
         <button onClick={skipAll} className="hk-press" style={{ background: "transparent", border: "none", cursor: "pointer",
           color: t.sub, fontFamily: DISPLAY, fontSize: 13, fontWeight: 700, padding: "6px 4px" }}>Skip all</button>
-        <ThemeToggle />
       </header>
 
       {/* progress dots */}

@@ -1,15 +1,42 @@
 import React from "react";
+import CLIPS from "./audio-manifest.json";
 
-// All of HeroKana's audio runs on the OS ja-JP voice via Web Speech. One place
-// for the utterance + a hook to detect whether a Japanese voice exists, so
-// audio-dependent surfaces can degrade gracefully instead of failing silently.
+// All of HeroKana's audio runs on the OS ja-JP voice via Web Speech, except
+// dialogue lines, which prefer bundled neural-TTS clips (scripts/make-audio.mjs)
+// and fall back to the OS voice. One place for the utterance + a hook to detect
+// whether a Japanese voice exists, so audio-dependent surfaces can degrade
+// gracefully instead of failing silently.
 
 export function speak(text, { rate = 0.8, pitch = 1 } = {}) {
+  stopSpeech();
   try {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "ja-JP"; u.rate = rate; u.pitch = pitch;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    speechSynthesis.speak(u);
   } catch (e) {}
+}
+
+let clipEl = null;
+export function stopSpeech() {
+  try { speechSynthesis.cancel(); } catch (e) {}
+  if (clipEl) { try { clipEl.pause(); } catch (e) {} clipEl = null; }
+}
+
+// Dialogue lines: play the bundled clip for this speaker+text if one exists,
+// else fall back to device TTS with the per-speaker pitch trick. `rate` is the
+// SUPPORT-level TTS rate (0.75–0.95); clips are natural-speed recordings, so it
+// maps up to a playbackRate around 1 (browsers preserve pitch by default).
+export function speakLine(text, { who = "staff", rate = 0.85 } = {}) {
+  const file = (CLIPS[who] || {})[text];
+  const fallback = () => speak(text, { rate, pitch: who === "you" ? 1.25 : 0.95 });
+  if (!file) return fallback();
+  stopSpeech();
+  try {
+    const a = new Audio(`/audio/${file}`);
+    a.playbackRate = rate + 0.15;
+    clipEl = a;
+    a.play().catch(fallback);
+  } catch (e) { fallback(); }
 }
 
 // --- Speaking practice (production) ---------------------------------------

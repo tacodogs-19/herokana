@@ -2,9 +2,8 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell } from "../components/chrome.jsx";
-import { packById } from "../reading.js";
+import { packById, slowWords } from "../reading.js";
 import { dialoguesForPack, checkCount, SUPPORT } from "../dialogue.js";
-import { useJaVoice } from "../speech.js";
 
 const fmt = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
@@ -14,8 +13,8 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
   const pack = packById(packId);
   const data = progress.reading[packId];
   const played = (data && data.plays) || 0;
-  const dialogues = dialoguesForPack(packId);
-  const hasVoice = useJaVoice(); // conversations are listening-only — no voice, no play
+  const slow = slowWords(pack, data);
+  const dialogues = dialoguesForPack(packId); // audio comes from bundled clips, no device voice needed
 
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
@@ -63,15 +62,19 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
         <span style={{ color: t.faint, fontSize: 18, flexShrink: 0 }}>›</span>
       </button>
 
+      {/* re-drill the words whose last read was slow — only shown when there are any */}
+      {slow.length > 0 && (
+        <button onClick={() => onStartReading(packId, true)} className="hk-press"
+          style={{ display: "block", margin: "-3px 0 11px", padding: "9px 14px", cursor: "pointer",
+            background: t.sunk, border: "none", borderRadius: 12, fontFamily: DISPLAY,
+            fontSize: 12.5, fontWeight: 700, color: t.sub }}>
+          Read {slow.length} slow {slow.length === 1 ? "word" : "words"} again →
+        </button>
+      )}
+
       {dialogues.length === 0 ? (
         <div style={{ background: t.sunk, borderRadius: 16, padding: "18px 16px", textAlign: "center" }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: t.faint }}>More conversations coming soon.</p>
-        </div>
-      ) : !hasVoice ? (
-        <div style={{ background: t.sunk, borderRadius: 16, padding: "18px 16px", textAlign: "center" }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: t.faint, lineHeight: 1.5 }}>
-            Conversations are listening practice — this device has no Japanese voice, so there's no audio to play.
-          </p>
         </div>
       ) : (
         <div style={{ display: "grid", gap: 11 }}>

@@ -46,19 +46,6 @@ export function Ring({ size = 46, stroke = 4, pct, color, track, pct2, color2, c
   );
 }
 
-export function ThemeToggle() {
-  const { t, mode, setMode } = useTheme();
-  return (
-    <button onClick={() => setMode(mode === "light" ? "dark" : "light")} className="hk-press" aria-label="Toggle theme"
-      style={{ width: 42, height: 42, borderRadius: 13, cursor: "pointer", background: t.surface, border: `1.5px solid ${t.line}`,
-        color: t.ink, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      {mode === "light"
-        ? <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" /></svg>
-        : <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4.2" /><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19" /></svg>}
-    </button>
-  );
-}
-
 function NavIcon({ name, active, c }) {
   if (name === "Learn") return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.2 : 1.9} strokeLinecap="round" strokeLinejoin="round">
