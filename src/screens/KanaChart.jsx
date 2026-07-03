@@ -123,17 +123,55 @@ export default function KanaChart({ onClose }) {
     setFlipped(false);
   };
 
-  // Swipe left/right on the card = next/prev. A real swipe also suppresses the
-  // tap-to-flip that some browsers still fire after touchend.
+  // Swipe like the Learn-tab chapter carousel: the card follows the finger,
+  // flies out on a real swipe, and the next card settles in with the same
+  // 260ms expo ease and side-card fade/scale. Taps still flip; vertical
+  // scrolling is untouched. A drag also suppresses the tap-to-flip click.
+  const EASE_EXPO = "cubic-bezier(0.16, 1, 0.3, 1)";
+  const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const [slideDir, setSlideDir] = React.useState(0); // 1 = new card enters from the right, -1 = from the left
+  const cardRef = React.useRef(null);
   const touch = React.useRef(null);
   const swiped = React.useRef(false);
-  const onTouchStart = (e) => { swiped.current = false; const p = e.touches[0]; touch.current = { x: p.clientX, y: p.clientY }; };
+  const animating = React.useRef(false);
+
+  const advance = (dir) => { setSlideDir(dir); goCard(dir); };
+
+  const onTouchStart = (e) => {
+    if (animating.current) return;
+    swiped.current = false;
+    const p = e.touches[0];
+    touch.current = { x: p.clientX, y: p.clientY, horiz: null };
+  };
+  const onTouchMove = (e) => {
+    const s = touch.current, el = cardRef.current;
+    if (!s || !el) return;
+    const p = e.touches[0];
+    const dx = p.clientX - s.x, dy = p.clientY - s.y;
+    if (s.horiz == null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) s.horiz = Math.abs(dx) > Math.abs(dy);
+    if (s.horiz) {
+      swiped.current = true;
+      el.style.transition = "none";
+      el.style.transform = `translateX(${dx}px)`;
+    }
+  };
   const onTouchEnd = (e) => {
     const s = touch.current; touch.current = null;
-    if (!s) return;
-    const p = e.changedTouches[0];
-    const dx = p.clientX - s.x, dy = p.clientY - s.y;
-    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) { swiped.current = true; goCard(dx < 0 ? 1 : -1); }
+    const el = cardRef.current;
+    if (!s || !s.horiz || !el) return;
+    const dx = e.changedTouches[0].clientX - s.x;
+    if (Math.abs(dx) > 56) {
+      const dir = dx < 0 ? 1 : -1;
+      if (reducedMotion()) return advance(dir);
+      animating.current = true;
+      el.style.transition = `transform 200ms ${EASE_EXPO}, opacity 200ms ${EASE_EXPO}`;
+      el.style.transform = `translateX(${-dir * el.offsetWidth}px)`;
+      el.style.opacity = "0.55";
+      setTimeout(() => { animating.current = false; advance(dir); }, 200);
+    } else {
+      el.style.transition = `transform 260ms ${EASE_EXPO}`;
+      el.style.transform = "translateX(0px)";
+    }
   };
 
   const Cell = ({ rj: romaji }) => {
@@ -265,10 +303,12 @@ export default function KanaChart({ onClose }) {
           </>
         ) : (
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
-            <div key={`${rowFilter}-${cardIdx}`}
+            <div key={`${rowFilter}-${cardIdx}`} ref={cardRef}
               onClick={() => { if (swiped.current) { swiped.current = false; return; } setFlipped((f) => !f); if (hasJa) speak(map[rj]); }}
-              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-              style={{ width: "100%", perspective: "1200px", cursor: "pointer", flexShrink: 0, touchAction: "pan-y" }}>
+              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
+              onAnimationEnd={(e) => { e.currentTarget.style.animation = "none"; }}
+              style={{ width: "100%", perspective: "1200px", cursor: "pointer", flexShrink: 0, touchAction: "pan-y",
+                animation: slideDir ? `${slideDir === 1 ? "hkCardInR" : "hkCardInL"} 260ms ${EASE_EXPO} both` : "none" }}>
               <div style={{ position: "relative", width: "100%", height: 300,
                 transformStyle: "preserve-3d", transition: "transform 400ms cubic-bezier(0.4,0,0.2,1)",
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
@@ -320,7 +360,7 @@ export default function KanaChart({ onClose }) {
 
             {/* Prev / counter / Next */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, width: "100%" }}>
-              <button onClick={() => goCard(-1)} className="hk-press"
+              <button onClick={() => advance(-1)} className="hk-press"
                 style={{ width: 50, height: 50, borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: t.ink, flexShrink: 0 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M15 18l-6-6 6-6" /></svg>
@@ -329,7 +369,7 @@ export default function KanaChart({ onClose }) {
                 <span style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{cardIdx + 1}</span>
                 <span style={{ fontSize: 14, fontWeight: 600, color: t.faint }}> / {visibleKana.length}</span>
               </div>
-              <button onClick={() => goCard(1)} className="hk-press"
+              <button onClick={() => advance(1)} className="hk-press"
                 style={{ width: 50, height: 50, borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: t.ink, flexShrink: 0 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>

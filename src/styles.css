@@ -85,6 +85,17 @@ button, input { font-family: inherit; }
   to   { opacity: 1; transform: none; }
 }
 
+/* kana chart: card slide-in — mirrors the Learn carousel settle
+   (260ms expo ease, side-card opacity 0.55 / scale 0.92) */
+@keyframes hkCardInR {
+  from { opacity: 0.55; transform: translateX(55%) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes hkCardInL {
+  from { opacity: 0.55; transform: translateX(-55%) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* kana chart: stroke-order draw (paths use pathLength=1) */
 .hk-stroke { animation: hkStroke 460ms ease forwards; }
 @keyframes hkStroke {
