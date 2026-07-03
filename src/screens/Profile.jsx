@@ -44,11 +44,11 @@ function ProfileBody({ onEditProfile, onReset }) {
       {/* overall + level */}
       <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>YOUR PROGRESS</p>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-        <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+        <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
           {(() => {
             const hardPct = p.bankedTotal > 0 ? Math.round((p.hardDoneTotal / p.bankedTotal) * 100) : 0;
             return (
-              <Ring size={88} stroke={9} pct={p.overallPct} color={p.hard ? t.sunk : t.primary} track={t.sunk}
+              <Ring size={100} stroke={10} pct={p.overallPct} color={p.hard ? t.sunk : t.primary} track={t.sunk}
                 pct2={p.hard ? hardPct : undefined} color2={t.gold}>
                 <div style={{ textAlign: "center", lineHeight: 1 }}>
                   {p.hard ? (

@@ -65,7 +65,10 @@ function NavIcon({ name, active, c }) {
   );
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill={active ? c : "none"} stroke={c} strokeWidth={active ? 1.8 : 1.9} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4" /><path d="M4 20.5a8 8 0 0 1 16 0" />
+      {/* active shoulders close with z so the fill's bottom edge gets round
+          joins — an open arc auto-closes with sharp corners that poke past
+          the round stroke caps and read as a clipped edge */}
+      <circle cx="12" cy="8" r="4" /><path d={active ? "M4 20.5a8 8 0 0 1 16 0z" : "M4 20.5a8 8 0 0 1 16 0"} />
     </svg>
   );
 }
