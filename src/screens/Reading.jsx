@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell } from "../components/chrome.jsx";
+import { Shell, Modal } from "../components/chrome.jsx";
 import { READING_PACKS, readingUnlocked, readingGate } from "../reading.js";
 import { dialoguesForPack } from "../dialogue.js";
 
@@ -186,6 +186,9 @@ function ReadingBody({ onOpenPack }) {
   const curIdx = selIdx >= 0 ? selIdx : startedIdx >= 0 ? startedIdx : states.findIndex((s) => !s.done);
   const doneCount = states.filter((s) => s.done).length;
 
+  const [confirmReset, setConfirmReset] = React.useState(false);
+  const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
+
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
@@ -222,6 +225,47 @@ function ReadingBody({ onOpenPack }) {
             </React.Fragment>
           ))}
         </div>
+      )}
+
+      {/* quiet reset — Scenes data only, nothing else is touched */}
+      {unlocked && hasScenesData && (
+        <button onClick={() => setConfirmReset(true)} className="hk-press"
+          style={{ display: "block", margin: "28px auto 0", padding: "8px 16px", borderRadius: 12, cursor: "pointer",
+            background: "transparent", border: "none", color: t.faint, fontFamily: DISPLAY, fontSize: 12, fontWeight: 700 }}>
+          Reset Scenes progress
+        </button>
+      )}
+
+      {confirmReset && (
+        <Modal onDismiss={() => setConfirmReset(false)}>
+          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px",
+            boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <span style={{ width: 34, height: 34, borderRadius: 10, background: t.sunk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+                </svg>
+              </span>
+              <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset Scenes?</div>
+            </div>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "8px 0 18px", fontFamily: DISPLAY, lineHeight: 1.5 }}>
+              Reading times and conversation results will be cleared, so every stop starts fresh.
+              Chapter progress, XP and reviews are unaffected.
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              <button onClick={() => { progress.resetScenes(); setSel(null); setConfirmReset(false); }} className="hk-press"
+                style={{ width: "100%", padding: "13px", borderRadius: 14, border: "none", background: t.primary,
+                  color: "#fff", fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>
+                Reset Scenes
+              </button>
+              <button onClick={() => setConfirmReset(false)} className="hk-press"
+                style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
+                  color: t.sub, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>
+                Keep my progress
+              </button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

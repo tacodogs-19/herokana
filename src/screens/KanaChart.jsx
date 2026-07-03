@@ -133,12 +133,37 @@ export default function KanaChart({ onClose }) {
   const cardRef = React.useRef(null);
   const touch = React.useRef(null);
   const swiped = React.useRef(false);
-  const animating = React.useRef(false);
 
-  const advance = (dir) => { setSlideDir(dir); goCard(dir); };
+  // The outgoing card leaves as a non-interactive DOM ghost so the real card
+  // can advance (and accept taps) immediately — the ghost and the incoming
+  // card cross in flight like adjacent slots on the Learn carousel.
+  const flyOutGhost = (el, dir) => {
+    const parent = el.parentElement;
+    parent.style.position = "relative";
+    // measure now — el is detached from the DOM (remounted) before the rAF fires
+    const w = el.offsetWidth;
+    const ghost = el.cloneNode(true);
+    Object.assign(ghost.style, {
+      position: "absolute", left: el.offsetLeft + "px", top: el.offsetTop + "px",
+      width: w + "px", pointerEvents: "none", transition: "none", animation: "none",
+    });
+    parent.appendChild(ghost);
+    requestAnimationFrame(() => {
+      ghost.style.transition = `transform 260ms ${EASE_EXPO}, opacity 260ms ${EASE_EXPO}`;
+      ghost.style.transform = `translateX(${-dir * w * 1.05}px) scale(0.92)`;
+      ghost.style.opacity = "0";
+    });
+    setTimeout(() => ghost.remove(), 300);
+  };
+
+  const advance = (dir) => {
+    const el = cardRef.current;
+    if (el && !reducedMotion()) flyOutGhost(el, dir);
+    setSlideDir(dir);
+    goCard(dir);
+  };
 
   const onTouchStart = (e) => {
-    if (animating.current) return;
     swiped.current = false;
     const p = e.touches[0];
     touch.current = { x: p.clientX, y: p.clientY, horiz: null };
@@ -161,13 +186,7 @@ export default function KanaChart({ onClose }) {
     if (!s || !s.horiz || !el) return;
     const dx = e.changedTouches[0].clientX - s.x;
     if (Math.abs(dx) > 56) {
-      const dir = dx < 0 ? 1 : -1;
-      if (reducedMotion()) return advance(dir);
-      animating.current = true;
-      el.style.transition = `transform 200ms ${EASE_EXPO}, opacity 200ms ${EASE_EXPO}`;
-      el.style.transform = `translateX(${-dir * el.offsetWidth}px)`;
-      el.style.opacity = "0.55";
-      setTimeout(() => { animating.current = false; advance(dir); }, 200);
+      advance(dx < 0 ? 1 : -1); // ghost departs from the drag position
     } else {
       el.style.transition = `transform 260ms ${EASE_EXPO}`;
       el.style.transform = "translateX(0px)";
@@ -228,7 +247,7 @@ export default function KanaChart({ onClose }) {
         </div>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: view === "card" ? "hidden" : "auto", padding: "4px 20px 28px", display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: view === "card" ? "hidden" : "auto", overflowX: "hidden", padding: "4px 20px 28px", display: "flex", flexDirection: "column" }}>
 
         {/* first-visit hint */}
         {hint && (

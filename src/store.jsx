@@ -48,6 +48,12 @@ export function ProgressProvider({ children }) {
     setP((prev) => ({ ...prev, reviewDoneDate: todayISO() }));
   }, []);
 
+  // Clear Scenes data only (reading times + dialogue results); chapters,
+  // XP and the review pool are untouched.
+  const resetScenes = React.useCallback(() => {
+    setP((prev) => ({ ...prev, reading: {}, dialogues: {} }));
+  }, []);
+
   const value = React.useMemo(() => {
     const totalUnits = CHAPTERS.reduce((s, c) => s + c.units.length, 0);
     const totalDone = p.done.reduce((s, n) => s + n, 0);
@@ -84,9 +90,9 @@ export function ProgressProvider({ children }) {
       weekBars: week,
       todayIdx: (new Date().getDay() + 6) % 7,
       completeLesson, setHard, recordReading, recordDialogue,
-      resetProgress, resetFromChapter, markReviewDone,
+      resetProgress, resetFromChapter, markReviewDone, resetScenes,
     };
-  }, [p, completeLesson, setHard, recordReading, recordDialogue, resetProgress, resetFromChapter, markReviewDone]);
+  }, [p, completeLesson, setHard, recordReading, recordDialogue, resetProgress, resetFromChapter, markReviewDone, resetScenes]);
 
   return <ProgressCtx.Provider value={value}>{children}</ProgressCtx.Provider>;
 }

@@ -535,7 +535,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                           : <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, color: "#fff" }}>{c.units[0].jp}</span>}
                       </span>
                       <span style={{ fontSize: 9.5, fontWeight: on ? 800 : 600, color: on ? t.ink : t.faint, textAlign: "center",
-                        lineHeight: 1.15, whiteSpace: "nowrap" }}>{c.name.split(" ")[0]}</span>
+                        lineHeight: 1.15, whiteSpace: "nowrap" }}>{c.short || c.name.split(" ")[0]}</span>
                     </button>
                   );
                 })}

@@ -86,13 +86,14 @@ button, input { font-family: inherit; }
 }
 
 /* kana chart: card slide-in — mirrors the Learn carousel settle
-   (260ms expo ease, side-card opacity 0.55 / scale 0.92) */
+   (260ms expo ease, side-card opacity 0.55 / scale 0.92). Enters from a full
+   card-width away so it tracks the outgoing ghost like an adjacent slot. */
 @keyframes hkCardInR {
-  from { opacity: 0.55; transform: translateX(55%) scale(0.92); }
+  from { opacity: 0.55; transform: translateX(105%) scale(0.92); }
   to   { opacity: 1; transform: none; }
 }
 @keyframes hkCardInL {
-  from { opacity: 0.55; transform: translateX(-55%) scale(0.92); }
+  from { opacity: 0.55; transform: translateX(-105%) scale(0.92); }
   to   { opacity: 1; transform: none; }
 }
 

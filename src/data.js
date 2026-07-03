@@ -106,7 +106,7 @@ export const CHAPTERS = [
     ] },
   // Appended 2026-07 (append-only — see decisions.md on positional identity).
   // Post-graduation bonus: graduation stays pinned to "complex" in Result.jsx.
-  { id: "kanji", name: "First kanji", caption: "The kanji you'll see everywhere.",
+  { id: "kanji", name: "First kanji", short: "Kanji", caption: "The kanji you'll see everywhere.",
     units: [
       { jp: "一", label: "Numbers", romaji: [] },
       { jp: "日", label: "Time", romaji: [] },
