@@ -12,7 +12,6 @@ import ReadingPack from "./screens/ReadingPack.jsx";
 import ReadingMode from "./screens/ReadingMode.jsx";
 import Dialogue from "./screens/Dialogue.jsx";
 import KanaChart from "./screens/KanaChart.jsx";
-import Stats from "./screens/Stats.jsx";
 import VerbChart from "./screens/VerbChart.jsx";
 import Basics from "./screens/Basics.jsx";
 
@@ -107,7 +106,6 @@ export default function App() {
   const startReading = (packId, slow) => go({ name: "readingDrill", packId, slow });
   const startDialogue = (dialogueId, packId) => go({ name: "dialogue", dialogueId, packId });
   const openKanaChart = () => go({ name: "kanaChart" });
-  const openStats = () => go({ name: "stats" });
   const openVerbChart = () => go({ name: "verbChart" });
   const openBasics = () => go({ name: "sentenceBasics" });
   const openKanaBasics = () => go({ name: "kanaBasics" });
@@ -146,13 +144,11 @@ export default function App() {
         onReadingGrad={() => replace({ name: "reading" })} />
     );
   else if (scr.name === "profile")
-    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} onOpenStats={openStats} />;
+    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} />;
   else if (scr.name === "practice")
     content = <Practice onNav={nav} onStart={startPractice} onOpenChart={openKanaChart} onOpenVerbChart={openVerbChart} onOpenBasics={openBasics} />;
   else if (scr.name === "kanaChart")
     content = <KanaChart onClose={goBack} />;
-  else if (scr.name === "stats")
-    content = <Stats onClose={goBack} />;
   else if (scr.name === "verbChart")
     content = <VerbChart onClose={goBack} />;
   else if (scr.name === "sentenceBasics")

@@ -4,7 +4,7 @@ import { useProgress } from "../store.jsx";
 import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
-function ProfileBody({ onEditProfile, onReset, onOpenStats }) {
+function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
@@ -90,7 +90,7 @@ function ProfileBody({ onEditProfile, onReset, onOpenStats }) {
       </div>
 
       {/* weekly activity */}
-      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 14 }}>
+      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: t.ink, whiteSpace: "nowrap" }}>This week</span>
           <span style={{ fontSize: 12, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
@@ -104,10 +104,6 @@ function ProfileBody({ onEditProfile, onReset, onOpenStats }) {
             </div>
           ))}
         </div>
-      </div>
-
-      <div style={{ marginBottom: 72 }}>
-        <SettingRow label="See the full picture" sub="Chapters, review pool and Scenes in detail" onClick={onOpenStats} />
       </div>
 
       {/* settings */}
@@ -224,6 +220,6 @@ function ProfileBody({ onEditProfile, onReset, onOpenStats }) {
   );
 }
 
-export default function Profile({ onNav, onEditProfile, onReset, onOpenStats }) {
-  return <Shell active="Profile" onNav={onNav}><ProfileBody onEditProfile={onEditProfile} onReset={onReset} onOpenStats={onOpenStats} /></Shell>;
+export default function Profile({ onNav, onEditProfile, onReset }) {
+  return <Shell active="Profile" onNav={onNav}><ProfileBody onEditProfile={onEditProfile} onReset={onReset} /></Shell>;
 }

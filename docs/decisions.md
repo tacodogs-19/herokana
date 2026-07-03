@@ -37,12 +37,19 @@ skill tree. Combination kana are two glyphs and hide the toggle (their component
 Reduced motion collapses to the finished glyph. Upgrade path if users ask to *write*: tracing on a
 canvas over these same paths.
 
-### Progress snapshot returns as a subpage, not inline Profile rows (v1.20.0)
-The per-chapter list removed in v1.7 (redundant with Home's track) returns as the dedicated subpage
-that removal note anticipated: [`Stats.jsx`](../src/screens/Stats.jsx) (route `stats`, entry
-Profile → "See the full picture"). It earns its place by showing what Home *doesn't*: all chapters
-at once, the review pool's box distribution (the SRS is otherwise invisible until items are due),
-and per-pack reading speeds. Read-only and calm: no goals, no comparisons, no red.
+### Progress snapshot page: built, then deleted (v1.20.0, same day)
+The v1.7-deferred "richer progress subpage" was built (`Stats.jsx`: per-chapter bars, SRS box
+distribution, per-pack reading speeds), the owner didn't love it, and a five-advisor council review
+concluded **delete, don't redesign**. Why it failed: it displayed the database, not the learning —
+Leitner box counts are scheduler internals, per-pack reading speeds answer a question no learner
+asks, and chapter bars duplicate Home's track. A stats dashboard is also quietly off-thesis for a
+calm app (box/due counts are Anki's anxiety machinery in softer colours). The page's only
+actionable number — reviews due — was already surfaced by Home's "Ready to review" card, so
+deletion lost nothing actionable. **Do not rebuild a stats page.** The one idea shelved for
+post-launch, if a progress surface ever returns: **"what you can read now"** — progress expressed
+as capability (real words/sentences the learner has earned, content-as-hero), possibly with the
+per-item wrong-answer data surfaced contextually ("your slippery kana") at the end of a review
+round rather than on a page. The deleted screen is in git history (commit e95422f) if needed.
 
 ### Dialogue audio is bundled neural clips, not live TTS (v1.20.0)
 The known "TTS quality is device-dependent" risk was sharpest in Conversations (multi-line dialogue,

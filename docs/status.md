@@ -82,10 +82,6 @@ The app is a complete, shippable PWA. All core flows are implemented:
   single-glyph kana) by [`scripts/make-strokes.mjs`](../scripts/make-strokes.mjs). Combination kana
   (two glyphs) hide the pill. Reduced motion shows the finished glyph instantly. Passive reference
   only — no graded writing (read-first stance holds).
-- **Progress snapshot subpage** (v1.20.0) — the richer snapshot deferred since v1.7:
-  [`Stats.jsx`](../src/screens/Stats.jsx), routed as `stats` from Profile → "See the full picture".
-  Per-chapter bars, review-pool shape (per-box counts + due now), per-pack Scenes reading stats and
-  conversations cleared. Read-only, calm framing, all derived from `hk-progress-v2`.
 - **Profile** — overall %, level/XP, accuracy, weekly activity bars, hard-mode toggle (when unlocked),
   edit details, reset progress (keeps XP) with confirm dialog. (The per-chapter progress list was
   removed in v1.7.0 as redundant with Home's track — a richer progress snapshot may return on a subpage.)
@@ -229,10 +225,12 @@ The app is a complete, shippable PWA. All core flows are implemented:
 
 ## Planned / likely next (not committed)
 
-The 2026-07-03 roadmap (competitor scan: Dr. Moku, Ringotan, WaniKani, KanaDojo) is **fully
-shipped** as of v1.20.0: kana mnemonics (pre-existing), recorded dialogue audio, First kanji
-chapter, stroke-order playback, progress snapshot. Natural follow-ons, uncommitted: more kanji
-units (append to the `kanji` bank), kanji in Scenes word lists, recorded audio beyond dialogues.
+The 2026-07-03 roadmap (competitor scan: Dr. Moku, Ringotan, WaniKani, KanaDojo) shipped in
+v1.20.0: kana mnemonics (pre-existing), recorded dialogue audio, First kanji chapter, stroke-order
+playback. The fifth item (progress snapshot page) was built, reviewed, and **deleted** — see
+decisions.md. Natural follow-ons, uncommitted: more kanji units (append to the `kanji` bank),
+kanji in Scenes word lists, recorded audio beyond dialogues, and the shelved **"what you can read
+now"** capability moment (the post-launch replacement idea for the deleted stats page).
 
 ## Release procedure (reminder)
 

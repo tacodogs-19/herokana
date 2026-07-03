@@ -61,7 +61,7 @@ src/
   UpdatePrompt.jsx, WhatsNew.jsx
   components/chrome.jsx Shared UI: Shell, BottomNav, Modal, Ring, Cat, ThemeToggle
   screens/              Home, Lesson, Result, Practice, Profile, Onboarding, Basics (kana/sentence),
-                        Reading*/Dialogue (Scenes), KanaChart, VerbChart, Stats
+                        Reading*/Dialogue (Scenes), KanaChart, VerbChart
 ```
 
 ## Architecture in one pass
