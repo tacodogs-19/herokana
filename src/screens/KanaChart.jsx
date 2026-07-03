@@ -66,7 +66,10 @@ const ROW_CHIPS = [
   { id: "extra-1", rj: "kya" },
 ];
 
-const PREF_KEY = "hk-kana-chart";
+// v2: default view changed to flashcards — new key so everyone (including
+// devices that stored view:"grid" under the old key) gets the new default and
+// the updated first-visit hint once.
+const PREF_KEY = "hk-kana-chart-v2";
 function loadPrefs() {
   try { return JSON.parse(localStorage.getItem(PREF_KEY) || "{}"); } catch { return {}; }
 }
@@ -92,7 +95,7 @@ const CardIcon = ({ color }) => (
 export default function KanaChart({ onClose }) {
   const { t } = useTheme();
   const [kana,      setKana]      = React.useState(() => loadPrefs().kana || "hira");
-  const [view,      setView]      = React.useState(() => loadPrefs().view || "grid");
+  const [view,      setView]      = React.useState(() => loadPrefs().view || "card");
   const [rowFilter, setRowFilter] = React.useState("all");
   const [active,    setActive]    = React.useState(null);
   const [cardIdx,   setCardIdx]   = React.useState(0);
@@ -118,6 +121,19 @@ export default function KanaChart({ onClose }) {
   const goCard = (dir) => {
     setCardIdx((i) => (i + dir + visibleKana.length) % visibleKana.length);
     setFlipped(false);
+  };
+
+  // Swipe left/right on the card = next/prev. A real swipe also suppresses the
+  // tap-to-flip that some browsers still fire after touchend.
+  const touch = React.useRef(null);
+  const swiped = React.useRef(false);
+  const onTouchStart = (e) => { swiped.current = false; const p = e.touches[0]; touch.current = { x: p.clientX, y: p.clientY }; };
+  const onTouchEnd = (e) => {
+    const s = touch.current; touch.current = null;
+    if (!s) return;
+    const p = e.changedTouches[0];
+    const dx = p.clientX - s.x, dy = p.clientY - s.y;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) { swiped.current = true; goCard(dx < 0 ? 1 : -1); }
   };
 
   const Cell = ({ rj: romaji }) => {
@@ -180,7 +196,7 @@ export default function KanaChart({ onClose }) {
         {hint && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: t.primarySoft, borderRadius: 13, padding: "10px 14px", marginBottom: 12, flexShrink: 0 }}>
             <span style={{ flex: 1, fontSize: 13, color: t.primary, fontWeight: 600, lineHeight: 1.4 }}>
-              Use the icons top-right to switch between grid lookup and flashcard drill.
+              Flip through the kana one card at a time — or tap the grid icon top-right to see the whole chart.
             </span>
             <button onClick={() => setHint(false)} className="hk-press"
               style={{ background: "transparent", border: "none", cursor: "pointer", color: t.primary, padding: 2, flexShrink: 0, fontSize: 18, lineHeight: 1 }}>×</button>
@@ -189,7 +205,7 @@ export default function KanaChart({ onClose }) {
 
         <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, flexShrink: 0 }}>
           {view === "card"
-            ? "Tap the card to reveal the reading. Navigate with the arrows."
+            ? "Tap the card to reveal the reading. Swipe or use the arrows to move."
             : hasJa ? "Tap any kana to hear it." : "Tap a kana to see its reading. (No Japanese voice on this device.)"}
         </p>
 
@@ -212,15 +228,17 @@ export default function KanaChart({ onClose }) {
         {/* Row filter chips */}
         <div style={{ display: "flex", gap: 7, overflowX: "auto", marginBottom: 16, flexShrink: 0, paddingBottom: 2,
           scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {/* romaji labels, not kana — a learner who can't read kana yet can't
+              use kana as a filter for kana */}
           {[{ id: "all", label: "All" }, ...ROW_CHIPS].map((chip) => {
             const on = rowFilter === chip.id;
-            const label = chip.id === "all" ? "All" : map[chip.rj];
+            const label = chip.id === "all" ? "All" : chip.rj;
             return (
               <button key={chip.id} onClick={() => { setRowFilter(chip.id); setActive(null); }} className="hk-press"
                 style={{ flexShrink: 0, padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${on ? t.primary : t.line}`,
                   background: on ? t.primarySoft : t.surface, color: on ? t.primary : t.sub,
-                  fontFamily: chip.id === "all" ? DISPLAY : JP, fontSize: chip.id === "all" ? 12 : 16,
-                  fontWeight: on ? 800 : 600, cursor: "pointer", lineHeight: 1.4 }}>
+                  fontFamily: DISPLAY, fontSize: 12,
+                  fontWeight: on ? 800 : 600, cursor: "pointer", lineHeight: 1.75 }}>
                 {label}
               </button>
             );
@@ -247,8 +265,10 @@ export default function KanaChart({ onClose }) {
           </>
         ) : (
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
-            <div key={`${rowFilter}-${cardIdx}`} onClick={() => { setFlipped((f) => !f); if (hasJa) speak(map[rj]); }}
-              style={{ width: "100%", perspective: "1200px", cursor: "pointer", flexShrink: 0 }}>
+            <div key={`${rowFilter}-${cardIdx}`}
+              onClick={() => { if (swiped.current) { swiped.current = false; return; } setFlipped((f) => !f); if (hasJa) speak(map[rj]); }}
+              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+              style={{ width: "100%", perspective: "1200px", cursor: "pointer", flexShrink: 0, touchAction: "pan-y" }}>
               <div style={{ position: "relative", width: "100%", height: 300,
                 transformStyle: "preserve-3d", transition: "transform 400ms cubic-bezier(0.4,0,0.2,1)",
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
