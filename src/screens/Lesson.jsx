@@ -269,14 +269,24 @@ function LessonBody({ session, onComplete, onExit }) {
           </div>
         ) : q.prod ? (
           <div>
-            {/* composed answer */}
-            <div style={{ height: 54, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center",
+            {/* composed answer + backspace (steps back: "ka" → "k…" → empty) */}
+            <div style={{ position: "relative", height: 54, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center",
               borderRadius: 16, fontFamily: DISPLAY, fontSize: 22, fontWeight: 800, textTransform: "lowercase",
               border: `2px solid ${checked ? (correct ? t.done : t.wrong) : sel ? t.primary : t.line}`,
               background: checked ? (correct ? t.doneSoft : t.wrongSoft) : t.surface,
               color: checked ? (correct ? t.done : t.wrong) : sel ? t.ink : t.faint,
               transition: "border-color 200ms, background 200ms" }}>
               {sel || (cons ? `${cons}…` : "build the sound")}
+              {!checked && (sel || cons) && (
+                <button onClick={() => { if (sel) setSel(null); else setCons(null); }} className="hk-press" aria-label="Backspace"
+                  style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                    width: 38, height: 38, borderRadius: 11, border: "none", cursor: "pointer",
+                    background: t.sunk, color: t.sub, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" /><path d="m12 9 6 6M18 9l-6 6" />
+                  </svg>
+                </button>
+              )}
             </div>
             {checked && !correct && (
               <p className="hk-reveal" style={{ margin: "0 0 10px", textAlign: "center", fontSize: 14.5, fontWeight: 800, color: t.done }}>{q.answer}</p>
