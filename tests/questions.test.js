@@ -65,16 +65,17 @@ describe("unitQuestions — kana chapter", () => {
     });
   });
 
-  it("kana questions have exactly 4 options", () => {
+  it("multiple-choice kana questions have exactly 4 options", () => {
     const qs = unitQuestions(kanaIdx, 0);
-    const kana = qs.filter((q) => q.type === "kana");
-    for (const q of kana) expect(q.options).toHaveLength(4);
+    const mc = qs.filter((q) => q.type === "kana" && !q.prod);
+    expect(mc.length).toBeGreaterThan(0);
+    for (const q of mc) expect(q.options).toHaveLength(4);
   });
 
   it("answer is always among options", () => {
     const qs = unitQuestions(kanaIdx, 0);
     for (const q of qs) {
-      if (q.type !== "kana") continue;
+      if (q.type !== "kana" || q.prod) continue;
       expect(q.options).toContain(q.answer);
     }
   });
@@ -82,9 +83,37 @@ describe("unitQuestions — kana chapter", () => {
   it("options contain no duplicates", () => {
     const qs = unitQuestions(kanaIdx, 0);
     for (const q of qs) {
-      if (q.type !== "kana") continue;
+      if (q.type !== "kana" || q.prod) continue;
       expect(new Set(q.options).size).toBe(q.options.length);
     }
+  });
+
+  // ── memory loop (teach → recognise → produce) ──
+  it("first-time lessons teach every kana before its first scored question", () => {
+    const qs = unitQuestions(kanaIdx, 0); // no progress = first time
+    const unit = chapter.units[0];
+    for (const a of unit.romaji) {
+      const teachAt = qs.findIndex((q) => q.type === "teach" && q.answer === a);
+      const firstQuizAt = qs.findIndex((q) => q.type === "kana" && q.answer === a);
+      expect(teachAt).toBeGreaterThanOrEqual(0);
+      expect(teachAt).toBeLessThan(firstQuizAt);
+    }
+  });
+
+  it("first-time lessons end with a production question per kana", () => {
+    const qs = unitQuestions(kanaIdx, 0);
+    const unit = chapter.units[0];
+    const prod = qs.filter((q) => q.prod);
+    expect(prod.map((q) => q.answer).sort()).toEqual([...unit.romaji].sort());
+    for (const q of prod) expect(q.options).toBeUndefined();
+  });
+
+  it("replays of a completed unit have no teach cards but keep production", () => {
+    const done = CHAPTERS.map(() => 0);
+    done[kanaIdx] = chapter.units.length; // whole chapter complete
+    const qs = unitQuestions(kanaIdx, 0, "easy", undefined, { done });
+    expect(qs.some((q) => q.type === "teach")).toBe(false);
+    expect(qs.some((q) => q.prod)).toBe(true);
   });
 
   it("appends a word_reveal trailer for non-review units that have a row word", () => {
@@ -101,7 +130,7 @@ describe("unitQuestions — kana chapter", () => {
 
   it("caps at 15 scored questions", () => {
     const qs = unitQuestions(kanaIdx, 0);
-    const scored = qs.filter((q) => q.type !== "word_reveal");
+    const scored = qs.filter((q) => q.type !== "word_reveal" && q.type !== "teach");
     expect(scored.length).toBeLessThanOrEqual(15);
   });
 });

@@ -1,7 +1,7 @@
 # HeroKana — Status & Baseline
 
 Snapshot of what exists so a fresh session can resume without re-deriving the baseline.
-**As of:** 2026-07-03 · **App version:** `1.20.0` (see [`src/release.js`](../src/release.js)).
+**As of:** 2026-07-04 · **App version:** `1.21.0` (see [`src/release.js`](../src/release.js)).
 
 > Update this file when the baseline changes — it is the "where are we" anchor after a `/clear`.
 
@@ -64,9 +64,20 @@ The app is a complete, shippable PWA. All core flows are implemented:
   `globPatterns`), so Conversations keep audio offline — and now work on devices with **no** ja-JP
   voice, so the ReadingPack no-voice notice was removed. **After editing `dialogue.js`, re-run
   `npm run audio` and commit the mp3s + manifest.**
-- **Kana mnemonics** — every kana (base, voiced, combinations) has a one-line memory hook in
-  `KANA_MNEMONICS` ([`data.js`](../src/data.js)), shown as the post-answer reveal on kana lesson
-  questions and on the Kana chart's flashcard view. (Shipped earlier; documented 2026-07-03.)
+- **Kana mnemonics** (reworked v1.21.0) — **script-aware**: hiragana and katakana each have their
+  own shape-based hooks (`HIRA_MN`/`KATA_MN` in [`data.js`](../src/data.js)); voiced and combination
+  entries are generated from each script's own glyphs. Consistent format: `"<image> — '<romaji>'"`.
+  Access via `mnemonicFor(romaji, "hira"|"kata")`. Shown on teach cards, post-answer reveals, and
+  the Kana chart's flashcards.
+- **Kana memory loop** (v1.21.0, council-reviewed) — Hiragana/Katakana row lessons run
+  teach → recognise → produce: unscored **teach cards** (glyph + sound + mnemonic, in pairs) precede
+  a kana's first question; after the MC pass, every kana returns as a **production question** on a
+  consonant+vowel **tile pad** (`KANA_COMPOSE` in [`questions.js`](../src/questions.js) — canonical
+  romaji by construction, so shi/chi/tsu/fu can't be "misspelled"); **misses requeue** to the end of
+  the lesson for a second retrieval attempt ([`Lesson.jsx`](../src/screens/Lesson.jsx)). Teach cards
+  appear only until the unit is first completed; replays are MC + production. Chapter reviews and 総
+  units mix in production every third question. Scoring excludes teach cards. Voiced/combination
+  chapters keep MC (no tile rows for them yet) but do get MC requeues on misses.
 - **First kanji chapter** (v1.20.0) — chapter 8, **appended** to `CHAPTERS` (id `kanji`): 23 N5-level
   kanji in four small units (Numbers / Time / People / Signs in town), backed by a `KANJI` bank in
   [`data.js`](../src/data.js) where `jp` *is* the kanji (so it's the prompt at every difficulty),
@@ -90,8 +101,9 @@ The app is a complete, shippable PWA. All core flows are implemented:
   toggle; Profile → Settings → "Match device theme" un-pins (`hk-theme` present = pinned, absent =
   follow system).
 - **PWA** — installable, offline via service worker, prompt-based updates (`UpdatePrompt`), one-time
-  "What's new" after an update (`WhatsNew`), branded splash (static HTML only — the React splash
-  with its forced 2.2s hold was removed in v1.17.0; the static splash covers until React mounts).
+  "What's new" after an update (`WhatsNew`). **No loading screen at all** (v1.21.0): the page is
+  just the themed background until React mounts — the v1.17 static splash (cat video + "Loading…")
+  was removed entirely after it kept resurfacing on update reloads; `cat-loading.mp4` deleted.
 - **Content** — Hiragana, Katakana, voiced, combination kana; 14 word/phrase themes; 11 sentence
   themes; 4 complex-sentence themes; number ranges; grammar foundations. Every banked theme has 25+ items.
 - **Read the Real World** (v1.6.0) — reading-fluency mode in the **Scenes tab** (4th bottom-nav

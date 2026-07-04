@@ -57,10 +57,11 @@ describe("buildQuestions", () => {
     const qs = buildQuestions({ kind: "unit", chapterIdx: kanaIdx, unitIdx: 0 }, emptyProgress);
     expect(qs.length).toBeGreaterThan(0);
     for (const q of qs) {
-      if (q.type === "word_reveal") continue; // trailer card — unscored, no options
+      if (q.type === "word_reveal" || q.type === "teach") continue; // unscored cards — no options
       expect(q.type).toBe("kana");
       expect(q.prompt).toBeTruthy();
       expect(q.answer).toBeTruthy();
+      if (q.prod) continue; // production — answered on the tile pad, no options
       expect(q.options).toHaveLength(4);
       expect(q.options).toContain(q.answer);
     }

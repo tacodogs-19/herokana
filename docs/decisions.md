@@ -7,6 +7,41 @@ are not relitigated. Newest at the top. When you make a non-obvious call, add an
 
 ## Product / UX
 
+### Kana lessons: teach → recognise → produce (v1.21.0, council-reviewed)
+A council review of "how do learners actually commit kana to memory?" converged on: recognition
+(multiple choice) doesn't transfer; memory forms during *effortful retrieval*; and mnemonics are
+encoding scaffolds that must come *before* first exposure, not after answering. The loop for
+Hiragana/Katakana row lessons:
+- **Teach cards** (unscored: glyph + auto-spoken sound + mnemonic) in pairs before each pair's
+  first questions — never quiz a kana the learner hasn't met. Shown only until the unit is first
+  completed (`progress.done` gate in `unitQuestions`).
+- **Production round** — every kana re-asked with no options: the learner builds the romaji on a
+  **consonant+vowel tile pad** (`KANA_COMPOSE`). Chosen over the OS keyboard deliberately: no
+  autocorrect/layout jank, and compose yields canonical romaji (s+i = shi), so romanisation
+  variants (si/tu/hu) can't be marked wrong — the trap peer review caught in "just use typed input".
+- **Miss requeue** — a wrong kana answer appends one retry at the lesson's end (production when
+  composable, same MC otherwise). Same-session second retrieval is where encoding happens.
+- **MC stays the floor**: SRS review and practice modes remain easy multiple-choice (calm), and
+  voiced/combination chapters keep MC until the tile pad grows their rows (g/z/d/b/p, ya/yu/yo).
+- Deferred from the verdict: reversed-direction questions (sound → pick glyph), katakana
+  cross-script drills (か→カ). Evidence first.
+
+### Mnemonics are per-script, format-fixed (v1.21.0)
+The single shared mnemonic table described hiragana shapes under katakana glyphs (あ "open mouth"
+makes no sense for ア). Now `HIRA_MN` + `KATA_MN` (46 hand-written each) with voiced/combination
+entries **generated** from each script's own glyphs (か+dashes vs カ+dashes) — consistent by
+construction. Wording rule for all entries: `"<shape image> — '<romaji>'"` — no caps-shouting, the
+romaji always present and always in quotes. Use `mnemonicFor(romaji, script)`; there is no shared
+table export anymore.
+
+### No loading screen, at all (v1.21.0)
+The static HTML splash (cat video + wordmark + "Loading…") kept appearing on update reloads and
+occasionally on slow launches, reading as the "forced" splash v1.17 was supposed to have killed.
+Owner call: remove it entirely — `index.html` now shows only the pre-paint themed background until
+React mounts; the TWA/OS splash covers cold launches. `cat-loading.mp4` (1MB) deleted from
+`public/assets` (git history has it). The mascot's sanctioned surfaces are now icon + onboarding +
+results (+ reading mode per its brief).
+
 ### First kanji is a post-graduation bonus chapter, not a course extension (v1.20.0)
 Appended as chapter 8 (`kanji` — append-only per the positional-identity rule). Key calls:
 - **`jp` is the kanji itself** in the `KANJI` bank, unlike other banks where `jp` is kana. The kanji

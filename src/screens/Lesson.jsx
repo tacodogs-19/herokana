@@ -3,7 +3,7 @@ import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
-import { buildQuestions, MODE_TITLES } from "../questions.js";
+import { buildQuestions, MODE_TITLES, KANA_COMPOSE, COMPOSABLE } from "../questions.js";
 import { speak, useJaVoice } from "../speech.js";
 
 const SPEED_MS = 8000;
@@ -23,9 +23,10 @@ function sessionLabel(session, qs) {
 function LessonBody({ session, onComplete, onExit }) {
   const { t } = useTheme();
   const progress = useProgress();
-  const [qs] = React.useState(() => buildQuestions(session, progress));
+  const [qs, setQs] = React.useState(() => buildQuestions(session, progress));
   const [i, setI] = React.useState(0);
   const [sel, setSel] = React.useState(null);
+  const [cons, setCons] = React.useState(null); // tile pad: pending consonant
   const [typed, setTyped] = React.useState("");
   const [checked, setChecked] = React.useState(false);
   const [results, setResults] = React.useState([]);
@@ -44,7 +45,8 @@ function LessonBody({ session, onComplete, onExit }) {
   const given = q.input ? norm(typed) : sel;
   const isRight = (g) => q.input ? (q.answers || [q.answer]).some((a) => norm(a) === g) : g === q.answer;
   const correct = checked && isRight(given);
-  const canCheck = q.type === "word_reveal" || (q.input ? typed.trim().length > 0 : sel != null);
+  const unscoredType = (x) => x.type === "word_reveal" || x.type === "teach";
+  const canCheck = unscoredType(q) || (q.input ? typed.trim().length > 0 : sel != null);
 
   const hasVoice = useJaVoice();
   // Kanji seen in this session — updated on advance so furigana stays visible
@@ -54,13 +56,23 @@ function LessonBody({ session, onComplete, onExit }) {
   // Listening questions announce themselves — but only when there's a voice to
   // do it; without one the question falls back to a readable prompt (below).
   React.useEffect(() => {
-    if (q.listen && hasVoice) speak(q.prompt);
+    if ((q.listen || q.type === "teach") && hasVoice) speak(q.prompt);
     return () => { try { speechSynthesis.cancel(); } catch (e) {} };
   }, [i, hasVoice]);
 
   const check = React.useCallback(() => {
     setChecked(true);
-    setResults((r) => [...r, isRight(given)]);
+    const right = isRight(given);
+    setResults((r) => [...r, right]);
+    // Memory loop: a missed kana returns at the end of the lesson for a second
+    // retrieval attempt — production when the tile pad can build the sound,
+    // otherwise the same question again. One retry per question.
+    if (!right && q.type === "kana" && session.kind === "unit" && !q.requeued) {
+      const again = COMPOSABLE.has(q.answer) && !q.prod
+        ? { type: "kana", prod: true, prompt: q.prompt, answer: q.answer, meaning: q.meaning, requeued: true }
+        : { ...q, requeued: true };
+      setQs((prev) => [...prev, again]);
+    }
   }, [given, q]);
   const checkRef = React.useRef(check);
   checkRef.current = check;
@@ -78,32 +90,30 @@ function LessonBody({ session, onComplete, onExit }) {
     return () => clearInterval(id);
   }, [i, checked, isSpeed]);
 
+  // Unscored cards (word reveal / teach) never count toward correct or total;
+  // concept items additionally stay out of the spaced-review bookkeeping.
+  const finish = () => {
+    const scored = (x) => !unscoredType(x);
+    const right = qs.reduce((s, x, k) => s + (scored(x) && results[k] ? 1 : 0), 0);
+    const pooled = (ok) => qs.filter((x, k) => x.type !== "concept" && scored(x) && !!results[k] === ok)
+      .map((m) => ({ prompt: m.prompt, answer: m.answer }));
+    onComplete({ correct: right, total: qs.filter(scored).length, missed: pooled(false), solved: pooled(true) });
+  };
+  const advance = () => { setI(i + 1); setSel(null); setCons(null); setTyped(""); setChecked(false); };
+
   const onAction = () => {
-    // word_reveal: unscored reveal card — one tap advances without check phase
-    if (q.type === "word_reveal") {
-      const right = results.filter(Boolean).length;
+    // reveal/teach: unscored card — one tap advances without a check phase
+    if (unscoredType(q)) {
       setResults((r) => [...r, true]);
-      if (i + 1 >= qs.length) {
-        const reveals = qs.filter((x) => x.type === "word_reveal").length;
-        const pooled = (ok) => qs.filter((x, k) => x.type !== "concept" && x.type !== "word_reveal" && !!results[k] === ok)
-          .map((m) => ({ prompt: m.prompt, answer: m.answer }));
-        onComplete({ correct: right, total: qs.length - reveals, missed: pooled(false), solved: pooled(true) });
-      } else {
-        setI(i + 1); setSel(null); setTyped(""); setChecked(false);
-      }
+      if (i + 1 >= qs.length) finish();
+      else advance();
       return;
     }
     if (!checked) check();
-    else if (i + 1 >= qs.length) {
-      const right = results.filter(Boolean).length;
-      // concept (grammar) items have no reviewable identity, so keep them out of
-      // the spaced-review bookkeeping; everything else feeds the review pool.
-      const pooled = (ok) => qs.filter((q, k) => q.type !== "concept" && !!results[k] === ok)
-        .map((m) => ({ prompt: m.prompt, answer: m.answer }));
-      onComplete({ correct: right, total: qs.length, missed: pooled(false), solved: pooled(true) });
-    } else {
+    else if (i + 1 >= qs.length) finish();
+    else {
       if (q.furigana) seenKanjiRef.current.add(q.prompt);
-      setI(i + 1); setSel(null); setTyped(""); setChecked(false);
+      advance();
     }
   };
 
@@ -126,7 +136,9 @@ function LessonBody({ session, onComplete, onExit }) {
   };
 
   const concept = q.type === "concept";
-  const heading = q.type === "word_reveal" ? "Look what you can read." : concept ? "Sentence basics" : (q.listen && hasVoice) ? "What do you hear?" : q.furigana ? "What does this kanji mean?" : q.type === "phrase" ? "What does this say?" : "Which sound is this?";
+  const heading = q.type === "teach" ? "Meet a new kana." : q.type === "word_reveal" ? "Look what you can read." : concept ? "Sentence basics" : (q.listen && hasVoice) ? "What do you hear?" : q.furigana ? "What does this kanji mean?" : q.prod ? "What sound does it make?" : q.type === "phrase" ? "What does this say?" : "Which sound is this?";
+  // "Hear it" pre-answer would give production questions away — the sound IS the answer
+  const hearSlot = checked || (q.type === "kana" && !q.prod) || q.type === "word_reveal" || q.type === "teach";
   // typed (hard) questions use the shorter card, so cap the prompt size to keep
   // it clear of the input below
   const promptSize = q.input
@@ -213,9 +225,9 @@ function LessonBody({ session, onComplete, onExit }) {
             {checked && q.meaning && <span className="hk-reveal" style={{ fontSize: 13, fontWeight: 600, color: t.sub, lineHeight: 1.4 }}>{q.meaning}</span>}
           </div>
         ) : (
-          <div style={{ height: (checked || q.type === "kana") ? 38 : 0, marginTop: (checked || q.type === "kana") ? 0 : -8, overflow: "hidden", flexShrink: 0, transition: "height 200ms, margin-top 200ms" }}>
+          <div style={{ height: hearSlot ? 38 : 0, marginTop: hearSlot ? 0 : -8, overflow: "hidden", flexShrink: 0, transition: "height 200ms, margin-top 200ms" }}>
             <div style={{ height: 38, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {showPrompt && hasVoice && (checked || q.type === "kana" || q.type === "word_reveal") && (
+              {showPrompt && hasVoice && hearSlot && (
                 <button onClick={() => speak(q.prompt)} className="hk-press" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px",
                   borderRadius: 12, border: `1.5px solid ${t.line}`, background: t.bg, color: t.sub, cursor: "pointer", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: DISPLAY }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
@@ -249,6 +261,56 @@ function LessonBody({ session, onComplete, onExit }) {
           <div style={{ textAlign: "center" }}>
             <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 700, color: t.sub, fontFamily: DISPLAY, letterSpacing: "0.05em" }}>{q.reading}</p>
             <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>{q.meaning}</p>
+          </div>
+        ) : q.type === "teach" ? (
+          <div className="hk-reveal" style={{ textAlign: "center" }}>
+            <p style={{ margin: "0 0 6px", fontSize: 38, fontWeight: 800, color: t.primary, fontFamily: DISPLAY, textTransform: "lowercase", lineHeight: 1 }}>{q.reading}</p>
+            {q.meaning && <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.5 }}>{q.meaning}</p>}
+          </div>
+        ) : q.prod ? (
+          <div>
+            {/* composed answer */}
+            <div style={{ height: 54, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: 16, fontFamily: DISPLAY, fontSize: 22, fontWeight: 800, textTransform: "lowercase",
+              border: `2px solid ${checked ? (correct ? t.done : t.wrong) : sel ? t.primary : t.line}`,
+              background: checked ? (correct ? t.doneSoft : t.wrongSoft) : t.surface,
+              color: checked ? (correct ? t.done : t.wrong) : sel ? t.ink : t.faint,
+              transition: "border-color 200ms, background 200ms" }}>
+              {sel || (cons ? `${cons}…` : "build the sound")}
+            </div>
+            {checked && !correct && (
+              <p className="hk-reveal" style={{ margin: "0 0 10px", textAlign: "center", fontSize: 14.5, fontWeight: 800, color: t.done }}>{q.answer}</p>
+            )}
+            {(() => {
+              const tile = (on, off) => ({ padding: "12px 4px", borderRadius: 12, cursor: checked || off ? "default" : "pointer",
+                background: on ? t.primarySoft : t.surface, border: `2px solid ${on ? t.primary : t.line}`,
+                color: on ? t.primary : t.ink, fontFamily: DISPLAY, fontSize: 16, fontWeight: 800,
+                opacity: off ? 0.35 : 1, transition: "opacity 150ms, border-color 150ms, background 150ms" });
+              return (
+                <>
+                  {/* consonants — tap again to clear */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 8 }}>
+                    {Object.keys(KANA_COMPOSE).map((c) => (
+                      <button key={c} disabled={checked} className="hk-press"
+                        onClick={() => { setCons(cons === c ? null : c); setSel(null); }}
+                        style={tile(cons === c, false)}>{c}</button>
+                    ))}
+                  </div>
+                  {/* vowels + standalone ん */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
+                    {["a", "i", "u", "e", "o"].map((v) => {
+                      const val = cons ? (KANA_COMPOSE[cons] || {})[v] : v;
+                      return (
+                        <button key={v} disabled={checked || (cons != null && !val)} className="hk-press"
+                          onClick={() => setSel(val)} style={tile(false, cons != null && !val)}>{v}</button>
+                      );
+                    })}
+                    <button disabled={checked || cons != null} className="hk-press"
+                      onClick={() => setSel("n")} style={tile(false, cons != null)}>n</button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         ) : q.input ? (
           <>
@@ -302,7 +364,7 @@ function LessonBody({ session, onComplete, onExit }) {
           fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, flexShrink: 0,
           boxShadow: checked || canCheck ? t.glow(checked ? (correct ? t.done : t.wrong) : t.primary) : "none",
           transition: "background 240ms var(--ease-out-quart), box-shadow 240ms var(--ease-out-quart), color 150ms" }}>
-        {q.type === "word_reveal" ? (i + 1 >= qs.length ? "Finish →" : "Got it →") : !checked ? "Check" : i + 1 >= qs.length ? "Finish →" : "Continue →"}
+        {unscoredType(q) ? (i + 1 >= qs.length ? "Finish →" : "Got it →") : !checked ? "Check" : i + 1 >= qs.length ? "Finish →" : "Continue →"}
       </button>
 
       {confirmExit && (

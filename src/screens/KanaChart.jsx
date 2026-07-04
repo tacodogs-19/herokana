@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
-import { HIRA, KATA, KANA_MNEMONICS } from "../data";
+import { HIRA, KATA, mnemonicFor } from "../data";
 import { speak, useJaVoice } from "../speech.js";
 import STROKES from "../strokes.json";
 
@@ -108,7 +108,7 @@ export default function KanaChart({ onClose }) {
 
   const visibleKana = filteredKanaFor(rowFilter);
   const rj = visibleKana[Math.min(cardIdx, visibleKana.length - 1)];
-  const mnemonic = KANA_MNEMONICS[rj] || null;
+  const mnemonic = mnemonicFor(rj, kana);
 
   React.useEffect(() => {
     localStorage.setItem(PREF_KEY, JSON.stringify({ view, kana }));

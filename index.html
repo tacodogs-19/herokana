@@ -35,32 +35,13 @@
   </head>
   <body>
     <style>
-      /* html/body track the resolved theme so no light strip shows at the top */
+      /* html/body track the resolved theme so no light strip shows at the top.
+         No loading screen (owner call, 2026-07): while React mounts — including
+         the reload after accepting an update — the page is just the themed
+         background. The TWA/OS splash covers cold launches. */
       html, body { background: var(--hk-bg, #f3f5fa); }
-      /* splash shown until React mounts and replaces #root's content.
-         Background matches the loading video's off-white. */
-      #hk-splash {
-        position: fixed; inset: 0; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 14px;
-        background: #0e4fb0;
-      }
-      #hk-splash video { width: 200px; height: 200px; object-fit: contain; }
-      #hk-splash .hk-wordmark {
-        font-family: "Outfit", system-ui, sans-serif; font-size: 21px;
-        font-weight: 800; letter-spacing: -0.02em; color: #fff;
-      }
-      #hk-splash .hk-loading {
-        font-family: "Outfit", system-ui, sans-serif; font-size: 13px;
-        font-weight: 600; letter-spacing: 0.04em; color: rgba(255,255,255,0.6);
-      }
     </style>
-    <div id="root">
-      <div id="hk-splash">
-        <video src="/assets/cat-loading.mp4" autoplay loop muted playsinline></video>
-        <span class="hk-wordmark">HeroKana</span>
-        <span class="hk-loading">Loading…</span>
-      </div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

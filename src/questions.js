@@ -1,4 +1,4 @@
-import { CHAPTERS, HIRA, KATA, BANKS, bankFor, NUMBER_GROUPS, FOUNDATIONS, KANA_MNEMONICS } from "./data.js";
+import { CHAPTERS, HIRA, KATA, BANKS, bankFor, NUMBER_GROUPS, FOUNDATIONS, mnemonicFor } from "./data.js";
 
 // One real word per kana row — keyed by unit.jp. Shown as an unscored reveal
 // card at the end of the lesson so the learner reads something meaningful
@@ -67,7 +67,40 @@ export function shuffle(a) {
 const mapFor = (chapter, unit) =>
   chapter.id === "kata" || /Kata/.test(unit.label) ? KATA : HIRA;
 
-const kanaItem = (map, ans, mates = []) => ({ type: "kana", prompt: map[ans] || "—", answer: ans, pool: map, mates, meaning: KANA_MNEMONICS[ans] || null });
+const kanaItem = (map, ans, mates = []) => ({ type: "kana", prompt: map[ans] || "—", answer: ans, pool: map, mates,
+  meaning: mnemonicFor(ans, map === KATA ? "kata" : "hira") });
+
+// ── kana memory loop (council review, 2026-07) ─────────────────────────────
+// Production recall via a consonant+vowel tile pad: the learner builds the
+// romaji from nothing instead of recognising it among options. The compose
+// table yields canonical romaji (s+i = shi), which sidesteps romanisation
+// variants entirely. Standalone ん is the extra "n" tile in the vowel row.
+export const KANA_COMPOSE = {
+  k: { a: "ka", i: "ki", u: "ku", e: "ke", o: "ko" },
+  s: { a: "sa", i: "shi", u: "su", e: "se", o: "so" },
+  t: { a: "ta", i: "chi", u: "tsu", e: "te", o: "to" },
+  n: { a: "na", i: "ni", u: "nu", e: "ne", o: "no" },
+  h: { a: "ha", i: "hi", u: "fu", e: "he", o: "ho" },
+  m: { a: "ma", i: "mi", u: "mu", e: "me", o: "mo" },
+  y: { a: "ya", u: "yu", o: "yo" },
+  r: { a: "ra", i: "ri", u: "ru", e: "re", o: "ro" },
+  w: { a: "wa", o: "wo" },
+};
+// Every sound the tile pad can produce — misses of anything else requeue as
+// multiple-choice instead of production.
+export const COMPOSABLE = new Set([
+  "a", "i", "u", "e", "o", "n",
+  ...Object.values(KANA_COMPOSE).flatMap((row) => Object.values(row)),
+]);
+
+// Unscored first-contact card: glyph + sound + mnemonic, before any question.
+const teachItem = (map, ans) => ({ type: "teach", prompt: map[ans] || "—", reading: ans,
+  answer: ans, meaning: mnemonicFor(ans, map === KATA ? "kata" : "hira") });
+
+// Production question: same identity as the MC kana question (shared SRS key),
+// but answered on the tile pad with no options on screen.
+export const prodItem = (map, ans) => ({ type: "kana", prod: true, prompt: map[ans] || "—", answer: ans,
+  meaning: mnemonicFor(ans, map === KATA ? "kata" : "hira") });
 
 // Distractors that can't be solved by spotting initials: at least three of the
 // four options share the answer's starting letter when the syllabary allows it
@@ -139,20 +172,50 @@ function bankQuestion(p, difficulty, pool, dirOverride) {
 
 // A unit lesson started from Home (Continue / unit chip). `dir` forces the
 // answer language (used by hard mode); otherwise the practice setting applies.
-export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir) {
+export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir, progress) {
   const chapter = CHAPTERS[chapterIdx];
   const unit = chapter.units[unitIdx];
   const bank = bankFor(chapter.id);
   if (bank)
     return shuffle(bank[unitIdx]).slice(0, 15).map((p) => bankQuestion(p, difficulty, bankFor(chapter.id).flat(), dir || "romaji"));
   const map = mapFor(chapter, unit);
+
+  // Hiragana/Katakana rows run the memory loop (teach → recognise → produce);
+  // production needs the tile pad, so only base-kana chapters qualify.
+  const memoryLoop = (chapter.id === "hira" || chapter.id === "kata") && unit.romaji.length > 0;
+  if (memoryLoop) {
+    const firstTime = !progress || (progress.done[chapterIdx] || 0) <= unitIdx;
+    const questions = [];
+    if (firstTime) {
+      // Teach in pairs, quiz the pair, move on — a new kana is always met
+      // before it's tested, and its first MC comes with a 1-2 question gap.
+      for (let k = 0; k < unit.romaji.length; k += 2) {
+        const pair = unit.romaji.slice(k, k + 2);
+        pair.forEach((a) => questions.push(teachItem(map, a)));
+        pair.forEach((a) => questions.push(withKanaOptions(kanaItem(map, a, unit.romaji))));
+      }
+    } else {
+      shuffle(unit.romaji).forEach((a) => questions.push(withKanaOptions(kanaItem(map, a, unit.romaji))));
+    }
+    // Production round — build each sound from nothing, shuffled so the gap
+    // from its MC is at least a few questions.
+    questions.push(...shuffle(unit.romaji).map((a) => prodItem(map, a)));
+    const rowWord = KANA_ROW_WORDS[unit.jp];
+    if (rowWord) questions.push({ type: "word_reveal", prompt: rowWord.word, reading: rowWord.reading, meaning: rowWord.meaning });
+    return questions;
+  }
+
   let items;
   // question order is shuffled so repeat runs (and parallel rows across
   // hiragana/katakana) never share an answer sequence
   if (unit.romaji.length) items = shuffle(unit.romaji).map((a) => kanaItem(map, a, unit.romaji));
   else // Review unit — sample across the whole chapter
     items = shuffle(chapter.units.flatMap((u) => u.romaji.map((a) => kanaItem(map, a, u.romaji))));
-  const questions = items.slice(0, 15).map(withKanaOptions);
+  // Base-kana chapter reviews mix in production questions (every third), since
+  // review is exactly where retrieval earns its keep.
+  const reviewProd = chapter.id === "hira" || chapter.id === "kata";
+  const questions = items.slice(0, 15).map((it, k) =>
+    reviewProd && k % 3 === 2 ? prodItem(map, it.answer) : withKanaOptions(it));
   const rowWord = KANA_ROW_WORDS[unit.jp];
   if (rowWord) questions.push({ type: "word_reveal", prompt: rowWord.word, reading: rowWord.reading, meaning: rowWord.meaning });
   return questions;
@@ -330,11 +393,14 @@ export function chapterReviewQuestions(chapterIdx, count = 20) {
   chapter.units.forEach((u) => {
     u.romaji.forEach((a) => all.push(kanaItem(mapFor(chapter, u), a, u.romaji)));
   });
-  return shuffle(all).slice(0, count).map(withKanaOptions);
+  // base-kana chapters mix in production questions — review is retrieval's home
+  const prodOk = chapter.id === "hira" || chapter.id === "kata";
+  return shuffle(all).slice(0, count).map((it, k) =>
+    prodOk && k % 3 === 2 ? prodItem(it.pool, it.answer) : withKanaOptions(it));
 }
 
 export function buildQuestions(session, progress) {
-  if (session.kind === "unit") return unitQuestions(session.chapterIdx, session.unitIdx, session.difficulty, session.dir);
+  if (session.kind === "unit") return unitQuestions(session.chapterIdx, session.unitIdx, session.difficulty, session.dir, progress);
   if (session.kind === "custom") return customQuestions(session);
   if (session.kind === "numbers") return numberQuestions(session);
   if (session.kind === "foundations") return foundationsQuestions(session);
