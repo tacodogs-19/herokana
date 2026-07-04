@@ -22,6 +22,25 @@ export function stopSpeech() {
   if (clipEl) { try { clipEl.pause(); } catch (e) {} clipEl = null; }
 }
 
+// Kana clips are keyed by hiragana; katakana folds down since it's the same
+// sound (also used by toKana below).
+const foldKata = (s) => (s || "").replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+export const kanaClipFor = (text) => (CLIPS.kana || {})[foldKata(text)];
+
+// Kana syllables: prefer the bundled clip — works with no device voice and
+// beats a poor one. Anything unmanifested (words, sentences) falls back to
+// device TTS, so callers can pass any prompt through here.
+export function speakKana(text, opts) {
+  const file = kanaClipFor(text);
+  if (!file) return speak(text, opts);
+  stopSpeech();
+  try {
+    const a = new Audio(`/audio/${file}`);
+    clipEl = a;
+    a.play().catch(() => speak(text, opts));
+  } catch (e) { speak(text, opts); }
+}
+
 // Dialogue lines: play the bundled clip for this speaker+text if one exists,
 // else fall back to device TTS with the per-speaker pitch trick. `rate` is the
 // SUPPORT-level TTS rate (0.75–0.95); clips are natural-speed recordings, so it

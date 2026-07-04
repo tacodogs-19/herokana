@@ -4,7 +4,7 @@ import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
 import { buildQuestions, MODE_TITLES, KANA_COMPOSE, COMPOSABLE } from "../questions.js";
-import { speak, useJaVoice } from "../speech.js";
+import { speakKana, kanaClipFor, useJaVoice } from "../speech.js";
 
 const SPEED_MS = 8000;
 
@@ -46,17 +46,24 @@ function LessonBody({ session, onComplete, onExit }) {
   const isRight = (g) => q.input ? (q.answers || [q.answer]).some((a) => norm(a) === g) : g === q.answer;
   const correct = checked && isRight(given);
   const unscoredType = (x) => x.type === "word_reveal" || x.type === "teach";
-  const canCheck = unscoredType(q) || (q.input ? typed.trim().length > 0 : sel != null);
+  // Production questions are always actionable: with nothing built the action
+  // becomes "I don't know" (reveals the answer, counts as a miss, requeues) so a
+  // learner who can't recall a sound is never trapped by a dead Check button.
+  const canCheck = unscoredType(q) || q.prod || (q.input ? typed.trim().length > 0 : sel != null);
+  const idk = q.prod && !checked && sel == null; // the "I don't know" escape state
 
   const hasVoice = useJaVoice();
+  // Kana prompts have bundled clips (no device voice needed); words/sentences
+  // still ride the OS voice. canHear covers both so kana surfaces work anywhere.
+  const canHear = (text) => hasVoice || !!kanaClipFor(text);
   // Kanji seen in this session — updated on advance so furigana stays visible
   // for the entire first encounter, then hides on any repeat of the same kanji.
   const seenKanjiRef = React.useRef(new Set());
 
-  // Listening questions announce themselves — but only when there's a voice to
-  // do it; without one the question falls back to a readable prompt (below).
+  // Listening questions announce themselves — but only when there's audio to
+  // do it; without any the question falls back to a readable prompt (below).
   React.useEffect(() => {
-    if ((q.listen || q.type === "teach") && hasVoice) speak(q.prompt);
+    if ((q.listen || q.type === "teach") && canHear(q.prompt)) speakKana(q.prompt);
     return () => { try { speechSynthesis.cancel(); } catch (e) {} };
   }, [i, hasVoice]);
 
@@ -136,7 +143,7 @@ function LessonBody({ session, onComplete, onExit }) {
   };
 
   const concept = q.type === "concept";
-  const heading = q.type === "teach" ? "Meet a new kana." : q.type === "word_reveal" ? "Look what you can read." : concept ? "Sentence basics" : (q.listen && hasVoice) ? "What do you hear?" : q.furigana ? "What does this kanji mean?" : q.prod ? "What sound does it make?" : q.type === "phrase" ? "What does this say?" : "Which sound is this?";
+  const heading = q.type === "teach" ? "Meet a new kana." : q.type === "word_reveal" ? "Look what you can read." : concept ? "Sentence basics" : (q.listen && canHear(q.prompt)) ? "What do you hear?" : q.furigana ? "What does this kanji mean?" : q.prod ? "What sound does it make?" : q.type === "phrase" ? "What does this say?" : "Which sound is this?";
   // "Hear it" pre-answer would give production questions away — the sound IS the answer
   const hearSlot = checked || (q.type === "kana" && !q.prod) || q.type === "word_reveal" || q.type === "teach";
   // typed (hard) questions use the shorter card, so cap the prompt size to keep
@@ -144,7 +151,7 @@ function LessonBody({ session, onComplete, onExit }) {
   const promptSize = q.input
     ? (q.prompt.length > 7 ? 26 : 32)
     : (q.prompt.length > 7 ? 30 : q.prompt.length > 2 ? 44 : 96);
-  const showPrompt = !q.listen || checked || !hasVoice;
+  const showPrompt = !q.listen || checked || !canHear(q.prompt);
   // sentence-length romaji options don't fit two abreast
   const longOptions = !q.input && q.options?.some((o) => o.length > 12);
 
@@ -196,7 +203,7 @@ function LessonBody({ session, onComplete, onExit }) {
         {/* flex column so kana + mnemonic center together as a unit */}
         <div style={{ flex: 1, minHeight: 0, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           {!showPrompt
-            ? <button onClick={() => speak(q.prompt)} className="hk-press" aria-label="Play sound"
+            ? <button onClick={() => speakKana(q.prompt)} className="hk-press" aria-label="Play sound"
                 style={{ width: 96, height: 96, borderRadius: "50%", border: "none", cursor: "pointer", background: t.primarySoft,
                   color: t.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
@@ -227,8 +234,8 @@ function LessonBody({ session, onComplete, onExit }) {
         ) : (
           <div style={{ height: hearSlot ? 38 : 0, marginTop: hearSlot ? 0 : -8, overflow: "hidden", flexShrink: 0, transition: "height 200ms, margin-top 200ms" }}>
             <div style={{ height: 38, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {showPrompt && hasVoice && hearSlot && (
-                <button onClick={() => speak(q.prompt)} className="hk-press" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px",
+              {showPrompt && canHear(q.prompt) && hearSlot && (
+                <button onClick={() => speakKana(q.prompt)} className="hk-press" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px",
                   borderRadius: 12, border: `1.5px solid ${t.line}`, background: t.bg, color: t.sub, cursor: "pointer", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: DISPLAY }}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" /></svg>
                   Hear it
@@ -298,25 +305,29 @@ function LessonBody({ session, onComplete, onExit }) {
                 opacity: off ? 0.35 : 1, transition: "opacity 150ms, border-color 150ms, background 150ms" });
               return (
                 <>
-                  {/* consonants — tap again to clear */}
+                  {/* consonants (tap again to clear) + standalone ん after w —
+                      one 5-col grid so every key is the same width */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8, marginBottom: 8 }}>
                     {Object.keys(KANA_COMPOSE).map((c) => (
                       <button key={c} disabled={checked} className="hk-press"
                         onClick={() => { setCons(cons === c ? null : c); setSel(null); }}
                         style={tile(cons === c, false)}>{c}</button>
                     ))}
+                    <button disabled={checked || cons != null} className="hk-press"
+                      onClick={() => setSel("n")} style={tile(sel === "n" && cons == null, cons != null)}>n</button>
                   </div>
-                  {/* vowels + standalone ん */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
+                  {/* vowels — same 5-col rhythm. Once a consonant is armed the
+                      keys relabel to the actual syllable (h → ha hi fu he ho), so
+                      irregular sounds like fu/shi/chi/tsu are discoverable rather
+                      than needing an "f"/"sh" key that doesn't exist. */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
                     {["a", "i", "u", "e", "o"].map((v) => {
                       const val = cons ? (KANA_COMPOSE[cons] || {})[v] : v;
                       return (
                         <button key={v} disabled={checked || (cons != null && !val)} className="hk-press"
-                          onClick={() => setSel(val)} style={tile(false, cons != null && !val)}>{v}</button>
+                          onClick={() => setSel(val)} style={tile(false, cons != null && !val)}>{cons ? (val || v) : v}</button>
                       );
                     })}
-                    <button disabled={checked || cons != null} className="hk-press"
-                      onClick={() => setSel("n")} style={tile(false, cons != null)}>n</button>
                   </div>
                 </>
               );
@@ -369,12 +380,12 @@ function LessonBody({ session, onComplete, onExit }) {
       </div>
       <button onClick={onAction} disabled={!checked && !canCheck} className="hk-press"
         style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none", cursor: checked || canCheck ? "pointer" : "default",
-          background: !checked && !canCheck ? t.sunk : checked ? (correct ? t.done : t.wrong) : t.primary,
-          color: !checked && !canCheck ? t.faint : "#fff",
+          background: idk ? t.sunk : !checked && !canCheck ? t.sunk : checked ? (correct ? t.done : t.wrong) : t.primary,
+          color: idk ? t.sub : !checked && !canCheck ? t.faint : "#fff",
           fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, flexShrink: 0,
-          boxShadow: checked || canCheck ? t.glow(checked ? (correct ? t.done : t.wrong) : t.primary) : "none",
+          boxShadow: idk || (!checked && !canCheck) ? "none" : t.glow(checked ? (correct ? t.done : t.wrong) : t.primary),
           transition: "background 240ms var(--ease-out-quart), box-shadow 240ms var(--ease-out-quart), color 150ms" }}>
-        {unscoredType(q) ? (i + 1 >= qs.length ? "Finish →" : "Got it →") : !checked ? "Check" : i + 1 >= qs.length ? "Finish →" : "Continue →"}
+        {unscoredType(q) ? (i + 1 >= qs.length ? "Finish →" : "Got it →") : !checked ? (idk ? "I don't know" : "Check") : i + 1 >= qs.length ? "Finish →" : "Continue →"}
       </button>
 
       {confirmExit && (

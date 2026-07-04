@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { HIRA, KATA, mnemonicFor } from "../data";
-import { speak, useJaVoice } from "../speech.js";
+import { speakKana } from "../speech.js";
 import STROKES from "../strokes.json";
 
 // Animated stroke order (KanjiVG data, 109x109 viewBox). A faint full glyph
@@ -104,7 +104,6 @@ export default function KanaChart({ onClose }) {
   const [hint,      setHint]      = React.useState(() => !localStorage.getItem(PREF_KEY));
 
   const map = kana === "hira" ? HIRA : KATA;
-  const hasJa = useJaVoice();
 
   const visibleKana = filteredKanaFor(rowFilter);
   const rj = visibleKana[Math.min(cardIdx, visibleKana.length - 1)];
@@ -163,7 +162,7 @@ export default function KanaChart({ onClose }) {
     goCard(dir);
   };
 
-  const flip = () => { setFlipped((f) => !f); if (hasJa) speak(map[rj]); };
+  const flip = () => { setFlipped((f) => !f); speakKana(map[rj]); };
 
   const onTouchStart = (e) => {
     swiped.current = false;
@@ -209,7 +208,7 @@ export default function KanaChart({ onClose }) {
     if (!romaji) return <span aria-hidden />;
     const on = active === romaji;
     return (
-      <button onClick={() => { setActive(romaji); if (hasJa) speak(map[romaji]); }} className="hk-press"
+      <button onClick={() => { setActive(romaji); speakKana(map[romaji]); }} className="hk-press"
         aria-label={`${map[romaji]} — ${romaji}`}
         style={{ aspectRatio: "1", borderRadius: 13, cursor: "pointer", padding: 0, minWidth: 0,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
@@ -275,7 +274,7 @@ export default function KanaChart({ onClose }) {
         <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, flexShrink: 0 }}>
           {view === "card"
             ? "Tap the card to reveal the reading. Swipe or use the arrows to move."
-            : hasJa ? "Tap any kana to hear it." : "Tap a kana to see its reading. (No Japanese voice on this device.)"}
+            : "Tap any kana to hear it."}
         </p>
 
         {/* Hiragana / Katakana toggle */}

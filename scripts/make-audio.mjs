@@ -14,18 +14,27 @@ import { mkdirSync, writeFileSync, existsSync, readdirSync, unlinkSync } from "n
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { DIALOGUES } from "../src/dialogue.js";
+import { HIRA, KATA } from "../src/data.js";
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUT = path.join(ROOT, "public", "audio");
 mkdirSync(OUT, { recursive: true });
 
-const VOICES = { staff: "ja-JP-NanamiNeural", you: "ja-JP-KeitaNeural" };
+const VOICES = { staff: "ja-JP-NanamiNeural", you: "ja-JP-KeitaNeural", kana: "ja-JP-NanamiNeural" };
 
 // Collect unique speaker+line pairs across all dialogues/variants.
 const lines = new Map(); // "who|jp" -> { who, jp }
 for (const d of DIALOGUES)
   for (const v of d.variants)
     for (const ln of v) lines.set(`${ln.who}|${ln.jp}`, { who: ln.who, jp: ln.jp });
+
+// Kana syllables: one clip per sound, keyed by the hiragana glyph (speech.js
+// folds katakana to hiragana at lookup — same sound). Closed set, so kana
+// surfaces stop depending on the device voice. Synthesis input is the KATAKANA
+// form: bare hiragana は/へ/を risk the particle reading (wa/e/o); katakana is
+// never a particle, so it's always read phonetically.
+for (const [rj, glyph] of Object.entries(HIRA))
+  lines.set(`kana|${glyph}`, { who: "kana", jp: KATA[rj], key: glyph });
 
 const fileFor = ({ who, jp }) =>
   createHash("md5").update(`${VOICES[who]}|${jp}`).digest("hex").slice(0, 10) + ".mp3";
@@ -44,15 +53,15 @@ const synth = async ({ who, jp }) => {
   return Buffer.concat(chunks);
 };
 
-const manifest = { staff: {}, you: {} };
+const manifest = { staff: {}, you: {}, kana: {} };
 let made = 0, kept = 0;
 for (const item of lines.values()) {
   const file = fileFor(item);
-  manifest[item.who][item.jp] = file;
+  manifest[item.who][item.key || item.jp] = file;
   const dest = path.join(OUT, file);
   if (existsSync(dest)) { kept++; continue; }
   const buf = await synth(item);
-  if (buf.length < 1000) throw new Error(`suspiciously small clip for: ${item.jp}`);
+  if (buf.length < 500) throw new Error(`suspiciously small clip for: ${item.jp}`);
   writeFileSync(dest, buf);
   made++;
   console.log(`  ${item.who.padEnd(5)} ${file}  ${item.jp}`);

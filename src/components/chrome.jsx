@@ -22,6 +22,24 @@ export function Cat({ mood = "general", size = 64, style, className }) {
   );
 }
 
+// Kana clips are bundled, but words/sentences/verbs still speak via the OS
+// Japanese voice — absent on some bare Android devices. Where those surfaces
+// can't play, point the learner at the one fix web code can offer: install
+// Google's TTS engine (a PWA/TWA can't fire the native install-voice intent).
+const TTS_PLAY_URL = "https://play.google.com/store/apps/details?id=com.google.android.tts";
+export function NoVoiceHint({ children }) {
+  const { t } = useTheme();
+  return (
+    <p style={{ margin: 0, fontSize: 12.5, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
+      {children || "This device has no Japanese voice, so audio here stays silent."}{" "}
+      <a href={TTS_PLAY_URL} target="_blank" rel="noopener noreferrer"
+        style={{ color: t.primary, fontWeight: 700, textDecoration: "underline" }}>
+        Install or update Google Text-to-Speech
+      </a>{" "}to turn it on.
+    </p>
+  );
+}
+
 export function Ring({ size = 46, stroke = 4, pct, color, track, pct2, color2, children }) {
   const r = (size - stroke) / 2, circ = 2 * Math.PI * r;
   const r2 = r - stroke - 5, circ2 = 2 * Math.PI * r2;

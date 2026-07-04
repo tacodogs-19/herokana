@@ -1,6 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { speak, useJaVoice } from "../speech.js";
+import { NoVoiceHint } from "../components/chrome.jsx";
 
 const GROUPS = [
   {
@@ -82,9 +83,12 @@ export default function VerbChart({ onClose }) {
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Verb list</h1>
       </header>
 
-      <p style={{ margin: "0 20px 14px", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, flexShrink: 0 }}>
-        {hasJa ? "Tap a verb to see its forms and hear it." : "Tap a verb to see its conjugation forms."}
-      </p>
+      <div style={{ margin: "0 20px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+        <p style={{ margin: 0, fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
+          {hasJa ? "Tap a verb to see its forms and hear it." : "Tap a verb to see its conjugation forms."}
+        </p>
+        {!hasJa && <NoVoiceHint>Verbs are spoken by your device's Japanese voice, which isn't installed.</NoVoiceHint>}
+      </div>
 
       {/* Group toggle */}
       <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, margin: "0 20px 16px", flexShrink: 0 }}>
