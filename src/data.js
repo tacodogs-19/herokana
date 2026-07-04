@@ -1413,6 +1413,8 @@ export function aboutMeSentences() {
   // pad to 25 with general About me lines the learner hasn't already got
   for (const s of SENTENCES[0]) {
     if (out.length >= 25) break;
+    // the learner's own name already led the unit — never fall back to "…Tanaka"
+    if (p.name && s.romaji === "watashi no namae wa tanaka desu") continue;
     if (!out.some((o) => o.romaji === s.romaji)) out.push(s);
   }
   return out;

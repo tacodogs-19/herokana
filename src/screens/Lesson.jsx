@@ -3,7 +3,7 @@ import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
-import { buildQuestions, MODE_TITLES, KANA_COMPOSE, COMPOSABLE } from "../questions.js";
+import { buildQuestions, MODE_TITLES, KANA_COMPOSE, canProduce } from "../questions.js";
 import { speakKana, kanaClipFor, useJaVoice } from "../speech.js";
 
 const SPEED_MS = 8000;
@@ -75,7 +75,7 @@ function LessonBody({ session, onComplete, onExit }) {
     // retrieval attempt — production when the tile pad can build the sound,
     // otherwise the same question again. One retry per question.
     if (!right && q.type === "kana" && session.kind === "unit" && !q.requeued) {
-      const again = COMPOSABLE.has(q.answer) && !q.prod
+      const again = canProduce(q.answer) && !q.prod
         ? { type: "kana", prod: true, prompt: q.prompt, answer: q.answer, meaning: q.meaning, requeued: true }
         : { ...q, requeued: true };
       setQs((prev) => [...prev, again]);

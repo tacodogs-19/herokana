@@ -45,6 +45,30 @@ function ChipsMulti({ options, values, onToggle, t }) {
   );
 }
 
+// DOB as three plain number fields (DD / MM / YYYY). Keeps the stored value as an
+// ISO "YYYY-MM-DD" string so ageFromDob and everything downstream is unchanged.
+function DobInput({ value, onChange, t }) {
+  const init = value ? value.split("-") : ["", "", ""]; // [YYYY, MM, DD]
+  const [d, setD] = React.useState(init[2] || "");
+  const [m, setM] = React.useState(init[1] || "");
+  const [y, setY] = React.useState(init[0] || "");
+  React.useEffect(() => {
+    onChange(d && m && y ? `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}` : "");
+  }, [d, m, y]); // eslint-disable-line react-hooks/exhaustive-deps
+  const field = (val, set, ph, len, w) => (
+    <input value={val} inputMode="numeric" placeholder={ph} aria-label={ph}
+      onChange={(e) => set(e.target.value.replace(/\D/g, "").slice(0, len))}
+      style={{ ...inputStyle(t), width: w, textAlign: "center", letterSpacing: "0.06em" }} />
+  );
+  return (
+    <div style={{ display: "flex", gap: 10 }}>
+      {field(d, setD, "DD", 2, 72)}
+      {field(m, setM, "MM", 2, 72)}
+      {field(y, setY, "YYYY", 4, 104)}
+    </div>
+  );
+}
+
 function OnboardingBody({ initial, onDone, registerBack }) {
   const { t } = useTheme();
   const [data, setData] = React.useState(() => {
@@ -80,10 +104,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
     {
       key: "dob", title: "When's your birthday?", cat: "load",
       blurb: "So “I am … years old” always matches your age.",
-      render: () => (
-        <input type="date" value={data.dob} onChange={(e) => set("dob", e.target.value)}
-          max={new Date().toISOString().slice(0, 10)} style={{ ...inputStyle(t), colorScheme: "light dark" }} />
-      ),
+      render: () => <DobInput t={t} value={data.dob} onChange={(v) => set("dob", v)} />,
     },
     {
       key: "country", title: "Where are you from?", cat: "run",

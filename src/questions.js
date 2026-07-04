@@ -86,12 +86,18 @@ export const KANA_COMPOSE = {
   r: { a: "ra", i: "ri", u: "ru", e: "re", o: "ro" },
   w: { a: "wa", o: "wo" },
 };
-// Every sound the tile pad can produce — misses of anything else requeue as
-// multiple-choice instead of production.
+// Every sound the tile pad can mechanically build.
 export const COMPOSABLE = new Set([
   "a", "i", "u", "e", "o", "n",
   ...Object.values(KANA_COMPOSE).flatMap((row) => Object.values(row)),
 ]);
+
+// fu and chi are the only kana whose romaji initial (f, c) isn't a key on the
+// pad — you can only reach them by knowing they hide in the h- and t-rows. That
+// tests table layout, not the sound, which is unfair as a cold production
+// prompt (e.g. in chapter review). They stay multiple-choice everywhere.
+const PROD_EXCLUDE = new Set(["fu", "chi"]);
+export const canProduce = (ans) => COMPOSABLE.has(ans) && !PROD_EXCLUDE.has(ans);
 
 // Unscored first-contact card: glyph + sound + mnemonic, before any question.
 const teachItem = (map, ans) => ({ type: "teach", prompt: map[ans] || "—", reading: ans,
@@ -198,8 +204,10 @@ export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir, pro
       shuffle(unit.romaji).forEach((a) => questions.push(withKanaOptions(kanaItem(map, a, unit.romaji))));
     }
     // Production round — build each sound from nothing, shuffled so the gap
-    // from its MC is at least a few questions.
-    questions.push(...shuffle(unit.romaji).map((a) => prodItem(map, a)));
+    // from its MC is at least a few questions. fu/chi can't be entered from
+    // their initial, so they re-appear as multiple-choice instead.
+    questions.push(...shuffle(unit.romaji).map((a) =>
+      canProduce(a) ? prodItem(map, a) : withKanaOptions(kanaItem(map, a, unit.romaji))));
     const rowWord = KANA_ROW_WORDS[unit.jp];
     if (rowWord) questions.push({ type: "word_reveal", prompt: rowWord.word, reading: rowWord.reading, meaning: rowWord.meaning });
     return questions;
@@ -215,7 +223,7 @@ export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir, pro
   // review is exactly where retrieval earns its keep.
   const reviewProd = chapter.id === "hira" || chapter.id === "kata";
   const questions = items.slice(0, 15).map((it, k) =>
-    reviewProd && k % 3 === 2 ? prodItem(map, it.answer) : withKanaOptions(it));
+    reviewProd && k % 3 === 2 && canProduce(it.answer) ? prodItem(map, it.answer) : withKanaOptions(it));
   const rowWord = KANA_ROW_WORDS[unit.jp];
   if (rowWord) questions.push({ type: "word_reveal", prompt: rowWord.word, reading: rowWord.reading, meaning: rowWord.meaning });
   return questions;
@@ -396,7 +404,7 @@ export function chapterReviewQuestions(chapterIdx, count = 20) {
   // base-kana chapters mix in production questions — review is retrieval's home
   const prodOk = chapter.id === "hira" || chapter.id === "kata";
   return shuffle(all).slice(0, count).map((it, k) =>
-    prodOk && k % 3 === 2 ? prodItem(it.pool, it.answer) : withKanaOptions(it));
+    prodOk && k % 3 === 2 && canProduce(it.answer) ? prodItem(it.pool, it.answer) : withKanaOptions(it));
 }
 
 export function buildQuestions(session, progress) {
