@@ -110,7 +110,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
         boxShadow: active ? `0 16px 34px -26px ${t.shadow}` : "none",
         transition: morph("background-color", "border-color", "padding", "box-shadow") }}>
         <button onClick={select} className="hk-press"
-          style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "8px 0",
+          style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "12px 0",
             borderRadius: 12, // keeps the keyboard focus ring rounded
             background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
           <span style={{ width: active ? 44 : 28, height: active ? 44 : 28, borderRadius: active ? 12 : 9,
@@ -194,6 +194,18 @@ function ReadingBody({ onOpenPack }) {
       <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
         <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Scenes</h1>
+        <div style={{ flex: 1 }} />
+        {/* same idiom as the chapter reset pill on Learn */}
+        {unlocked && hasScenesData && (
+          <button onClick={() => setConfirmReset(true)} className="hk-press" aria-label="Reset Scenes progress"
+            style={{ padding: "5px 7px", borderRadius: 9, background: t.sunk, border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 4, color: t.faint }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+            </svg>
+            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.04em" }}>RESET</span>
+          </button>
+        )}
       </header>
 
       <p style={{ margin: "0 0 6px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>IN THE REAL WORLD</p>
@@ -225,15 +237,6 @@ function ReadingBody({ onOpenPack }) {
             </React.Fragment>
           ))}
         </div>
-      )}
-
-      {/* quiet reset — Scenes data only, nothing else is touched */}
-      {unlocked && hasScenesData && (
-        <button onClick={() => setConfirmReset(true)} className="hk-press"
-          style={{ display: "block", margin: "28px auto 0", padding: "8px 16px", borderRadius: 12, cursor: "pointer",
-            background: "transparent", border: "none", color: t.faint, fontFamily: DISPLAY, fontSize: 12, fontWeight: 700 }}>
-          Reset Scenes progress
-        </button>
       )}
 
       {confirmReset && (

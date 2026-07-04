@@ -10,7 +10,7 @@ function StrokeGlyph({ ch, size, ink, guide }) {
   const ds = STROKES[ch] || [];
   const [run, setRun] = React.useState(0);
   return (
-    <svg key={run} width={size} height={size} viewBox="0 0 109 109" role="img"
+    <svg key={run} width={size} height={size} viewBox="0 0 109 109" role="img" data-stroke="1"
       aria-label={`Stroke order for ${ch}`}
       onClick={(e) => { e.stopPropagation(); setRun((r) => r + 1); }}>
       {ds.map((d, i) => (
@@ -163,6 +163,8 @@ export default function KanaChart({ onClose }) {
     goCard(dir);
   };
 
+  const flip = () => { setFlipped((f) => !f); if (hasJa) speak(map[rj]); };
+
   const onTouchStart = (e) => {
     swiped.current = false;
     const p = e.touches[0];
@@ -183,7 +185,17 @@ export default function KanaChart({ onClose }) {
   const onTouchEnd = (e) => {
     const s = touch.current; touch.current = null;
     const el = cardRef.current;
-    if (!s || !s.horiz || !el) return;
+    if (!s || !el) return;
+    if (!s.horiz) {
+      // A tap — flip right here instead of waiting for the browser's
+      // synthesized click (its delay made taps feel laggy on device), and
+      // swallow that trailing click. The stroke glyph's own tap (replay,
+      // handled in its onClick) is left to the click path.
+      if (e.target.closest && e.target.closest("[data-stroke]")) return;
+      swiped.current = true;
+      flip();
+      return;
+    }
     const dx = e.changedTouches[0].clientX - s.x;
     if (Math.abs(dx) > 56) {
       advance(dx < 0 ? 1 : -1); // ghost departs from the drag position
@@ -323,7 +335,7 @@ export default function KanaChart({ onClose }) {
         ) : (
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
             <div key={`${rowFilter}-${cardIdx}`} ref={cardRef}
-              onClick={() => { if (swiped.current) { swiped.current = false; return; } setFlipped((f) => !f); if (hasJa) speak(map[rj]); }}
+              onClick={() => { if (swiped.current) { swiped.current = false; return; } flip(); }}
               onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
               onAnimationEnd={(e) => { e.currentTarget.style.animation = "none"; }}
               style={{ width: "100%", perspective: "1200px", cursor: "pointer", flexShrink: 0, touchAction: "pan-y",
