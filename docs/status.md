@@ -283,6 +283,11 @@ now"** capability moment (the post-launch replacement idea for the deleted stats
 
 ## Release procedure (reminder)
 
-Bump `VERSION` and edit `RELEASE_NOTES` in [`src/release.js`](../src/release.js) → `npm run build` →
-deploy `dist/`. Installed clients see the update prompt; on accept they get the new build and the
-"What's new" dialog once. See [decisions.md](decisions.md) for why updates are prompt-gated.
+**Git-based CD (Netlify builds from `main`):** bump `VERSION` and edit `RELEASE_NOTES` in
+[`src/release.js`](../src/release.js) → `git commit` → `git push origin main`. Netlify builds
+`dist/` and publishes automatically — no local build, no dragging. Installed clients see the
+update prompt (any deploy triggers it); on accept they get the new build, and the "What's new"
+dialog shows once **only when `VERSION` changed**. So: content-only fixes can ship without a
+`VERSION` bump (update prompt, no What's New); bump `VERSION` when you want the notes shown.
+Deploys are atomic with one-click rollback in the Netlify dashboard. See
+[decisions.md](decisions.md) for why updates are prompt-gated.
