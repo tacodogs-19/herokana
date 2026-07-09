@@ -22,6 +22,18 @@ export function stopSpeech() {
   if (clipEl) { try { clipEl.pause(); } catch (e) {} clipEl = null; }
 }
 
+// Play a bundled clip, running `fallback` if it can't start. Shared by every
+// bundled-audio surface (kana, verbs, dialogue) so there's one Audio path.
+function playFile(file, { rate = 1, fallback } = {}) {
+  stopSpeech();
+  try {
+    const a = new Audio(`/audio/${file}`);
+    if (rate !== 1) a.playbackRate = rate;
+    clipEl = a;
+    a.play().catch(() => fallback && fallback());
+  } catch (e) { fallback && fallback(); }
+}
+
 // Kana clips are keyed by hiragana; katakana folds down since it's the same
 // sound (also used by toKana below).
 const foldKata = (s) => (s || "").replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
@@ -33,12 +45,17 @@ export const kanaClipFor = (text) => (CLIPS.kana || {})[foldKata(text)];
 export function speakKana(text, opts) {
   const file = kanaClipFor(text);
   if (!file) return speak(text, opts);
-  stopSpeech();
-  try {
-    const a = new Audio(`/audio/${file}`);
-    clipEl = a;
-    a.play().catch(() => speak(text, opts));
-  } catch (e) { speak(text, opts); }
+  playFile(file, { fallback: () => speak(text, opts) });
+}
+
+// Verb list: dictionary form has a bundled clip (keyed by the kanji spelling),
+// so the Verb list has audio even with no device voice. Conjugated forms aren't
+// bundled — only the dictionary form is spoken.
+export const verbClipFor = (jp) => (CLIPS.verb || {})[jp];
+export function speakVerb(jp, opts) {
+  const file = verbClipFor(jp);
+  if (!file) return speak(jp, opts);
+  playFile(file, { fallback: () => speak(jp, opts) });
 }
 
 // Dialogue lines: play the bundled clip for this speaker+text if one exists,
@@ -49,13 +66,7 @@ export function speakLine(text, { who = "staff", rate = 0.85 } = {}) {
   const file = (CLIPS[who] || {})[text];
   const fallback = () => speak(text, { rate, pitch: who === "you" ? 1.25 : 0.95 });
   if (!file) return fallback();
-  stopSpeech();
-  try {
-    const a = new Audio(`/audio/${file}`);
-    a.playbackRate = rate + 0.15;
-    clipEl = a;
-    a.play().catch(fallback);
-  } catch (e) { fallback(); }
+  playFile(file, { rate: rate + 0.15, fallback });
 }
 
 // --- Speaking practice (production) ---------------------------------------

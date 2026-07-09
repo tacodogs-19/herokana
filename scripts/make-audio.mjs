@@ -15,12 +15,13 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { DIALOGUES } from "../src/dialogue.js";
 import { HIRA, KATA } from "../src/data.js";
+import { GROUPS as VERB_GROUPS } from "../src/verbs.js";
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUT = path.join(ROOT, "public", "audio");
 mkdirSync(OUT, { recursive: true });
 
-const VOICES = { staff: "ja-JP-NanamiNeural", you: "ja-JP-KeitaNeural", kana: "ja-JP-NanamiNeural" };
+const VOICES = { staff: "ja-JP-NanamiNeural", you: "ja-JP-KeitaNeural", kana: "ja-JP-NanamiNeural", verb: "ja-JP-NanamiNeural" };
 
 // Collect unique speaker+line pairs across all dialogues/variants.
 const lines = new Map(); // "who|jp" -> { who, jp }
@@ -35,6 +36,12 @@ for (const d of DIALOGUES)
 // never a particle, so it's always read phonetically.
 for (const [rj, glyph] of Object.entries(HIRA))
   lines.set(`kana|${glyph}`, { who: "kana", jp: KATA[rj], key: glyph });
+
+// Verb list dictionary forms: synth the kana reading (unambiguous — kanji like
+// 生 have many readings), but key the manifest by the kanji spelling the UI
+// passes to speakVerb. Only the dictionary form; conjugations aren't bundled.
+for (const g of VERB_GROUPS)
+  for (const v of g.verbs) lines.set(`verb|${v.r}`, { who: "verb", jp: v.r, key: v.jp });
 
 const fileFor = ({ who, jp }) =>
   createHash("md5").update(`${VOICES[who]}|${jp}`).digest("hex").slice(0, 10) + ".mp3";
@@ -53,7 +60,7 @@ const synth = async ({ who, jp }) => {
   return Buffer.concat(chunks);
 };
 
-const manifest = { staff: {}, you: {}, kana: {} };
+const manifest = { staff: {}, you: {}, kana: {}, verb: {} };
 let made = 0, kept = 0;
 for (const item of lines.values()) {
   const file = fileFor(item);

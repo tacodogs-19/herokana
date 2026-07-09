@@ -80,7 +80,7 @@ const FRAMES = [
   ["05-kanji-hard", "Ready for more? Hard mode", "Kanji prompts once you finish the course"],
   ["06-results", "Progress worth celebrating", "XP and accuracy — never a streak to lose"],
   ["07-practice", "Practice your way", "Quick review, weak spots, speed, listening"],
-  ["08-home-progress", "No streaks. No ads. No account.", "Free, offline, and entirely yours"],
+  ["08-home-progress", "No streaks. No ads. No account.", "One-time $0.99 — offline, private, entirely yours"],
 ];
 
 for (const [name, headline, sub] of FRAMES) {

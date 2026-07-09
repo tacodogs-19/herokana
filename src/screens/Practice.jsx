@@ -55,11 +55,11 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   });
   const [numGroups, setNumGroups] = React.useState(() => loadSessionSet("hk-prac-numbers"));
   const [tab, setTab] = React.useState(() => {
-    try { const v = localStorage.getItem("hk-prac-tab"); if (v === "alpha" || v === "words" || v === "numbers") return v; } catch (e) {}
+    try { const v = localStorage.getItem("hk-prac-tab"); if (v === "alpha" || v === "words" || v === "verbs" || v === "numbers") return v; } catch (e) {}
     return "words";
   });
   const [modeCategory, setModeCategory] = React.useState(() => {
-    try { const v = localStorage.getItem("hk-prac-mode-cat"); if (v === "alpha" || v === "words" || v === "sentences" || v === "numbers") return v; } catch (e) {}
+    try { const v = localStorage.getItem("hk-prac-mode-cat"); if (v === "alpha" || v === "words" || v === "verbs" || v === "sentences" || v === "numbers") return v; } catch (e) {}
     return "alpha";
   });
   React.useEffect(() => { try { sessionStorage.setItem("hk-prac-chapters", JSON.stringify([...picked])); } catch (e) {} }, [picked]);
@@ -89,9 +89,13 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
     return { ...p, [id]: n };
   });
 
-  // the custom set works within the active tab: alphabet (kana chapters)
-  // or words & sentences (banked chapters)
-  const inTab = (i) => (BANKS[CHAPTERS[i].id] ? tab === "words" : tab === "alpha");
+  // the custom set works within the active tab: kana chapters, verbs (its own
+  // tab), or words & sentences (the other banked chapters)
+  const inTab = (i) => {
+    const id = CHAPTERS[i].id;
+    if (id === "verb") return tab === "verbs";
+    return BANKS[id] ? tab === "words" : tab === "alpha";
+  };
   // banked chapters only contribute once at least one theme is chosen
   const effective = [...picked].filter((i) => inTab(i) && (!BANKS[CHAPTERS[i].id] || themes[CHAPTERS[i].id].size > 0));
   const needThemes = [...picked].some((i) => inTab(i) && BANKS[CHAPTERS[i].id] && themes[CHAPTERS[i].id].size === 0);
@@ -207,14 +211,14 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       {/* Practice modes — the one-tap path, front and centre */}
       <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE MODES</p>
       <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
-        {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
+        {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = modeCategory === tb.id;
           return (
             <button key={tb.id} onClick={() => setModeCategory(tb.id)} className="hk-press"
-              style={{ flex: 1, padding: "9px 4px", borderRadius: 9, border: "none", cursor: "pointer",
+              style={{ flex: 1, padding: "9px 3px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
                 boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
-                fontSize: 13, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
+                fontSize: 11.5, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
               {tb.label}
             </button>
           );
@@ -242,7 +246,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       </p>
       <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "16px 16px 18px" }}>
       <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
-        {[{ id: "alpha", label: "Alphabet" }, { id: "words", label: "Words" }, { id: "numbers", label: "Numbers" }].map((tb) => {
+        {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = tab === tb.id;
           return (
             <button key={tb.id} onClick={() => setTab(tb.id)} className="hk-press"
@@ -256,8 +260,8 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         })}
       </div>
 
-      {/* Words tab — difficulty + answer language above the chapter selection */}
-      {tab === "words" && (
+      {/* Words / Verbs tabs — difficulty + answer language above the selection */}
+      {(tab === "words" || tab === "verbs") && (
         <div style={{ marginBottom: 16 }}>
           {diffAnswer("English")}
         </div>

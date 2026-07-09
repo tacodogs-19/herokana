@@ -1,7 +1,7 @@
 # HeroKana — Status & Baseline
 
 Snapshot of what exists so a fresh session can resume without re-deriving the baseline.
-**As of:** 2026-07-04 · **App version:** `1.21.0` (see [`src/release.js`](../src/release.js)).
+**As of:** 2026-07-05 · **App version:** `1.22.0` (see [`src/release.js`](../src/release.js)).
 
 > Update this file when the baseline changes — it is the "where are we" anchor after a `/clear`.
 
@@ -9,7 +9,9 @@ Snapshot of what exists so a fresh session can resume without re-deriving the ba
 
 The app is a complete, shippable PWA. All core flows are implemented:
 
-- **Onboarding** — 6-step skippable wizard; saves a profile that personalises Sentences.
+- **Onboarding** — 6-step skippable wizard; saves a profile that personalises Sentences. The DOB
+  step (DD/MM/YYYY) auto-advances to the next field once one is full and jumps back on backspace of an
+  empty field (`DobInput` in [`Onboarding.jsx`](../src/screens/Onboarding.jsx)).
 - **Home (Learn)** — chapter rail (map), focus card with progress ring, Continue / unit-jump,
   expandable "what's in this chapter", per-chapter lock/current/done states. Hiragana chapter shows a
   "Read the basics" pill (Kana basics explainer; label becomes "New to Japanese? Start here" on first
@@ -74,12 +76,21 @@ The app is a complete, shippable PWA. All core flows are implemented:
   a kana's first question; after the MC pass, every kana returns as a **production question** on a
   consonant+vowel **tile pad** (`KANA_COMPOSE` in [`questions.js`](../src/questions.js) — canonical
   romaji by construction, so shi/chi/tsu/fu can't be "misspelled"); **misses requeue** to the end of
-  the lesson for a second retrieval attempt ([`Lesson.jsx`](../src/screens/Lesson.jsx)). Teach cards
+  the lesson for a second retrieval attempt ([`Lesson.jsx`](../src/screens/Lesson.jsx)). (v1.22.0: the
+  standalone ん key shows the kana itself, not a second "n"; the picked syllable now highlights
+  alongside its consonant.) Teach cards
   appear only until the unit is first completed; replays are MC + production. Chapter reviews and 総
   units mix in production every third question. Scoring excludes teach cards. Voiced/combination
   chapters keep MC (no tile rows for them yet) but do get MC requeues on misses.
-- **First kanji chapter** (v1.20.0) — chapter 8, **appended** to `CHAPTERS` (id `kanji`): 23 N5-level
-  kanji in four small units (Numbers / Time / People / Signs in town), backed by a `KANJI` bank in
+- **Voiced / combination intro cards** (v1.22.0) — an unscored `intro` card (title + hero + body) is
+  prepended to the first unit of the voiced and combination chapters the first time through, explaining
+  the dakuten/handakuten marks and the small ゃゅょ before any kana is quizzed. Content is `CHAPTER_INTRO`
+  in [`questions.js`](../src/questions.js); rendered like teach/word_reveal (one-tap "Got it →", excluded
+  from scoring) in [`Lesson.jsx`](../src/screens/Lesson.jsx).
+- **First kanji chapter** (v1.20.0, extended 2026-07) — chapter 8, **appended** to `CHAPTERS`
+  (id `kanji`): 35 N5-level kanji in six small units (Numbers / Time / People / Signs in town /
+  Around town / Food & drink — the last two appended 2026-07, tuned to the Scenes reading wedge),
+  backed by a `KANJI` bank in
   [`data.js`](../src/data.js) where `jp` *is* the kanji (so it's the prompt at every difficulty),
   `romaji` is one common reading, `en` the meaning. Flows through `bankFor`/`itemIndex` untouched, so
   lessons, SRS review, weak spots, hard mode, and the Practice builder's Words tab all picked it up
@@ -104,8 +115,10 @@ The app is a complete, shippable PWA. All core flows are implemented:
   "What's new" after an update (`WhatsNew`). **No loading screen at all** (v1.21.0): the page is
   just the themed background until React mounts — the v1.17 static splash (cat video + "Loading…")
   was removed entirely after it kept resurfacing on update reloads; `cat-loading.mp4` deleted.
-- **Content** — Hiragana, Katakana, voiced, combination kana; 14 word/phrase themes; 11 sentence
-  themes; 4 complex-sentence themes; number ranges; grammar foundations. Every banked theme has 25+ items.
+- **Content** — Hiragana, Katakana, voiced, combination kana; 16 word/phrase themes (incl.
+  Objects & things 40, Food 40, Body 30 — 435 words total); 30 verbs
+  (ru / u / irregular); 11 sentence themes; 4 complex-sentence themes; number ranges; grammar
+  foundations. Every banked theme has 25+ items.
 - **Read the Real World** (v1.6.0) — reading-fluency mode in the **Scenes tab** (4th bottom-nav
   tab, renamed from "Reading" in v1.7.0 once it grew to include conversations; internal screen/route
   names are still `reading*`). [`Reading.jsx`](../src/screens/Reading.jsx) hub +
@@ -151,7 +164,30 @@ The app is a complete, shippable PWA. All core flows are implemented:
   section heading (no accordion), with its own "Questions per round" picker. Closes the three-item
   critique batch (Review, Weak-spots-banked, Practice flip).
 
-- **Verb list** (v1.15.0) — passive reference screen opened from a card in Practice (alongside Kana chart). Lists 29 common N5/N4 verbs across three groups: RU verbs (ichidan), U verbs (godan), and Irregular. Tap any verb row to expand 4 conjugation tiles (Polite / Past / Te-form / Negative) and hear it via TTS. Implemented as [`VerbChart.jsx`](../src/screens/VerbChart.jsx), routed via `App.jsx` (`verbChart`), with the entry point in [`Practice.jsx`](../src/screens/Practice.jsx) using an `onOpenVerbChart` prop.
+- **Verbs chapter** (v1.22.0) — a learnable chapter (id `verb`, **inserted before Sentences** at
+  chapter index 5 — a deliberate mid-spine insert that resets sentence/complex/kanji progress for
+  existing learners; owner-accepted, pre-launch). Recognition only: see the verb, pick its English
+  meaning. Reuses the banked engine with **zero new question/screen code** — `data.js` imports
+  `GROUPS` from [`verbs.js`](../src/verbs.js) and derives a `VERBS` bank (units ru / u / irregular).
+  Behaves like any other banked chapter: prompt is the kana reading (kanji + furigana on medium/hard),
+  **romaji answer with the English meaning as the easy-mode hint**, and **hard mode answers in English**
+  (`startUnit` sets `difficulty: "medium", dir: "en"` for banked chapters). An earlier build forced
+  English via an `enOnly` flag; reversed pre-ship (see decisions.md) since cold English-answer prompts
+  are blind guesses for unknown verbs. Conjugation drilling deferred.
+  **Practice surfaces it** (v1.22.0): a "Verbs" category in both the one-tap modes (`modeQuestions`
+  `category: "verbs"` → `verb` bank, romaji + English hint) and Build a custom set (its own tab,
+  `inTab` routes the verb chapter there, with the normal difficulty + Romaji/English answer toggle).
+  The former "Alphabet" segmented-control label is now **"Kana"** in both places (id stays `alpha`).
+  Answered in the **dictionary (plain) form**; on answering, a PLAIN/POLITE chip pair is revealed
+  (plain kana + polite `ます` form with romaji) so the learner connects the pair the sentences use — data
+  via a `forms` field on the verb bank items, rendered with the `q.parts` reveal pattern in `Lesson.jsx`.
+  The reveal also carries a **"Hear it"** button playing the bundled neural clip (verb items carry an
+  `audio` key = `v.jp`; `Lesson.jsx` routes verbs through `speakVerb`/`verbClipFor`), so verb audio
+  works with no device voice like kana/dialogue.
+  The Verbs focus card on Home carries a **"Verb list"** secondary pill under the Continue CTA
+  (`chapter.id === "verb"` strip in [`Home.jsx`](../src/screens/Home.jsx)), mirroring the kana cards'
+  "Read the basics"/"Kana chart" pills — it routes to the existing `VerbChart` reference.
+- **Verb list** (v1.15.0) — passive reference screen opened from a card in Practice (alongside Kana chart). Lists 29 common N5/N4 verbs across three groups: RU verbs (ichidan), U verbs (godan), and Irregular. Tap any verb row to expand 4 conjugation tiles (Polite / Past / Te-form / Negative) and hear it via TTS. Implemented as [`VerbChart.jsx`](../src/screens/VerbChart.jsx), routed via `App.jsx` (`verbChart`), with the entry point in [`Practice.jsx`](../src/screens/Practice.jsx) using an `onOpenVerbChart` prop. Now shares its `GROUPS` data with the Verbs chapter bank.
 - **Kana row word reveal** (v1.14.0) — after each kana row lesson (all non-Review units in Hiragana, Katakana, Voiced, and Combination chapters), an unscored bonus card appears at the end of the lesson showing one real Japanese word the learner can already sound out. The card shows the word large (JP font), its reading broken into syllables, the English meaning, and a "Got it →" / "Finish →" button. Implemented as a `word_reveal` question type appended in `unitQuestions()` via a `KANA_ROW_WORDS` lookup table in [`questions.js`](../src/questions.js). The card is excluded from scoring and SRS pool — `correct/total` in the result screen reflect only the drilled kana questions.
 - **Scenes teaser on Complex Sentences card** (v1.13.0) — when the learner reaches Complex Sentences (chapter 6) and Reading is already unlocked, a full-width "Explore Scenes →" soft-pill appears beneath the main CTA in the focus card. Updates to "Scenes · N of 8 done" once packs have been played. Implemented as a third conditional strip in [`Home.jsx`](../src/screens/Home.jsx), following the hira and sentence strip patterns. Uses `readingUnlocked` + `READING_PACKS` from [`reading.js`](../src/reading.js).
 - **Scenes-unlock result screen** (v1.19.0) — passing the unit that completes the `READING_UNLOCK`
@@ -225,10 +261,11 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **No automated tests, linter, or type checking.** Nothing guards regressions; all verification is
   manual in the browser. Positional chapter/unit indexing (see [content-model.md](content-model.md))
   is the highest-risk area to change without tests.
-- **TTS quality is device-dependent — except Conversations.** Dialogue lines use bundled neural
-  clips (v1.20.0), which closed the sharpest exposure. Lesson "Hear it", Listening mode, the Kana
-  chart, and Verb list still rely on the OS Japanese voice, so a poor device voice still sounds bad
-  there.
+- **TTS quality is device-dependent — except Conversations, kana, and the Verb list.** Dialogue
+  lines, kana syllables (Kana chart + Lesson kana prompts), and the Verb list's dictionary forms
+  (2026-07) all use bundled neural clips, so they sound good and work with no device voice. Lesson
+  word/phrase/sentence prompts and Practice's Listening mode still rely on the OS Japanese voice —
+  bundling the whole banked vocab was judged too many clips for the payoff (kept as device TTS).
 - **`manifest.theme_color` hardcoded to light bg** — cosmetic; runtime overrides it after launch.
 - **Dead keyframe** `hkBreathe` in `styles.css`.
 - **Build path quirk on this machine** — the project path has a space; `vite.config.js` sets

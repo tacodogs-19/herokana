@@ -35,7 +35,7 @@ Most kana apps stop at the alphabet. HeroKana keeps going:
 • Works fully offline after install
 • No account, no sign-up — start learning in seconds
 • Zero data collection: your progress lives only on your device
-• Free, no ads, no subscription
+• One-time $0.99 — pay once, yours forever. No ads, no subscription, no in-app purchases
 
 **PRACTICE YOUR WAY**
 • Quick review, weak spots, speed rounds, and listening practice

@@ -6,6 +6,21 @@ import {
   applyCompleteLesson, applyRecordReading, applyRecordDialogue,
   applyResetFromChapter, deriveReviewDue,
 } from "./store.logic.js";
+import { track } from "./analytics.js";
+
+// Fire the funnel milestones when progress changes: first lesson (activation)
+// and each chapter newly completed (progression). One place — the drop between
+// consecutive chapter_done counts is exactly "where do learners stall". No-op
+// off the web build (see analytics.js).
+function reportMilestones(prev, next) {
+  const before = prev.done.reduce((s, n) => s + n, 0);
+  const after = next.done.reduce((s, n) => s + n, 0);
+  if (before === 0 && after > 0) track("first_lesson");
+  next.done.forEach((n, i) => {
+    const len = CHAPTERS[i].units.length;
+    if (n === len && prev.done[i] < len) track("chapter_done", { chapter: CHAPTERS[i].id });
+  });
+}
 
 const ProgressCtx = React.createContext(null);
 export const useProgress = () => React.useContext(ProgressCtx);
@@ -14,6 +29,13 @@ export function ProgressProvider({ children }) {
   const [p, setP] = React.useState(() => loadState());
   React.useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {}
+  }, [p]);
+  // Milestone funnel: compare each new state to the last committed one. A ref
+  // (not the reducer) keeps the reducer pure and dedupes StrictMode's dev
+  // double-mount — prevRef === p on the second run, so nothing fires twice.
+  const prevRef = React.useRef(p);
+  React.useEffect(() => {
+    if (prevRef.current !== p) { reportMilestones(prevRef.current, p); prevRef.current = p; }
   }, [p]);
   // Ask the browser to make this origin's storage eviction-resistant, so weeks
   // of progress survive storage-pressure cleanups. ponytail: the whole

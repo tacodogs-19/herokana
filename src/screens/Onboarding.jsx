@@ -55,16 +55,26 @@ function DobInput({ value, onChange, t }) {
   React.useEffect(() => {
     onChange(d && m && y ? `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}` : "");
   }, [d, m, y]); // eslint-disable-line react-hooks/exhaustive-deps
-  const field = (val, set, ph, len, w) => (
-    <input value={val} inputMode="numeric" placeholder={ph} aria-label={ph}
-      onChange={(e) => set(e.target.value.replace(/\D/g, "").slice(0, len))}
+  const dRef = React.useRef(), mRef = React.useRef(), yRef = React.useRef();
+  // auto-advance to the next field once this one is full (DD → MM → YYYY), and
+  // backspace on an empty field jumps back to the previous one
+  const field = (val, set, ph, len, w, ref, nextRef, prevRef) => (
+    <input ref={ref} value={val} inputMode="numeric" placeholder={ph} aria-label={ph}
+      onChange={(e) => {
+        const v = e.target.value.replace(/\D/g, "").slice(0, len);
+        set(v);
+        if (v.length === len && nextRef?.current) nextRef.current.focus();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Backspace" && !val && prevRef?.current) prevRef.current.focus();
+      }}
       style={{ ...inputStyle(t), width: w, textAlign: "center", letterSpacing: "0.06em" }} />
   );
   return (
     <div style={{ display: "flex", gap: 10 }}>
-      {field(d, setD, "DD", 2, 72)}
-      {field(m, setM, "MM", 2, 72)}
-      {field(y, setY, "YYYY", 4, 104)}
+      {field(d, setD, "DD", 2, 72, dRef, mRef, null)}
+      {field(m, setM, "MM", 2, 72, mRef, yRef, dRef)}
+      {field(y, setY, "YYYY", 4, 104, yRef, null, mRef)}
     </div>
   );
 }

@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+# Pin the CI Node version so Netlify builds match local (avoids "works on my
+# machine" from a Node mismatch). Vite 6 needs Node 18+.
+[build.environment]
+  NODE_VERSION = "20"
+
 [[redirects]]
   from = "/.well-known/assetlinks.json"
   to = "/assetlinks.json"

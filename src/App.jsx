@@ -167,7 +167,7 @@ export default function App() {
   else if (scr.name === "dialogue")
     content = <Dialogue key={scr.dialogueId} dialogueId={scr.dialogueId} onExit={goBack} />;
   else
-    content = <Home onNav={nav} onStart={startUnit} onStartReview={startReview} onReviewChapter={startChapterReview} onOpenBasics={openBasics} onOpenKanaBasics={openKanaBasics} onOpenChart={openKanaChart} onStartSession={startPractice} />;
+    content = <Home onNav={nav} onStart={startUnit} onStartReview={startReview} onReviewChapter={startChapterReview} onOpenBasics={openBasics} onOpenKanaBasics={openKanaBasics} onOpenChart={openKanaChart} onStartSession={startPractice} onOpenVerbChart={openVerbChart} />;
 
   // Forward nav: slide up from below (feels like drilling in / stacking a new card)
   // Back nav: fade in (feels like the stack is unwinding)

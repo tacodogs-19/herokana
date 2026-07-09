@@ -29,7 +29,7 @@ function UnitChip({ unit, st, t, onClick }) {
 }
 
 function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expanded, setExpanded,
-  onStart, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onResetRequest }) {
+  onStart, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart, onResetRequest }) {
   const isAlpha = (i) => !BANKS[CHAPTERS[i].id];
   const doneFor = (i) => hard ? (isAlpha(i) ? CHAPTERS[i].units.length : (progress.hardDone[i] ?? 0)) : (progress.done[i] ?? 0);
 
@@ -134,6 +134,18 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         </div>
       )}
 
+      {chapter.id === "verb" && st !== "locked" && (
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <button onClick={onOpenVerbChart} className="hk-press"
+            style={{ flex: 1, minWidth: 0, padding: "11px 8px", borderRadius: 13, cursor: "pointer",
+              background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h10M4 18h13" /></svg>
+            Verb list
+          </button>
+        </div>
+      )}
+
       {chapter.id === "complex" && st !== "locked" && readingUnlocked(progress) && (
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <button onClick={onOpenScenes} className="hk-press"
@@ -206,7 +218,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
   );
 }
 
-function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes }) {
+function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
   const { t } = useTheme();
   const progress = useProgress();
   const hard = progress.hard;
@@ -428,7 +440,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
   const cardProps = {
     hard, progress, t, currentChapterIdx, expanded, setExpanded,
-    onStart, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes,
+    onStart, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart,
     onResetRequest: (idx) => setResetTarget({ chapterIdx: idx }),
   };
 
@@ -596,6 +608,6 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   );
 }
 
-export default function Home({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession }) {
-  return <Shell active="Learn" onNav={onNav}><HomeBody onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} /></Shell>;
+export default function Home({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenVerbChart }) {
+  return <Shell active="Learn" onNav={onNav}><HomeBody onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} onOpenVerbChart={onOpenVerbChart} /></Shell>;
 }

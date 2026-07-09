@@ -64,6 +64,28 @@ export function shuffle(a) {
   return r;
 }
 
+// Session shuffle-bag: draw `count` items without replacement across calls, so
+// repeated Practice rounds work through the whole pool before anything repeats
+// (fixes independent per-round re-sampling, where some items recur and others
+// never appear). In-memory only — a page reload starts a fresh session, which
+// is the intended scope. Resets when the pool size changes (new content
+// learned). ponytail: index bag keyed per category; no cross-session storage.
+const _bags = new Map();
+export function bagDraw(key, pool, count) {
+  const n = pool.length;
+  if (!n) return [];
+  let bag = _bags.get(key);
+  if (!bag || bag.n !== n) { bag = { n, rest: [] }; _bags.set(key, bag); }
+  const out = [], used = new Set();
+  while (out.length < Math.min(count, n)) {
+    if (!bag.rest.length) bag.rest = shuffle([...Array(n).keys()]);
+    const i = bag.rest.pop();
+    if (used.has(i)) continue; // avoid an intra-round repeat at a refill boundary
+    used.add(i); out.push(pool[i]);
+  }
+  return out;
+}
+
 const mapFor = (chapter, unit) =>
   chapter.id === "kata" || /Kata/.test(unit.label) ? KATA : HIRA;
 
@@ -151,6 +173,8 @@ function bankQuestion(p, difficulty, pool, dirOverride) {
     hint: difficulty === "easy" ? p[other] : null,
     meaning: p[other], // revealed after answering on medium/hard
     parts: p.parts, // word-mapping chips on the reveal, if the item is annotated
+    forms: p.forms, // plain/polite pair shown on the reveal (verbs)
+    audio: p.audio, // bundled clip key ("Hear it" on the reveal — verbs)
     input: difficulty === "hard",
     furigana: useKanji ? p.jp : null, // reading shown under kanji prompt
   };
@@ -178,6 +202,15 @@ function bankQuestion(p, difficulty, pool, dirOverride) {
 
 // A unit lesson started from Home (Continue / unit chip). `dir` forces the
 // answer language (used by hard mode); otherwise the practice setting applies.
+// One-time modifier intro (unscored) shown before the very first unit of the
+// voiced / combination chapters — explains the mark before any kana is quizzed.
+const CHAPTER_INTRO = {
+  voiced: { type: "intro", title: "Voiced sounds", prompt: "か → が",
+    body: "A small mark changes a kana's sound. Two strokes ( ゛ dakuten) voice it: か→が, さ→ざ, た→だ, は→ば. A small circle ( ゜ handakuten) turns the は-row into p: は→ぱ." },
+  combo: { type: "intro", title: "Combination sounds", prompt: "き + ゃ → きゃ",
+    body: "A small ゃ ゅ ょ after an i-row kana blends the two into one syllable: き+ゃ→きゃ (kya), し+ゅ→しゅ (shu), ち+ょ→ちょ (cho)." },
+};
+
 export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir, progress) {
   const chapter = CHAPTERS[chapterIdx];
   const unit = chapter.units[unitIdx];
@@ -226,6 +259,9 @@ export function unitQuestions(chapterIdx, unitIdx, difficulty = "easy", dir, pro
     reviewProd && k % 3 === 2 && canProduce(it.answer) ? prodItem(map, it.answer) : withKanaOptions(it));
   const rowWord = KANA_ROW_WORDS[unit.jp];
   if (rowWord) questions.push({ type: "word_reveal", prompt: rowWord.word, reading: rowWord.reading, meaning: rowWord.meaning });
+  // First time through the first unit, lead with the modifier intro.
+  const intro = CHAPTER_INTRO[chapter.id];
+  if (intro && unitIdx === 0 && (!progress || (progress.done[chapterIdx] || 0) === 0)) questions.unshift(intro);
   return questions;
 }
 
@@ -268,35 +304,41 @@ export function modeQuestions(mode, progress, count = 10, category = "alpha") {
       const have = new Set(weakItems.map((p) => `${p.jp}|${p.romaji}`));
       source = [...weakItems, ...shuffle(items.filter((p) => !have.has(`${p.jp}|${p.romaji}`)))];
     }
-    const qs = source.slice(0, count).map((p) => bankQuestion(p, "easy", items));
+    const picked = mode === "weak" ? source.slice(0, count) : bagDraw("numbers", items, count);
+    const qs = picked.map((p) => bankQuestion(p, "easy", items));
     if (mode === "listen") qs.forEach((q) => { q.listen = true; });
     return qs;
   }
 
-  if (category === "words" || category === "sentences") {
-    // words = the phrase bank; sentences = the sentence + complex banks
-    const bankIds = category === "words" ? ["phrase"] : ["sentence", "complex"];
-    const pool = [];
+  if (category === "words" || category === "sentences" || category === "verbs") {
+    // words = the phrase bank; verbs = the verb bank; sentences = sentence + complex
+    const bankIds = category === "words" ? ["phrase"] : category === "verbs" ? ["verb"] : ["sentence", "complex"];
+    const allPool = [];      // every word in the category — the open learning path
+    const learnedPool = [];  // only completed themes — Weak spots' top-up stays learned-only
     CHAPTERS.forEach((c, ci) => {
       if (!bankIds.includes(c.id)) return;
       const bank = bankFor(c.id);
       const flat = bank.flat();
       const done = progress.done[ci] || 0;
-      // use completed themes, or fall back to the whole chapter so the mode is always usable
-      bank.slice(0, done || bank.length).flat().forEach((p) => pool.push({ p, flat }));
+      bank.flat().forEach((p) => allPool.push({ p, flat }));
+      // completed themes, or the whole chapter as a fallback so Weak spots is always usable
+      bank.slice(0, done || bank.length).flat().forEach((p) => learnedPool.push({ p, flat }));
     });
     if (mode === "weak") {
       const idx = itemIndex();
       // only misses belonging to this category's banks
-      const inPool = new Set(pool.flatMap(({ p }) => [`${p.jp}|${p.romaji}`, `${p.jp}|${p.en}`]));
+      const inPool = new Set(learnedPool.flatMap(({ p }) => [`${p.jp}|${p.romaji}`, `${p.jp}|${p.en}`]));
       const ranked = Object.entries(progress.wrong).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter((k) => inPool.has(k));
       const weak = ranked.map((k) => resolveKey(k, idx)).filter(Boolean);
       const have = new Set(weak.map((q) => `${q.prompt}|${q.answer}`));
-      const fill = shuffle(pool).map(({ p, flat }) => bankQuestion(p, "easy", flat)).filter((q) => !have.has(`${q.prompt}|${q.answer}`));
+      const fill = shuffle(learnedPool).map(({ p, flat }) => bankQuestion(p, "easy", flat)).filter((q) => !have.has(`${q.prompt}|${q.answer}`));
       return [...weak, ...fill].slice(0, count);
     }
-    if (!pool.length) return [];
-    const qs = shuffle(pool).slice(0, count).map(({ p, flat }) => bankQuestion(p, "easy", flat));
+    // Quick review / Speed / Listening draw from ALL words in the category,
+    // learned or not — Practice doubles as an alternate way to meet vocabulary,
+    // not just a re-drill of the track (owner call — see decisions.md).
+    if (!allPool.length) return [];
+    const qs = bagDraw(category, allPool, count).map(({ p, flat }) => bankQuestion(p, "easy", flat));
     if (mode === "listen") qs.forEach((q) => { q.listen = true; });
     return qs;
   }
@@ -323,7 +365,7 @@ export function modeQuestions(mode, progress, count = 10, category = "alpha") {
     const fill = shuffle(learned).map(withKanaOptions).filter((q) => !have.has(`${q.prompt}|${q.answer}`));
     return [...weak, ...fill].slice(0, count);
   }
-  const qs = shuffle(learned).slice(0, count).map(withKanaOptions);
+  const qs = bagDraw("alpha", learned, count).map(withKanaOptions);
   if (mode === "listen") qs.forEach((q) => { q.listen = true; });
   return qs;
 }

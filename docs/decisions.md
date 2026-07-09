@@ -5,7 +5,84 @@ are not relitigated. Newest at the top. When you make a non-obvious call, add an
 
 ---
 
+## Pricing
+
+### One-time $0.99, paid-upfront on Play (2026-07-05)
+HeroKana ships as a **paid app** on Play — pay $0.99 once, own it forever. No ads, no subscription,
+no in-app purchases. Chosen over free and over freemium-unlock:
+- **Paid-upfront over in-app unlock (Digital Goods API / Play Billing):** for $0.99 net (~$0.84, or
+  ~$0.90 under Play's 15% small-business tier), wiring Play Billing into the TWA is real, fragile
+  code for a coffee. Paid-upfront is a Console price setting — zero code, and Google handles billing,
+  refunds, restore-on-reinstall, and family sharing. No backend/accounts, so it keeps the hard
+  constraints intact.
+- **Cost accepted:** paywalling before the try removes the zero-friction install that was the app's
+  main conversion edge. The free web PWA at herokana.netlify.app is left free deliberately — it's a
+  de-facto web trial / funnel, not worth gating.
+- **Blocker that forced the timing:** Play does not allow free→paid conversion after publish. The
+  price must be set on the existing `app.netlify.herokana.twa` package **before first production
+  release** (it had not gone live free yet). If it ever ships free by accident, charging later means
+  a new package ID and losing the listing.
+
+Listing copy updated (`store/play-listing.md` "pay once, yours forever" line; screenshot caption 08
+in `scripts/store-assets.mjs` — re-run `npm run store-assets` to bake it).
+
 ## Product / UX
+
+### Verbs chapter — a mid-spine insert, positional progress reset accepted (v1.22.0)
+A recognition chapter (Japanese verb → English meaning), inserted **before Sentences** (id `verb`,
+chapter index 5). This **deliberately reverses** the reasoning in "Particles taught as a pre-sentence
+drill, not a chapter" below: that entry ruled out a real chapter between `phrase` and `sentence`
+*because* the positional-index model corrupts saved progress on insert. The owner accepted the
+progress reset for existing learners (sentence/complex/kanji shift one index) — verbs belong before
+sentence-building pedagogically, and it's pre-launch. Key calls:
+- **Reused the banked engine end to end** — no new question type, screen, or content file. The verb
+  data already lived in [`verbs.js`](../src/verbs.js) (`GROUPS`) for the Verb *list* reference screen;
+  `data.js` now imports it and derives a `VERBS` bank (3 units = ru / u / irregular). One source of
+  truth for both the chapter and the reference chart.
+- **Prompt is the kana reading by default, kanji on medium/hard** — mapped `jp: v.r` (kana),
+  `kanji: v.jp` (form). Learnable straight after the kana chapters; the kanji surfaces with furigana
+  at higher difficulty, same as other banks.
+- **Answers behave exactly like other banked chapters — romaji default, English on hard.** First
+  build forced English answers via an `enOnly` item flag (reasoning: romaji *is* a verb's reading, so
+  a romaji answer tests spelling not meaning). **Reversed before shipping** on owner review: learners
+  meeting these verbs cold know neither the reading nor the meaning, so a cold English-answer prompt
+  is a blind guess. The gentler on-ramp is the app's standard banked model — **romaji answer with the
+  English meaning as the easy-mode hint** (read it, absorb the meaning), with **hard mode flipping to
+  English answers** (`startUnit` already sets `difficulty: "medium", dir: "en"` for banked chapters).
+  So `enOnly` was deleted and verbs are now a plain banked chapter: no special-casing in `bankQuestion`,
+  and the Practice custom-set Verbs tab shows the normal Romaji/English answer toggle. Meaning-recall
+  therefore lives in hard mode + English-answer custom sets, same as phrases/sentences — acceptable,
+  and a medium-default or dedicated "test meaning" toggle can come later if evidence wants it earlier.
+- **Answered in the dictionary (plain) form, not the polite ます form.** Owner raised that polite is
+  more common in sentences. Kept plain as the answer because it's the verb's *identity* — the citation
+  form every other form derives from, and the basis of the ru/u/irregular grouping the chapter is built
+  on (those groups are a plain-form concept; quizzing ます would obscure them). Instead the polite form
+  is **surfaced, not quizzed**: on answering, a PLAIN/POLITE chip pair is revealed
+  ([`Lesson.jsx`](../src/screens/Lesson.jsx), reusing the `q.parts` reveal pattern) — plain in kana
+  (matches the prompt) + polite in its standard written form (`v.masu`, e.g. 出来ます) with romaji under
+  each, meaning already on the card. Data rides on a `forms` field on the verb bank items (no new
+  content — `verbs.js` already had every conjugation). Producing the ます form is the natural future
+  drill this leaves room for.
+
+### Voiced / combination lead with a one-time modifier intro (v1.22.0)
+These chapters quizzed が/きゃ etc. with no explanation of the *system* (the dakuten/handakuten marks,
+the small ゃゅょ). Added a single unscored `intro` card at the head of the first unit, first time
+through — same "teach before you test" principle as the hira/kata teach cards, but one chapter-level
+concept card rather than per-kana. Kept it a new lightweight card type (title + hero + body, one-tap
+"Got it →", excluded from scoring) rather than reusing `concept` (which needs options) or the Basics
+screen (a separate opt-in surface, easy to miss). Gated on `progress.done[chapter]===0` so it shows
+once and never nags on replays. Verb "Hear it" audio was wired the same session by routing verb
+questions through the existing bundled-clip path (`speakVerb`), matching kana/dialogue — the clips
+already existed for the Verb chart, they just weren't used in lessons.
+- **Scope: recognition only (v1).** Conjugation drilling (masu/ta/te/nai) is a genuinely different
+  question type and stays deferred — the `VerbChart` reference already shows the forms.
+
+### Kana tile pad: distinct ん + syllable highlight (v1.22.0)
+Two production-question ([`Lesson.jsx`](../src/screens/Lesson.jsx)) fixes: the standalone ん button was
+labelled "n", a confusing duplicate of the `n` consonant key (which builds na/ni/nu/ne/no) — now
+labelled with the kana ん itself (in the JP font) so it reads as one complete sound. And the
+vowel/syllable tiles never showed a selected state (`tile(false, …)`), so after arming a consonant only
+the consonant lit up — now the picked syllable highlights alongside it (`tile(sel === val, …)`).
 
 ### Kana lessons: teach → recognise → produce (v1.21.0, council-reviewed)
 A council review of "how do learners actually commit kana to memory?" converged on: recognition
@@ -353,6 +430,50 @@ sampling when the bank lacks same-letter items. Don't replace either with random
 ### Lenient typed answers
 Hard/typed questions normalise case, spacing, and punctuation and accept **either** romaji or English.
 Rationale: test recall of meaning, not exact transcription or input-method quirks.
+
+### Practice rounds use a session shuffle-bag, not independent re-sampling (2026-07)
+Each mode round was `shuffle(pool).slice(0, count)` — sampled independently, so within a
+session some items recurred while others never appeared. Replaced with `bagDraw(key, pool, count)`
+([`questions.js`](../src/questions.js)): an in-memory, per-category **draw-without-replacement**
+bag that works through the whole pool before anything repeats, then reshuffles. Chosen over a
+"don't repeat for X rounds" cooldown — no X to tune, and it guarantees coverage rather than
+approximating it. Applies to the non-weak pooled modes (Quick review / Speed / Listening) across
+`alpha` / `words` / `sentences` / `verbs` / `numbers`; **Weak spots is untouched** (misses-first
+by design). State is module-level and resets on reload (a fresh session) or when the pool size
+changes (new content learned). Guarded by a test (one full cycle over a 100-item pool → 100
+distinct, no repeat).
+
+### Two phrase gloss collisions fixed (2026-07)
+Two Words items shared an English gloss with a different item in the same theme, which breaks the
+English-answer direction (the twin can appear as a distractor, giving two identical options):
+Greetings よろしく was a second "nice to meet you" (now "please treat me well", distinct from
+はじめまして), and Small talk ちょっと was a second "a little" (now "a bit", distinct from すこし).
+
+### Food expanded, Body theme added (2026-07)
+Actioned the content-audit recommendations. **Food** grew 25→40 (breakfast/lunch/dinner, beer,
+juice, sugar, salt, soy sauce, cake, cheese, potato, onion, carrot, strawberry, ice cream) — items
+added *within* the existing theme, so no positional/progress impact. **Body** is a new appended
+theme (30 parts; unit `体`, index 15) — append-only per the positional rule, so it un-completes the
+Words track for finished learners (accepted, pre-launch, same as Objects/kanji). はな (nose) and
+かみ (hair) were deliberately omitted — they collide in kana with flower/paper elsewhere in the
+bank. A whole-bank scan after the additions found one new same-English collision (Objects かばん
+vs Shopping ふくろ, both "bag"); fixed by re-glossing かばん "bag / briefcase". Remaining same-kana
+homographs (つき month/moon, げんき, すき, だいじょうぶ, でんわ) are pre-existing and synonymous or
+low-harm — left as-is.
+
+### Practice Words/Sentences/Verbs modes draw from the whole bank (2026-07)
+Reverses the "use completed themes" scoping below for the **open** modes (Quick review,
+Speed, Listening) in the banked categories. Owner call: Practice should be a genuine
+**alternate learning path** — a way to *meet* vocabulary — not only a re-drill of what the
+track already taught. `modeQuestions` now builds two pools ([`questions.js`](../src/questions.js)):
+`allPool` (every word in the category's banks) feeds the open modes; `learnedPool` (completed
+themes, whole-bank fallback) still scopes **Weak spots**, which stays about your actual misses,
+not new words. Distractors were already drawn from the whole `flat` bank, so nothing else
+changed. Guarded by a test (partial `done` → open mode still fills `count` past one theme).
+Kana (`alpha`) modes keep their learned-only behaviour — you can't meet a kana you haven't been
+shown a glyph for the same way. Added alongside a broader **Objects & things** phrase theme
+(40 items vs the uniform 25 — banked lessons sample 15 so a bigger pool costs no lesson length,
+it just deepens Practice/SRS variety).
 
 ### Practice modes are category-scoped (v1.8.0, categories extended 2026-07)
 The one-tap modes run within a category tab — **Alphabet / Words / Sentences / Numbers**

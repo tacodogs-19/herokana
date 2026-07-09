@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { CHAPTERS, BANKS, HIRA, KATA, NUMBER_GROUPS } from "../src/data.js";
 import {
   shuffle,
+  bagDraw,
   unitQuestions,
   customQuestions,
   modeQuestions,
@@ -236,6 +237,23 @@ describe("modeQuestions", () => {
   it("returns at most `count` questions", () => {
     const qs = modeQuestions("review", emptyProgress, 7);
     expect(qs.length).toBeLessThanOrEqual(7);
+  });
+
+  it("bagDraw covers the whole pool before repeating", () => {
+    const pool = [...Array(100).keys()];
+    const seen = [];
+    for (let r = 0; r < 10; r++) seen.push(...bagDraw("t", pool, 10)); // one full cycle
+    expect(new Set(seen).size).toBe(100); // all 100 distinct — no repeat within a cycle
+  });
+
+  it("words modes draw from the whole bank, not just completed themes", () => {
+    const pi = CHAPTERS.findIndex((c) => c.id === "phrase");
+    const done = CHAPTERS.map(() => 0);
+    done[pi] = 1; // only the first Words theme (25 items) completed
+    const qs = modeQuestions("review", { ...emptyProgress, done }, 40, "words");
+    // Old learned-only scoping capped this at one 25-item theme; the open path
+    // fills 40 from the full bank regardless of track progress.
+    expect(qs.length).toBe(40);
   });
 });
 

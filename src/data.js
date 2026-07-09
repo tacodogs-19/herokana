@@ -1,5 +1,6 @@
 // Course content: kana tables plus the phrase / sentence / complex banks that
 // back the "banked" chapters. Each banked theme holds 25+ items.
+import { GROUPS } from "./verbs.js";
 
 export const CHAPTERS = [
   { id: "hira", name: "Hiragana", caption: "The foundation. 46 core sounds.",
@@ -66,7 +67,7 @@ export const CHAPTERS = [
       { jp: "ぴゃ", label: "PY · Hira", romaji: ["pya", "pyu", "pyo"] },
       { jp: "ピャ", label: "PY · Kata", romaji: ["pya", "pyu", "pyo"] },
     ] },
-  { id: "phrase", name: "Words and phrases", caption: "Everyday words across 14 themes.",
+  { id: "phrase", name: "Words and phrases", caption: "Everyday words across 16 themes.",
     units: [
       { jp: "挨", label: "Greetings", romaji: [] },
       { jp: "礼", label: "Politeness", romaji: [] },
@@ -82,6 +83,17 @@ export const CHAPTERS = [
       { jp: "家", label: "Family & friends", romaji: [] },
       { jp: "猫", label: "Animals & nature", romaji: [] },
       { jp: "色", label: "Colors", romaji: [] },
+      { jp: "物", label: "Objects & things", romaji: [] },
+      { jp: "体", label: "Body", romaji: [] },
+    ] },
+  // Inserted before Sentences 2026-07 (deliberate mid-array insert — shifts
+  // sentence/complex/kanji indices and resets those chapters for existing
+  // learners; accepted, verbs belong before sentence-building pedagogically).
+  { id: "verb", name: "Verbs", caption: "Everyday action words.",
+    units: [
+      { jp: "食", label: "Ru-verbs", romaji: [] },
+      { jp: "行", label: "U-verbs", romaji: [] },
+      { jp: "為", label: "Irregular", romaji: [] },
     ] },
   { id: "sentence", name: "Sentences", caption: "Simple everyday sentences.",
     units: [
@@ -112,6 +124,8 @@ export const CHAPTERS = [
       { jp: "日", label: "Time", romaji: [] },
       { jp: "人", label: "People", romaji: [] },
       { jp: "駅", label: "Signs in town", romaji: [] },
+      { jp: "上", label: "Around town", romaji: [] },
+      { jp: "食", label: "Food & drink", romaji: [] },
     ] },
 ];
 
@@ -325,7 +339,7 @@ export const PHRASES = [
     { jp: "ひさしぶり", romaji: "hisashiburi", en: "it's been a while" },
     { jp: "やあ", romaji: "yaa", en: "hi" },
     { jp: "どうも", romaji: "doumo", en: "hi / thanks" },
-    { jp: "よろしく", romaji: "yoroshiku", en: "nice to meet you" },
+    { jp: "よろしく", romaji: "yoroshiku", en: "please treat me well" },
     { jp: "よろしくおねがいします", romaji: "yoroshiku onegaishimasu", en: "pleased to meet you (polite)" },
     { jp: "ごきげんよう", romaji: "gokigenyou", en: "good day (formal)" },
   ],
@@ -380,6 +394,21 @@ export const PHRASES = [
     { jp: "カレー", romaji: "karee", en: "curry" },
     { jp: "おにぎり", romaji: "onigiri", en: "rice ball" },
     { jp: "みそしる", romaji: "misoshiru", en: "miso soup" },
+    { jp: "あさごはん", romaji: "asagohan", en: "breakfast" },
+    { jp: "ひるごはん", romaji: "hirugohan", en: "lunch" },
+    { jp: "ばんごはん", romaji: "bangohan", en: "dinner" },
+    { jp: "ビール", romaji: "biiru", en: "beer" },
+    { jp: "ジュース", romaji: "juusu", en: "juice" },
+    { jp: "さとう", romaji: "satou", en: "sugar" },
+    { jp: "しお", romaji: "shio", en: "salt" },
+    { jp: "しょうゆ", romaji: "shouyu", en: "soy sauce" },
+    { jp: "ケーキ", romaji: "keeki", en: "cake" },
+    { jp: "チーズ", romaji: "chiizu", en: "cheese" },
+    { jp: "じゃがいも", romaji: "jagaimo", en: "potato" },
+    { jp: "にんじん", romaji: "ninjin", en: "carrot" },
+    { jp: "いちご", romaji: "ichigo", en: "strawberry" },
+    { jp: "たまねぎ", romaji: "tamanegi", en: "onion" },
+    { jp: "アイスクリーム", romaji: "aisukuriimu", en: "ice cream" },
     { jp: "おいしい", romaji: "oishii", en: "delicious" },
     { jp: "からい", romaji: "karai", en: "spicy" },
   ],
@@ -480,7 +509,7 @@ export const PHRASES = [
     { jp: "すき", romaji: "suki", en: "like" },
     { jp: "いいね", romaji: "ii ne", en: "nice" },
     { jp: "だめ", romaji: "dame", en: "no good" },
-    { jp: "ちょっと", romaji: "chotto", en: "a little" },
+    { jp: "ちょっと", romaji: "chotto", en: "a bit" },
     { jp: "とても", romaji: "totemo", en: "very" },
     { jp: "すこし", romaji: "sukoshi", en: "a little" },
     { jp: "いつも", romaji: "itsumo", en: "always" },
@@ -679,6 +708,82 @@ export const PHRASES = [
     { jp: "にじ", romaji: "niji", en: "rainbow" },
     { jp: "こい", romaji: "koi", en: "deep (color)" },
     { jp: "うすい", romaji: "usui", en: "pale" },
+  ],
+  [ // Objects & things — deliberately broader (40) than the 25-item themes;
+    // lessons still sample 15, so it just deepens the Practice/SRS pool.
+    { jp: "ほん", romaji: "hon", en: "book" },
+    { jp: "ペン", romaji: "pen", en: "pen" },
+    { jp: "えんぴつ", romaji: "enpitsu", en: "pencil" },
+    { jp: "けしゴム", romaji: "keshigomu", en: "eraser" },
+    { jp: "ノート", romaji: "nooto", en: "notebook" },
+    { jp: "かみ", romaji: "kami", en: "paper" },
+    { jp: "かばん", romaji: "kaban", en: "bag / briefcase" },
+    { jp: "さいふ", romaji: "saifu", en: "wallet" },
+    { jp: "かぎ", romaji: "kagi", en: "key" },
+    { jp: "かさ", romaji: "kasa", en: "umbrella" },
+    { jp: "とけい", romaji: "tokei", en: "clock / watch" },
+    { jp: "スマホ", romaji: "sumaho", en: "smartphone" },
+    { jp: "でんわ", romaji: "denwa", en: "telephone" },
+    { jp: "パソコン", romaji: "pasokon", en: "computer" },
+    { jp: "テレビ", romaji: "terebi", en: "television" },
+    { jp: "つくえ", romaji: "tsukue", en: "desk" },
+    { jp: "いす", romaji: "isu", en: "chair" },
+    { jp: "ドア", romaji: "doa", en: "door" },
+    { jp: "まど", romaji: "mado", en: "window" },
+    { jp: "でんき", romaji: "denki", en: "light / electricity" },
+    { jp: "コップ", romaji: "koppu", en: "cup" },
+    { jp: "さら", romaji: "sara", en: "plate" },
+    { jp: "はし", romaji: "hashi", en: "chopsticks" },
+    { jp: "スプーン", romaji: "supuun", en: "spoon" },
+    { jp: "フォーク", romaji: "fooku", en: "fork" },
+    { jp: "タオル", romaji: "taoru", en: "towel" },
+    { jp: "せっけん", romaji: "sekken", en: "soap" },
+    { jp: "はブラシ", romaji: "haburashi", en: "toothbrush" },
+    { jp: "かがみ", romaji: "kagami", en: "mirror" },
+    { jp: "ふとん", romaji: "futon", en: "futon" },
+    { jp: "まくら", romaji: "makura", en: "pillow" },
+    { jp: "ふく", romaji: "fuku", en: "clothes" },
+    { jp: "くつ", romaji: "kutsu", en: "shoes" },
+    { jp: "ぼうし", romaji: "boushi", en: "hat" },
+    { jp: "めがね", romaji: "megane", en: "glasses" },
+    { jp: "はこ", romaji: "hako", en: "box" },
+    { jp: "しんぶん", romaji: "shinbun", en: "newspaper" },
+    { jp: "ざっし", romaji: "zasshi", en: "magazine" },
+    { jp: "しゃしん", romaji: "shashin", en: "photo" },
+    { jp: "てがみ", romaji: "tegami", en: "letter" },
+  ],
+  [ // Body — everyday parts. はな/かみ deliberately omitted: they collide with
+    // flower/paper elsewhere in the bank (same kana, different meaning).
+    { jp: "あたま", romaji: "atama", en: "head" },
+    { jp: "かお", romaji: "kao", en: "face" },
+    { jp: "め", romaji: "me", en: "eye" },
+    { jp: "みみ", romaji: "mimi", en: "ear" },
+    { jp: "くち", romaji: "kuchi", en: "mouth" },
+    { jp: "は", romaji: "ha", en: "tooth" },
+    { jp: "した", romaji: "shita", en: "tongue" },
+    { jp: "くび", romaji: "kubi", en: "neck" },
+    { jp: "かた", romaji: "kata", en: "shoulder" },
+    { jp: "て", romaji: "te", en: "hand" },
+    { jp: "ゆび", romaji: "yubi", en: "finger" },
+    { jp: "つめ", romaji: "tsume", en: "nail" },
+    { jp: "うで", romaji: "ude", en: "arm" },
+    { jp: "ひじ", romaji: "hiji", en: "elbow" },
+    { jp: "むね", romaji: "mune", en: "chest" },
+    { jp: "おなか", romaji: "onaka", en: "stomach" },
+    { jp: "せなか", romaji: "senaka", en: "back" },
+    { jp: "こし", romaji: "koshi", en: "lower back" },
+    { jp: "あし", romaji: "ashi", en: "leg / foot" },
+    { jp: "ひざ", romaji: "hiza", en: "knee" },
+    { jp: "かかと", romaji: "kakato", en: "heel" },
+    { jp: "ひげ", romaji: "hige", en: "beard" },
+    { jp: "まゆげ", romaji: "mayuge", en: "eyebrow" },
+    { jp: "まつげ", romaji: "matsuge", en: "eyelash" },
+    { jp: "ほほ", romaji: "hoho", en: "cheek" },
+    { jp: "あご", romaji: "ago", en: "chin" },
+    { jp: "のど", romaji: "nodo", en: "throat" },
+    { jp: "ほね", romaji: "hone", en: "bone" },
+    { jp: "ひふ", romaji: "hifu", en: "skin" },
+    { jp: "こころ", romaji: "kokoro", en: "heart / mind" },
   ],
 ];
 
@@ -1188,10 +1293,41 @@ export const KANJI = [
     { jp: "店", romaji: "mise", en: "shop" },
     { jp: "水", romaji: "mizu", en: "water" },
   ],
+  [ // Around town — the words on direction signs (append 2026-07)
+    { jp: "上", romaji: "ue", en: "up / above" },
+    { jp: "下", romaji: "shita", en: "down / below" },
+    { jp: "中", romaji: "naka", en: "middle / inside" },
+    { jp: "外", romaji: "soto", en: "outside" },
+    { jp: "左", romaji: "hidari", en: "left" },
+    { jp: "右", romaji: "migi", en: "right" },
+  ],
+  [ // Food & drink — the kanji on menus and konbini shelves (append 2026-07)
+    { jp: "食", romaji: "shoku", en: "food / eat" },
+    { jp: "飲", romaji: "nomu", en: "drink" },
+    { jp: "肉", romaji: "niku", en: "meat" },
+    { jp: "魚", romaji: "sakana", en: "fish" },
+    { jp: "茶", romaji: "cha", en: "tea" },
+    { jp: "米", romaji: "kome", en: "rice" },
+  ],
 ];
 
+// Verb chapter: reuse the reference data in verbs.js as a bank. Behaves like any
+// other banked chapter — default answer is romaji with the English meaning as the
+// easy-mode hint; hard mode flips to English answers. Prompt is the kana reading
+// (learnable right after kana); the kanji form surfaces on medium/hard as furigana.
+const VERBS = GROUPS.map((g) => g.verbs.map((v) => ({
+  jp: v.r,
+  kanji: v.jp !== v.r ? v.jp : null,
+  romaji: v.romaji,
+  en: v.en,
+  audio: v.jp, // bundled neural clip key (make-audio.mjs keys verbs by v.jp)
+  // Plain (dictionary) is the answer; polite (ます) is what shows up in sentences.
+  // Both are revealed together once answered so the learner connects the pair.
+  forms: { plainJp: v.r, plainR: v.romaji, politeJp: v.masu, politeR: v.masuR },
+})));
+
 // Banked chapters draw their lessons from a bank instead of the kana tables.
-export const BANKS = { phrase: PHRASES, sentence: SENTENCES, complex: COMPLEX, kanji: KANJI };
+export const BANKS = { phrase: PHRASES, verb: VERBS, sentence: SENTENCES, complex: COMPLEX, kanji: KANJI };
 
 // Numbers — practice-only, grouped the way Japanese numbers are usually taught:
 // the 1-10 base, the teens, the tens, hundreds (with 300/600/800 sound changes),
