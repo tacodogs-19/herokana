@@ -199,7 +199,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
         <button onClick={skipStep} className="hk-press"
           style={{ width: "100%", padding: "12px", borderRadius: 16, border: "none", cursor: "pointer",
             background: "transparent", color: t.sub, fontFamily: DISPLAY, fontSize: 14, fontWeight: 700 }}>
-          {last ? "Skip this question" : "Skip this question"}
+          {last ? "Skip & finish" : "Skip this question"}
         </button>
       </div>
     </div>

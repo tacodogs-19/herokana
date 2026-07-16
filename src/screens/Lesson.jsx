@@ -4,7 +4,7 @@ import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
 import { buildQuestions, MODE_TITLES, KANA_COMPOSE, canProduce } from "../questions.js";
-import { speakKana, kanaClipFor, speakVerb, verbClipFor, useJaVoice } from "../speech.js";
+import { speakKana, kanaClipFor, wordClipFor, speakVerb, verbClipFor, useJaVoice } from "../speech.js";
 
 const SPEED_MS = 8000;
 
@@ -53,9 +53,10 @@ function LessonBody({ session, onComplete, onExit }) {
   const idk = q.prod && !checked && sel == null; // the "I don't know" escape state
 
   const hasVoice = useJaVoice();
-  // Kana prompts have bundled clips (no device voice needed); words/sentences
-  // still ride the OS voice. canHear covers both so kana surfaces work anywhere.
-  const canHear = (text) => hasVoice || !!kanaClipFor(text);
+  // Kana and phrase-bank words have bundled clips (no device voice needed);
+  // sentences/numbers still ride the OS voice. canHear covers all three so those
+  // surfaces work anywhere a clip exists.
+  const canHear = (text) => hasVoice || !!kanaClipFor(text) || !!wordClipFor(text);
   // Kanji seen in this session — updated on advance so furigana stays visible
   // for the entire first encounter, then hides on any repeat of the same kanji.
   const seenKanjiRef = React.useRef(new Set());

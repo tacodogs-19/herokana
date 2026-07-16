@@ -261,11 +261,15 @@ The app is a complete, shippable PWA. All core flows are implemented:
 - **No automated tests, linter, or type checking.** Nothing guards regressions; all verification is
   manual in the browser. Positional chapter/unit indexing (see [content-model.md](content-model.md))
   is the highest-risk area to change without tests.
-- **TTS quality is device-dependent — except Conversations, kana, and the Verb list.** Dialogue
-  lines, kana syllables (Kana chart + Lesson kana prompts), and the Verb list's dictionary forms
-  (2026-07) all use bundled neural clips, so they sound good and work with no device voice. Lesson
-  word/phrase/sentence prompts and Practice's Listening mode still rely on the OS Japanese voice —
-  bundling the whole banked vocab was judged too many clips for the payoff (kept as device TTS).
+- **TTS quality is device-dependent — except Conversations, kana, the Verb list, and phrase-bank
+  words.** Dialogue lines, kana syllables (Kana chart + Lesson kana prompts), the Verb list's
+  dictionary forms, and **every phrase-bank word (all 16 themes, ~421 clips, 2026-07)** use bundled
+  neural clips, so they sound good and work with no device voice. `make-audio.mjs` now also synthesises
+  the phrase bank (`word` manifest bucket, keyed by JP spelling, deduped by content hash against
+  dialogue/kana/verb clips); `speakKana`/`canHear` fall through to `wordClipFor`. Only Lesson
+  **sentence** prompts, **numbers**, and Practice's Listening mode still rely on the OS Japanese voice
+  (personalised sentences can't be pre-bundled; numbers/sentences deferred). Reverses the earlier
+  "words stay on device TTS" scope call (owner-approved after a council review, 2026-07).
 - **`manifest.theme_color` hardcoded to light bg** — cosmetic; runtime overrides it after launch.
 - **Dead keyframe** `hkBreathe` in `styles.css`.
 - **Build path quirk on this machine** — the project path has a space; `vite.config.js` sets

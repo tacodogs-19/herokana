@@ -40,10 +40,10 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
         <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 800, color: passed ? t.done : t.primary }}>
           {passed ? (isGraduation ? "COURSE COMPLETE" : isScenesUnlock ? "SCENES UNLOCKED" : isUnit ? "UNIT COMPLETE" : "PRACTICE COMPLETE") : "KEEP PRACTISING"}
         </p>
-        <h1 style={{ margin: "2px 0 0", fontSize: 27, fontWeight: 800, color: t.ink, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
+        <h1 style={{ margin: "2px 0 0", fontSize: 27, fontWeight: 800, color: t.ink, letterSpacing: "-0.02em" }}>
           {isGraduation ? "You can read Japanese." : (passed ? "You nailed it!" : "Almost there!")}
         </h1>
-        <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>
+        <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 600 }}>
           {isUnit
             ? (isGraduation
                 ? "The whole course, done. First kanji await."

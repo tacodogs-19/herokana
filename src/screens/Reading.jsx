@@ -16,8 +16,8 @@ function LockedState({ t, progress }) {
       </span>
       <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: t.ink }}>Unlocks after the kana chapters</h2>
       <p style={{ margin: "8px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, maxWidth: 280 }}>
-        Finish the <strong style={{ color: t.ink }}>{gate.name}</strong> chapter, then come back to read real station,
-        konbini and restaurant words at a glance.
+        Finish the <strong style={{ color: t.ink }}>{gate.name}</strong> chapter, then come back to read the real
+        Japanese you'll meet on a trip — signs, konbini, cafés and more — at a glance.
       </p>
       {/* progress toward the gate */}
       <div style={{ width: "100%", maxWidth: 240, marginTop: 18 }}>

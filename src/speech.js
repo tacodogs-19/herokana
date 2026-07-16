@@ -39,11 +39,16 @@ function playFile(file, { rate = 1, fallback } = {}) {
 const foldKata = (s) => (s || "").replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 export const kanaClipFor = (text) => (CLIPS.kana || {})[foldKata(text)];
 
+// Phrase-bank words: every word across the 16 themes has a bundled clip (keyed
+// by JP spelling), so Lesson word/phrase prompts and the "Hear it" button work
+// with no device voice. Sentences/numbers stay on device TTS (unmanifested).
+export const wordClipFor = (jp) => (CLIPS.word || {})[jp];
+
 // Kana syllables: prefer the bundled clip — works with no device voice and
-// beats a poor one. Anything unmanifested (words, sentences) falls back to
-// device TTS, so callers can pass any prompt through here.
+// beats a poor one. Falls through to a bundled phrase-word clip, then to device
+// TTS, so callers can pass any prompt (kana OR word) through here.
 export function speakKana(text, opts) {
-  const file = kanaClipFor(text);
+  const file = kanaClipFor(text) || wordClipFor(text);
   if (!file) return speak(text, opts);
   playFile(file, { fallback: () => speak(text, opts) });
 }

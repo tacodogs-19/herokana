@@ -28,6 +28,40 @@ in `scripts/store-assets.mjs` — re-run `npm run store-assets` to bake it).
 
 ## Product / UX
 
+### No re-engagement notifications — rejected (council-reviewed, 2026-07)
+A UX review proposed an "opt-in, low-frequency local notification when spaced-review items are due"
+as a calm-compatible re-engagement hook. **Rejected.** A council pressure-test converged hard against it:
+- **It's a streak in disguise.** The pressure of a streak comes from the ping that pulls you back, not
+  from the word "streak." A "your reviews are ready" notification is loss-aversion outsourced to the
+  scheduler — it violates the one hard constraint (no streaks / daily-obligation / loss-aversion nudges).
+- **The justification was unfalsifiable.** "Bleeds retention" assumes churn we cannot see — the app has
+  no analytics/telemetry (deliberately, no data collection), and it's a $0.99 one-time purchase, so there
+  is no measurable retention or revenue to protect.
+- **It can't even be built reliably this cycle.** TWA/PWA background scheduling on Android is
+  unreliable and hostile (permission prompts, background limits), and backgrounded timers don't fire
+  (same root cause as the preview-rAF note), with no test suite to catch regressions.
+
+The sanctioned calm surface stays what it already is: the passive **"Ready to review" card on Home**
+([`Home.jsx`](../src/screens/Home.jsx)), shown only when items are due, seen only when the learner opens
+the app. That is the correct amount of re-engagement. Don't add notifications without a new explicit
+decision (and evidence the ethos + platform constraints have changed).
+
+### Phrase-bank words get bundled neural audio (council-reviewed, 2026-07)
+Reverses the "Scope: dialogues only — Lesson words stay on device TTS" call in the dialogue-audio entry
+below. A UX review + council flagged that word/phrase prompts are **silent on devices with no ja-JP
+voice** — a broken core experience for a *learning* app, hitting exactly the budget Android users who
+buy a $0.99 app. Owner approved bundling the **whole phrase bank** (all 16 themes). Key calls:
+- **Reused the existing pipeline, no new infra.** `make-audio.mjs` gained a `word` bucket (synth every
+  `PHRASES` item, keyed by JP spelling). Content-hash dedup means words that already appear as a
+  dialogue/kana/verb clip reuse the same file — the full bank added only ~134 new mp3s (~2MB; audio dir
+  now ~7.5MB, precache ~7MB). Runtime: `wordClipFor` + `speakKana`/`canHear` fall through to it, so
+  every existing word surface (Lesson prompts, "Hear it") gets clips for free with **device TTS still the
+  fallback** — zero regression if a clip is missing.
+- **Scope held to the phrase bank.** Sentences (incl. profile-personalised, un-bundleable), numbers, and
+  Practice's Listening tile stay on device TTS. Extend later only if evidence demands.
+- **The old payload objection is resolved by the dedup**, not ignored — bundling was cheap because most
+  words already had a clip. Re-run `npm run audio` after editing `data.js` phrase themes, commit the mp3s.
+
 ### Verbs chapter — a mid-spine insert, positional progress reset accepted (v1.22.0)
 A recognition chapter (Japanese verb → English meaning), inserted **before Sentences** (id `verb`,
 chapter index 5). This **deliberately reverses** the reasoning in "Particles taught as a pre-sentence

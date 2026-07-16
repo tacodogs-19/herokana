@@ -22,7 +22,7 @@ function UnitChip({ unit, st, t, onClick }) {
         </span>
       )}
       <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700 }}>{unit.jp}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, opacity: 0.9, maxWidth: "92%", overflow: "hidden",
+      <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.9, maxWidth: "92%", overflow: "hidden",
         textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{unit.label}</span>
     </button>
   );
@@ -65,16 +65,6 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           color: st === "current" ? t.primary : st === "done" ? t.done : t.faint }}>
           {st === "current" ? (firstUse ? "START YOUR JOURNEY" : "CONTINUE LEARNING") : st === "done" ? "CHAPTER COMPLETE" : "UP AHEAD"}
         </p>
-        <button onClick={() => canReset && onResetRequest(chapterIdx)} className="hk-press"
-          aria-label="Reset chapter progress"
-          style={{ padding: "5px 7px", borderRadius: 9, background: t.sunk, border: "none", cursor: canReset ? "pointer" : "default",
-            visibility: canReset ? "visible" : "hidden",
-            display: "flex", alignItems: "center", gap: 4, color: t.faint }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
-          </svg>
-          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.04em" }}>RESET</span>
-        </button>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, margin: "0 0 4px" }}>
@@ -207,9 +197,22 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
                   return <UnitChip key={i} unit={u} st={ust} t={t} onClick={() => ust !== "locked" && onStart(chapterIdx, i)} />;
                 })}
               </div>
-              <p style={{ margin: "11px 2px 0", fontSize: 11.5, color: t.faint }}>
-                Tap a unit to jump straight in · score 80% to mark it complete.
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "11px 2px 0" }}>
+                <p style={{ margin: 0, flex: 1, fontSize: 11.5, color: t.sub }}>
+                  Tap a unit to jump straight in · score 80% to mark it complete.
+                </p>
+                {canReset && (
+                  <button onClick={() => onResetRequest(chapterIdx)} className="hk-press"
+                    aria-label="Reset chapter progress"
+                    style={{ flexShrink: 0, padding: "5px 9px", borderRadius: 9, background: t.sunk, border: "none", cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 4, color: t.faint }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+                    </svg>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.04em" }}>RESET</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </>
@@ -546,7 +549,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                           : cst === "locked" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="2.2"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
                           : <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, color: "#fff" }}>{c.units[0].jp}</span>}
                       </span>
-                      <span style={{ fontSize: 9.5, fontWeight: on ? 800 : 600, color: on ? t.ink : t.faint, textAlign: "center",
+                      <span style={{ fontSize: 10.5, fontWeight: on ? 800 : 600, color: on ? t.ink : t.sub, textAlign: "center",
                         lineHeight: 1.15, whiteSpace: "nowrap" }}>{c.short || c.name.split(" ")[0]}</span>
                     </button>
                   );
@@ -590,15 +593,15 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                 : <> All chapter progress will be cleared.</>}
             </div>
             <div style={{ display: "grid", gap: 10 }}>
-              <button onClick={() => { progress.resetFromChapter(resetTarget.chapterIdx); setResetTarget(null); }} className="hk-press"
-                style={{ width: "100%", padding: "13px", borderRadius: 14, border: "none", background: t.primary,
-                  color: "#fff", fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>
-                Reset from {resetChapter.name}
-              </button>
               <button onClick={() => setResetTarget(null)} className="hk-press"
-                style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
-                  color: t.sub, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>
+                style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
+                  color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>
                 Keep my progress
+              </button>
+              <button onClick={() => { progress.resetFromChapter(resetTarget.chapterIdx); setResetTarget(null); }} className="hk-press"
+                style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
+                  color: t.wrong, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>
+                Reset from {resetChapter.name}
               </button>
             </div>
           </div>
