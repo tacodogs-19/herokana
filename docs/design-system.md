@@ -113,13 +113,9 @@ Defined in [`src/styles.css`](../src/styles.css). All of it respects
 - `.hk-relabel` / `.hk-settle` — production tile-pad craft: a quick fade when the vowels relabel
   (a → ka), and a scale-settle when a full syllable is composed.
 
-Answer feedback also fires **whisper-haptics** ([`haptics.js`](../src/haptics.js)): a soft tick on a
-correct answer, a double-blip on a wrong one, a longer note on a passed result. Android-only
-(`navigator.vibrate`; iOS no-ops), gated **only** on the Profile toggle — deliberately *not* on
-`prefers-reduced-motion`, since an explicit opt-in shouldn't be silently overridden by a device
-motion setting. Note it only actuates when the device's **system touch/haptic feedback** channel is
-on (Chrome routes web vibration through it), so `vibrate()` can return `true` yet buzz nothing — an
-OS setting outside app control, not a bug.
+(Whisper-haptics were trialled and **removed** — `navigator.vibrate` is swallowed by the OS unless the
+device's system touch-haptic channel is on, so the effect was unreliable across devices, including a
+stock Pixel. Not worth the surface area for a calm app; see decisions.md.)
 - Standard easing for transitions is `cubic-bezier(.3,.8,.3,1)` (rings, grow).
 
 ## Layout conventions

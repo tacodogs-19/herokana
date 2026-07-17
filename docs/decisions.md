@@ -28,6 +28,18 @@ in `scripts/store-assets.mjs` — re-run `npm run store-assets` to bake it).
 
 ## Product / UX
 
+### Whisper-haptics — trialled, then removed (2026-07)
+A gentle `navigator.vibrate` on answers / unit-complete (Profile-toggle gated, default on) shipped in
+the delight pass, then was **removed**. Reason: on Android, Chrome routes web vibration through the
+device's **system touch/haptic-feedback channel**, so `vibrate()` returns `true` (request accepted) yet
+actuates nothing when that OS setting is off — including on a **stock Pixel** with default settings.
+A feel-feature that silently does nothing on the reference Android device is a reliability liability,
+not delight, and the council had already flagged haptics as low/invisible payoff. The visual delight
+from the same batch (miss→correct guide halo, springier `.hk-press`, progress fill-sweep, tile-pad
+relabel/settle, varied affirmations) is kept — it renders on every device. Don't re-add web haptics
+without a materially better path (e.g. the packaged TWA with the `VIBRATE` permission, if evidence
+shows it actuates where the PWA doesn't).
+
 ### No re-engagement notifications — rejected (council-reviewed, 2026-07)
 A UX review proposed an "opt-in, low-frequency local notification when spaced-review items are due"
 as a calm-compatible re-engagement hook. **Rejected.** A council pressure-test converged hard against it:

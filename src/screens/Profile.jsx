@@ -3,7 +3,6 @@ import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
-import { hapticsOn, setHaptics, tapToggle } from "../haptics.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
@@ -12,7 +11,6 @@ function ProfileBody({ onEditProfile, onReset }) {
   const days = ["M", "T", "W", "T", "F", "S", "S"];
   const maxW = Math.max(...p.weekBars, 1);
   const [confirmReset, setConfirmReset] = React.useState(false);
-  const [haptics, setHapticsState] = React.useState(hapticsOn);
   const [restore, setRestore] = React.useState(null); // { ok, parsed, exportedAt, version } | { ok:false, error }
   const fileRef = React.useRef(null);
 
@@ -162,21 +160,6 @@ function ProfileBody({ onEditProfile, onReset }) {
             })}
           </div>
         </div>
-        {/* Haptics — a soft buzz on answers and finishing a unit (Android; no-op
-            where the device has no vibration). Persisted in localStorage. */}
-        <button onClick={() => { const n = !haptics; setHapticsState(n); setHaptics(n); if (n) tapToggle(); }} className="hk-press"
-          style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-            background: haptics ? t.primarySoft : t.surface, border: `1.5px solid ${haptics ? t.primary : t.line}`, textAlign: "left" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Haptics</div>
-            <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>A gentle buzz on answers and finishing a unit</div>
-          </div>
-          <span style={{ width: 44, height: 26, borderRadius: 13, flexShrink: 0, position: "relative",
-            background: haptics ? t.primary : t.line, transition: "background 160ms" }}>
-            <span style={{ position: "absolute", top: 3, left: haptics ? 21 : 3, width: 20, height: 20, borderRadius: "50%",
-              background: "#fff", transition: "left 160ms", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }} />
-          </span>
-        </button>
         <SettingRow label="Edit your details" sub="Personalise your experience" onClick={onEditProfile} />
         <SettingRow label="Back up progress" sub="Save a file you can keep or move to another device" onClick={downloadBackup} />
         <SettingRow label="Restore from backup" sub="Load progress from a backup file" onClick={() => fileRef.current && fileRef.current.click()} />

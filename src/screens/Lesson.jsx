@@ -5,7 +5,6 @@ import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
 import { buildQuestions, MODE_TITLES, KANA_COMPOSE, canProduce } from "../questions.js";
 import { speakKana, kanaClipFor, wordClipFor, speakVerb, verbClipFor, useJaVoice } from "../speech.js";
-import { tapRight, tapWrong } from "../haptics.js";
 
 const SPEED_MS = 8000;
 // A small, calm rotation so the affirmation doesn't read like one canned line.
@@ -74,7 +73,6 @@ function LessonBody({ session, onComplete, onExit }) {
   const check = React.useCallback(() => {
     setChecked(true);
     const right = isRight(given);
-    right ? tapRight() : tapWrong();
     setResults((r) => [...r, right]);
     // Memory loop: a missed kana returns at the end of the lesson for a second
     // retrieval attempt — production when the tile pad can build the sound,

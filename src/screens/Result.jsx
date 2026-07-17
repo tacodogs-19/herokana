@@ -4,7 +4,6 @@ import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
 import { READING_UNLOCK } from "../reading.js";
 import { Shell, Cat } from "../components/chrome.jsx";
-import { tapDone } from "../haptics.js";
 
 function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, onFinish, onReadingGrad }) {
   const { t } = useTheme();
@@ -12,8 +11,6 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   const acc = Math.round((correct / total) * 100);
   const passed = correct >= Math.ceil(total * 0.8);
   const xp = correct * 6 + (passed ? 8 : 0);
-  // a slightly longer note on a passed result — the one "you finished" beat
-  React.useEffect(() => { if (passed) tapDone(); }, []); // eslint-disable-line
 
   const isUnit = session.kind === "unit";
   const chapter = isUnit ? CHAPTERS[session.chapterIdx] : null;
