@@ -5,8 +5,11 @@ import { CHAPTERS } from "../data";
 import { Shell, Modal } from "../components/chrome.jsx";
 import { buildQuestions, MODE_TITLES, KANA_COMPOSE, canProduce } from "../questions.js";
 import { speakKana, kanaClipFor, wordClipFor, speakVerb, verbClipFor, useJaVoice } from "../speech.js";
+import { tapRight, tapWrong } from "../haptics.js";
 
 const SPEED_MS = 8000;
+// A small, calm rotation so the affirmation doesn't read like one canned line.
+const AFFIRM = ["Nice.", "That's it.", "Yes.", "Nicely done."];
 
 function sessionLabel(session, qs) {
   if (session.kind === "unit") {
@@ -71,6 +74,7 @@ function LessonBody({ session, onComplete, onExit }) {
   const check = React.useCallback(() => {
     setChecked(true);
     const right = isRight(given);
+    right ? tapRight() : tapWrong();
     setResults((r) => [...r, right]);
     // Memory loop: a missed kana returns at the end of the lesson for a second
     // retrieval attempt — production when the tile pad can build the sound,
@@ -166,8 +170,14 @@ function LessonBody({ session, onComplete, onExit }) {
         <div style={{ flex: 1, display: "flex", gap: 5 }}>
           {qs.map((_, k) => {
             const done = k < results.length, ok = done && results[k];
-            const c = k === i ? t.primary : !done ? t.line : ok ? t.done : t.wrong;
-            return <div key={k} style={{ flex: 1, height: 7, borderRadius: 4, background: c, transition: "background 200ms" }} />;
+            const track = k === i ? t.primary : t.line;
+            // inner bar sweeps left-to-right to the result colour as the segment resolves
+            return (
+              <div key={k} style={{ flex: 1, height: 7, borderRadius: 4, background: track, overflow: "hidden" }}>
+                <div style={{ width: done ? "100%" : "0%", height: "100%", borderRadius: 4,
+                  background: ok ? t.done : t.wrong, transition: "width 300ms var(--ease-out-quart)" }} />
+              </div>
+            );
           })}
         </div>
       </div>
@@ -307,7 +317,8 @@ function LessonBody({ session, onComplete, onExit }) {
               background: checked ? (correct ? t.doneSoft : t.wrongSoft) : t.surface,
               color: checked ? (correct ? t.done : t.wrong) : sel ? t.ink : t.faint,
               transition: "border-color 200ms, background 200ms" }}>
-              {sel || (cons ? `${cons}…` : "build the sound")}
+              {(() => { const txt = sel || (cons ? `${cons}…` : "build the sound");
+                return <span key={txt} className={sel ? "hk-settle" : ""}>{txt}</span>; })()}
               {!checked && (sel || cons) && (
                 <button onClick={() => { if (sel) setSel(null); else setCons(null); }} className="hk-press" aria-label="Backspace"
                   style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
@@ -351,7 +362,9 @@ function LessonBody({ session, onComplete, onExit }) {
                       const val = cons ? (KANA_COMPOSE[cons] || {})[v] : v;
                       return (
                         <button key={v} disabled={checked || (cons != null && !val)} className="hk-press"
-                          onClick={() => setSel(val)} style={tile(val != null && sel === val, cons != null && !val)}>{cons ? (val || v) : v}</button>
+                          onClick={() => setSel(val)} style={tile(val != null && sel === val, cons != null && !val)}>
+                          {(() => { const lbl = cons ? (val || v) : v; return <span key={lbl} className="hk-relabel">{lbl}</span>; })()}
+                        </button>
                       );
                     })}
                   </div>
@@ -381,9 +394,10 @@ function LessonBody({ session, onComplete, onExit }) {
           <div key={i} style={{ display: "grid", gap: 11, gridTemplateColumns: longOptions ? "1fr" : "1fr 1fr" }}>
             {q.options.map((o, oi) => (
               <button key={o} onClick={() => !checked && setSel(o)}
-                className={`hk-press hk-opt-enter${checked && o === q.answer ? " hk-correct" : ""}`}
+                className={`hk-press hk-opt-enter${checked && o === q.answer ? (correct ? " hk-correct" : " hk-guide") : ""}`}
                 disabled={checked}
-                style={{ '--i': oi, padding: longOptions ? "12px 8px" : "16px 8px", borderRadius: 16, cursor: checked ? "default" : "pointer", background: optBg(o),
+                style={{ '--i': oi, ...(checked && !correct && o === q.answer ? { '--guide': `${t.done}66` } : {}),
+                  padding: longOptions ? "12px 8px" : "16px 8px", borderRadius: 16, cursor: checked ? "default" : "pointer", background: optBg(o),
                   border: `2px solid ${optBorder(o)}`, color: optColor(o), fontFamily: DISPLAY,
                   fontSize: q.type === "phrase" || concept ? 15.5 : 19, fontWeight: 800,
                   textTransform: q.type === "phrase" || concept ? "none" : "lowercase",
@@ -400,7 +414,7 @@ function LessonBody({ session, onComplete, onExit }) {
         color: correct ? t.done : t.wrong, fontWeight: 800, fontSize: 15 }}>
         {checked && (
           <span className="hk-reveal">
-            {correct ? "Nicely done!" : "Not quite"}
+            {correct ? AFFIRM[i % AFFIRM.length] : "Not quite"}
           </span>
         )}
       </div>

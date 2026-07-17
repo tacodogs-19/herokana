@@ -1,8 +1,8 @@
 // Bump VERSION and update NOTES on each release. After an update, a one-time
 // "What's new" dialog shows these notes (see WhatsNew.jsx).
-export const VERSION = "1.24.0";
+export const VERSION = "1.25.0";
 
 export const RELEASE_NOTES = [
-  `Every word now speaks. All the words across the 16 themes have a clear, natural voice built in — so you can hear them even on phones with no Japanese voice installed, just like the alphabets and conversations already did.`,
-  `Small, safer touches: the chapter reset is tucked out of the way and no longer easy to tap by accident, some tiny text is easier to read, and a couple of labels were tidied up.`,
+  `A little more feel. Answers give a gentle buzz now (turn it off anytime in Profile), buttons press with a soft spring, and when you slip, the right answer quietly lights up so it's easy to learn from.`,
+  `Small motion touches throughout — the sound-building tiles and the lesson progress bar move a bit more smoothly.`,
 ];

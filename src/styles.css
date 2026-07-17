@@ -10,16 +10,18 @@ button, input { font-family: inherit; }
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);        /* iOS-like sheet curve */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);       /* confident, decisive — nav + entrances */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);      /* smooth — state changes, overlays */
+  --ease-spring: cubic-bezier(0.34, 1.25, 0.64, 1);     /* gentle ~2% overshoot — button release settle */
 }
 
 .hk-scroll-x { overflow-x: auto; scrollbar-width: none; }
 .hk-scroll-x::-webkit-scrollbar { display: none; }
 
-.hk-press { transition: transform 120ms var(--ease-out); }
-.hk-press:active { transform: scale(0.97); }
+/* press in fast (90ms), settle out with a gentle spring so a button feels
+   pressed-into-a-surface rather than snapped like a light switch */
+.hk-press { transition: transform 260ms var(--ease-spring); }
+.hk-press:active { transform: scale(0.97); transition-duration: 90ms; }
 
 @keyframes hkFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes hkBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 
 .hk-reveal { animation: hkReveal 240ms var(--ease-out-expo) both; }
 @keyframes hkReveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -60,13 +62,30 @@ button, input { font-family: inherit; }
   to   { opacity: 1; transform: none; }
 }
 
-/* correct answer pulse swell */
+/* correct answer pulse swell — confirmation when the LEARNER was right */
 .hk-correct { animation: hkCorrect 320ms var(--ease-out-quart) both; }
 @keyframes hkCorrect {
   0%   { transform: scale(1); }
   45%  { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
+
+/* teaching beat — after a MISS, a soft halo pulls the eye to the correct
+   answer (guidance, not celebration). --guide is set inline to a translucent
+   done colour. Twice, gently, then rests. */
+.hk-guide { animation: hkGuide 900ms var(--ease-out-quart) 120ms 2 both; }
+@keyframes hkGuide {
+  0%   { box-shadow: 0 0 0 0 var(--guide, transparent); }
+  50%  { box-shadow: 0 0 13px 1px var(--guide, transparent); }
+  100% { box-shadow: 0 0 0 0 var(--guide, transparent); }
+}
+
+/* production tile pad: relabel fade when a consonant re-labels the vowels
+   (a → ka), and a settle when a full syllable is composed */
+.hk-relabel { display: inline-block; animation: hkRelabel 150ms var(--ease-out) both; }
+@keyframes hkRelabel { from { opacity: 0.25; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+.hk-settle { display: inline-block; animation: hkSettle 220ms var(--ease-out-quart) both; }
+@keyframes hkSettle { 0% { transform: scale(0.9); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
 
 /* result screen: cat scale entrance */
 .hk-scale-in { animation: hkScaleIn 480ms var(--ease-out-expo) both; }

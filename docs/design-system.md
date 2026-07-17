@@ -101,11 +101,21 @@ Body copy weight is **600 minimum** — there is effectively no 400 text in the 
 Defined in [`src/styles.css`](../src/styles.css). All of it respects
 `@media (prefers-reduced-motion: reduce)` (animations disabled; grow bars jump to final width).
 
-- `.hk-press` — `scale(0.97)` on `:active`, 120ms. Applied to **every** interactive element.
+- `.hk-press` — `scale(0.97)` on `:active`; presses in fast (90ms) and settles out with a gentle
+  ~2% overshoot (`--ease-spring`, 260ms) so buttons feel pressed-into-a-surface. On **every** interactive element.
 - `.hk-reveal` — fade + 5px rise, 240ms. For content appearing in place (expanders, hints).
 - `.hk-grow` — width 0 → `var(--to)`, 750ms ease-out. Progress bars on the Result screen.
 - `.hk-pop` — springy scale-in (`cubic-bezier(.2,1.5,.4,1)`), 340ms. The correct/wrong badge.
-- `hkFade` (160ms) — modal backdrops. `hkBreathe` — defined but currently unused.
+- `hkFade` (160ms) — modal backdrops.
+- `.hk-guide` — after a **miss**, a soft halo (`--guide` set inline to a translucent `done`) pulses twice
+  on the correct option to guide the eye. Guidance, not celebration (paired with `.hk-correct`, which
+  only fires when the learner was right).
+- `.hk-relabel` / `.hk-settle` — production tile-pad craft: a quick fade when the vowels relabel
+  (a → ka), and a scale-settle when a full syllable is composed.
+
+Answer feedback also fires **whisper-haptics** ([`haptics.js`](../src/haptics.js)): a soft tick on a
+correct answer, a double-blip on a wrong one, a longer note on a passed result. Android-only
+(`navigator.vibrate`; iOS no-ops), gated on the Profile toggle + `prefers-reduced-motion`.
 - Standard easing for transitions is `cubic-bezier(.3,.8,.3,1)` (rings, grow).
 
 ## Layout conventions
@@ -158,7 +168,6 @@ deliberately before "fixing" — they may be intentional drift.
 1. **`manifest.theme_color` is hardcoded to the light `bg` (`#F3F5FA`).** The runtime overrides the
    live `theme-color` meta per theme, so an installed dark-mode user still gets a correct status bar
    after launch, but the manifest value itself doesn't reflect dark mode. Cosmetic; noted for accuracy.
-3. **`hkBreathe` keyframe is defined but unused** in `styles.css` — dead token, harmless.
 4. **Practice "Weak spots" subtitle says "tricky kana".** Weak-spots practice (`modeQuestions`) only
    ever draws kana items, so the copy is accurate today — but the `wrong` misses map also records
    phrase/sentence misses that this mode never surfaces. Not a visual issue; relevant if weak-spots is
