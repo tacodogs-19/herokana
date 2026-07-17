@@ -1,7 +1,9 @@
 // Whisper-haptics: a tiny vibration on the moments that matter (answer
 // checked, unit complete) — never on ordinary taps. Android-only: iOS Safari
-// has no navigator.vibrate and silently no-ops. Gated on a persisted setting
-// (default on) and prefers-reduced-motion, so it degrades, never nags.
+// has no navigator.vibrate and silently no-ops. Gated only on the Profile
+// toggle (default on). NB: even when enabled and vibrate() returns true, a
+// buzz is only FELT if the device's system touch/haptic-feedback channel is on
+// — Chrome routes web vibration through it, so it's off-limits to app code.
 const KEY = "hk-haptics";
 
 export const hapticsOn = () => {
@@ -17,18 +19,6 @@ export const setHaptics = (on) => {
 function buzz(pattern) {
   if (!hapticsOn()) return;
   try { navigator.vibrate && navigator.vibrate(pattern); } catch (e) {}
-}
-
-// On-device diagnostic: fires an unmistakable test pulse (ungated) and reports
-// what the platform actually did, so a "no buzz" report can be pinned to the
-// real cause (API missing / call refused / OS vibration off). Called from a tap
-// so user-activation is satisfied.
-export function probe() {
-  const r = { enabled: hapticsOn(), supported: false, called: null, reduceMotion: false };
-  try { r.supported = typeof navigator !== "undefined" && typeof navigator.vibrate === "function"; } catch (e) {}
-  try { r.reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-  try { if (r.supported) r.called = navigator.vibrate([120, 60, 120]); } catch (e) { r.called = "error"; }
-  return r;
 }
 
 // A soft tick on a right answer; a gentle double-blip on a wrong one (two short

@@ -115,7 +115,11 @@ Defined in [`src/styles.css`](../src/styles.css). All of it respects
 
 Answer feedback also fires **whisper-haptics** ([`haptics.js`](../src/haptics.js)): a soft tick on a
 correct answer, a double-blip on a wrong one, a longer note on a passed result. Android-only
-(`navigator.vibrate`; iOS no-ops), gated on the Profile toggle + `prefers-reduced-motion`.
+(`navigator.vibrate`; iOS no-ops), gated **only** on the Profile toggle — deliberately *not* on
+`prefers-reduced-motion`, since an explicit opt-in shouldn't be silently overridden by a device
+motion setting. Note it only actuates when the device's **system touch/haptic feedback** channel is
+on (Chrome routes web vibration through it), so `vibrate()` can return `true` yet buzz nothing — an
+OS setting outside app control, not a bug.
 - Standard easing for transitions is `cubic-bezier(.3,.8,.3,1)` (rings, grow).
 
 ## Layout conventions
