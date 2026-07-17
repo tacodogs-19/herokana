@@ -21,7 +21,12 @@ function buzz(pattern) {
 
 // A soft tick on a right answer; a gentle double-blip on a wrong one (two short
 // pulses read as "not quite" without feeling like an alarm); a slightly longer
-// note on finishing a unit.
-export const tapRight = () => buzz(8);
-export const tapWrong = () => buzz([6, 40, 6]);
-export const tapDone = () => buzz(14);
+// note on finishing a unit. Durations are kept low but ABOVE the ~10ms floor
+// most Android vibration motors can actually render — sub-10ms often produces
+// nothing perceptible on real hardware.
+export const tapRight = () => buzz(20);
+export const tapWrong = () => buzz([15, 50, 15]);
+export const tapDone = () => buzz(35);
+// Fired when the learner switches Haptics on — an immediate confirmation the
+// feature works on their device (and a self-diagnostic if it doesn't).
+export const tapToggle = () => buzz(25);

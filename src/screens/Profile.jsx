@@ -3,7 +3,7 @@ import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
-import { hapticsOn, setHaptics } from "../haptics.js";
+import { hapticsOn, setHaptics, tapToggle } from "../haptics.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
@@ -164,7 +164,7 @@ function ProfileBody({ onEditProfile, onReset }) {
         </div>
         {/* Haptics — a soft buzz on answers and finishing a unit (Android; no-op
             where the device has no vibration). Persisted in localStorage. */}
-        <button onClick={() => { const n = !haptics; setHapticsState(n); setHaptics(n); }} className="hk-press"
+        <button onClick={() => { const n = !haptics; setHapticsState(n); setHaptics(n); if (n) tapToggle(); }} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
             background: haptics ? t.primarySoft : t.surface, border: `1.5px solid ${haptics ? t.primary : t.line}`, textAlign: "left" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
