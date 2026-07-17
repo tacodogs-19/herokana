@@ -10,13 +10,25 @@ export const hapticsOn = () => {
 export const setHaptics = (on) => {
   try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) {}
 };
-const reduced = () => {
-  try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
-};
 
+// The Profile toggle is the single control. We deliberately do NOT also gate on
+// prefers-reduced-motion: an explicit opt-in shouldn't be silently overridden
+// by a device motion setting (that killed haptics for reduced-motion users).
 function buzz(pattern) {
-  if (!hapticsOn() || reduced()) return;
+  if (!hapticsOn()) return;
   try { navigator.vibrate && navigator.vibrate(pattern); } catch (e) {}
+}
+
+// On-device diagnostic: fires an unmistakable test pulse (ungated) and reports
+// what the platform actually did, so a "no buzz" report can be pinned to the
+// real cause (API missing / call refused / OS vibration off). Called from a tap
+// so user-activation is satisfied.
+export function probe() {
+  const r = { enabled: hapticsOn(), supported: false, called: null, reduceMotion: false };
+  try { r.supported = typeof navigator !== "undefined" && typeof navigator.vibrate === "function"; } catch (e) {}
+  try { r.reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  try { if (r.supported) r.called = navigator.vibrate([120, 60, 120]); } catch (e) { r.called = "error"; }
+  return r;
 }
 
 // A soft tick on a right answer; a gentle double-blip on a wrong one (two short

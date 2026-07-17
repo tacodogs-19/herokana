@@ -3,7 +3,7 @@ import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
-import { hapticsOn, setHaptics, tapToggle } from "../haptics.js";
+import { hapticsOn, setHaptics, probe } from "../haptics.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
@@ -13,6 +13,7 @@ function ProfileBody({ onEditProfile, onReset }) {
   const maxW = Math.max(...p.weekBars, 1);
   const [confirmReset, setConfirmReset] = React.useState(false);
   const [haptics, setHapticsState] = React.useState(hapticsOn);
+  const [hapticDiag, setHapticDiag] = React.useState(null);
   const [restore, setRestore] = React.useState(null); // { ok, parsed, exportedAt, version } | { ok:false, error }
   const fileRef = React.useRef(null);
 
@@ -164,7 +165,7 @@ function ProfileBody({ onEditProfile, onReset }) {
         </div>
         {/* Haptics — a soft buzz on answers and finishing a unit (Android; no-op
             where the device has no vibration). Persisted in localStorage. */}
-        <button onClick={() => { const n = !haptics; setHapticsState(n); setHaptics(n); if (n) tapToggle(); }} className="hk-press"
+        <button onClick={() => { const n = !haptics; setHapticsState(n); setHaptics(n); setHapticDiag(n ? probe() : null); }} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
             background: haptics ? t.primarySoft : t.surface, border: `1.5px solid ${haptics ? t.primary : t.line}`, textAlign: "left" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -177,6 +178,13 @@ function ProfileBody({ onEditProfile, onReset }) {
               background: "#fff", transition: "left 160ms", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }} />
           </span>
         </button>
+        {hapticDiag && (
+          <div style={{ margin: "-2px 4px 0", fontSize: 11, fontWeight: 600, color: t.faint, fontFamily: DISPLAY, lineHeight: 1.5 }}>
+            probe → vibrate API: <strong style={{ color: hapticDiag.supported ? t.done : t.wrong }}>{hapticDiag.supported ? "present" : "MISSING"}</strong>
+            {" · "}call returned: <strong style={{ color: hapticDiag.called === true ? t.done : t.wrong }}>{String(hapticDiag.called)}</strong>
+            {" · reduce-motion: "}<strong style={{ color: hapticDiag.reduceMotion ? t.wrong : t.ink }}>{hapticDiag.reduceMotion ? "ON" : "off"}</strong>
+          </div>
+        )}
         <SettingRow label="Edit your details" sub="Personalise your experience" onClick={onEditProfile} />
         <SettingRow label="Back up progress" sub="Save a file you can keep or move to another device" onClick={downloadBackup} />
         <SettingRow label="Restore from backup" sub="Load progress from a backup file" onClick={() => fileRef.current && fileRef.current.click()} />
