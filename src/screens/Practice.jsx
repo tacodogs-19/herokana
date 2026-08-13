@@ -131,7 +131,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
     : needThemes ? "Pick at least one theme" : "Select at least one chapter";
 
   const segLabel = { margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint };
-  const segBox = { display: "flex", gap: 0, background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 13 };
+  const segBox = { display: "flex", gap: 0, background: t.seg, borderRadius: 12, padding: 3, marginBottom: 13 };
   // Difficulty + Answer-in controls, shared by the Words and Numbers tabs and
   // shown above the selection.
   const diffAnswer = (enLabel) => (
@@ -182,7 +182,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
         <button onClick={onOpenChart} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
-            borderRadius: 18, cursor: "pointer", background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+            borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left" }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M9 3v18M3 9h18M3 15h18M15 3v18" /></svg>
@@ -195,7 +195,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         </button>
         <button onClick={onOpenVerbChart} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
-            borderRadius: 18, cursor: "pointer", background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+            borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left" }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h10M4 18h13" /></svg>
@@ -210,7 +210,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
 
       {/* Practice modes — the one-tap path, front and centre */}
       <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE MODES</p>
-      <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
+      <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = modeCategory === tb.id;
           return (
@@ -227,7 +227,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       <div style={{ display: "grid", gap: 11, gridTemplateColumns: "1fr 1fr", marginBottom: 0 }}>
         {modes.map((m) => (
           <button key={m.id} onClick={() => !m.off && onStart({ kind: "mode", mode: m.id, count: MODE_COUNT, category: modeCategory })} disabled={m.off} className="hk-press"
-            style={{ textAlign: "left", background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 18, padding: "14px 14px 15px",
+            style={{ textAlign: "left", background: t.surface, border: "none", borderRadius: 18, padding: "14px 14px 15px",
               cursor: m.off ? "default" : "pointer", opacity: m.off ? 0.55 : 1 }}>
             <span style={{ display: "flex", width: 40, height: 40, borderRadius: 12, background: m.soft, alignItems: "center", justifyContent: "center", marginBottom: 11 }}>
               <PModeIcon name={m.icon} c={m.color} />
@@ -244,8 +244,8 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.faint }}>
         {tab === "numbers" ? "Pick the number ranges to practise." : "Pick the chapters to draw questions from."}
       </p>
-      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "16px 16px 18px" }}>
-      <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 14 }}>
+      <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "16px 16px 18px" }}>
+      <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = tab === tb.id;
           return (
@@ -400,7 +400,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       {/* Round length — applies to the custom set */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: t.ink, whiteSpace: "nowrap" }}>Questions per round</span>
-        <div style={{ flex: 1, display: "flex", background: t.sunk, borderRadius: 12, padding: 3 }}>
+        <div style={{ flex: 1, display: "flex", background: t.seg, borderRadius: 12, padding: 3 }}>
           {ROUND_SIZES.map((n) => {
             const on = count === n;
             return (

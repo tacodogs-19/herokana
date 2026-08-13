@@ -35,7 +35,7 @@ export default function VerbChart({ onClose }) {
       </div>
 
       {/* Group toggle */}
-      <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, margin: "0 20px 16px", flexShrink: 0 }}>
+      <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, margin: "0 20px 16px", flexShrink: 0 }}>
         {GROUPS.map((g) => {
           const on = g.id === groupId;
           return (
@@ -84,7 +84,7 @@ export default function VerbChart({ onClose }) {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {FORMS.map(({ key, romKey, label }) => (
                         <div key={key} style={{ background: t.surface, borderRadius: 13, padding: "10px 12px",
-                          border: `1.5px solid ${t.line}` }}>
+                          border: "none" }}>
                           <div style={{ fontSize: 10, fontWeight: 700, color: t.faint, letterSpacing: "0.1em", marginBottom: 5 }}>{label.toUpperCase()}</div>
                           <div style={{ fontFamily: JP, fontSize: 20, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{v[key]}</div>
                           <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 3 }}>{v[romKey]}</div>

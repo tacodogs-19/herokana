@@ -213,7 +213,7 @@ function DialogueBody({ dialogueId, onExit }) {
       </div>
 
       {/* support dial — the manual difficulty scale */}
-      <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 4 }}>
+      <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 4 }}>
         {SUPPORT.map((s, li) => {
           const on = li === levelIdx;
           return (

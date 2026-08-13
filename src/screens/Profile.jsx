@@ -25,7 +25,7 @@ function ProfileBody({ onEditProfile, onReset }) {
   const SettingRow = ({ label, sub, danger, onClick }) => (
     <button onClick={onClick} className="hk-press"
       style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-        background: t.surface, border: `1.5px solid ${t.line}`, textAlign: "left" }}>
+        background: t.surface, border: "none", textAlign: "left" }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: danger ? t.wrong : t.ink, fontFamily: DISPLAY }}>{label}</div>
         {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
@@ -44,7 +44,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       {/* overall + level */}
       <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>YOUR PROGRESS</p>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-        <div style={{ flex: 1, background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        <div style={{ flex: 1, background: t.surface, border: "none", borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
           {(() => {
             const hardPct = p.bankedTotal > 0 ? Math.round((p.hardDoneTotal / p.bankedTotal) * 100) : 0;
             return (
@@ -71,7 +71,7 @@ function ProfileBody({ onEditProfile, onReset }) {
           </div>
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "14px 15px", flex: 1 }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "14px 15px", flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: t.sub }}>Level</span>
               <span style={{ width: 30, height: 30, borderRadius: 9, background: t.goldSoft, color: t.gold, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{p.level}</span>
@@ -82,7 +82,7 @@ function ProfileBody({ onEditProfile, onReset }) {
             </div>
             <p style={{ margin: "6px 0 0", fontSize: 10.5, color: t.faint }}>{p.xpToNext - p.xp} XP to Level {p.level + 1}</p>
           </div>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "12px 15px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "12px 15px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: t.sub }}>Accuracy</span>
             <span style={{ fontSize: 19, fontWeight: 800, color: t.done }}>{p.accuracy}%</span>
           </div>
@@ -90,7 +90,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </div>
 
       {/* weekly activity */}
-      <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72 }}>
+      <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: t.ink, whiteSpace: "nowrap" }}>This week</span>
           <span style={{ fontSize: 12, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
@@ -130,7 +130,7 @@ function ProfileBody({ onEditProfile, onReset }) {
           </button>
         ) : (
           <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
-            background: t.surface, border: `1.5px solid ${t.line}`, opacity: 0.7 }}>
+            background: t.surface, border: "none", opacity: 0.7 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
               <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>Finish the whole track to unlock</div>
@@ -140,14 +140,14 @@ function ProfileBody({ onEditProfile, onReset }) {
         )}
         {/* Theme: Auto follows the device; Light/Dark pins a manual choice */}
         <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
-          background: t.surface, border: `1.5px solid ${t.line}` }}>
+          background: t.surface, border: "none" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Theme</div>
             <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
               {followsSystem ? "Following your phone's setting" : `Pinned to ${mode}`}
             </div>
           </div>
-          <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, flexShrink: 0 }}>
+          <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, flexShrink: 0 }}>
             {[{ id: "auto", label: "Auto" }, { id: "light", label: "Light" }, { id: "dark", label: "Dark" }].map((o) => {
               const on = followsSystem ? o.id === "auto" : o.id === mode;
               return (
@@ -169,7 +169,7 @@ function ProfileBody({ onEditProfile, onReset }) {
 
       {restore && (
         <Modal onDismiss={() => setRestore(null)}>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px", boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px", boxShadow: "none" }}>
             {restore.ok ? (
               <>
                 <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Restore this backup?</div>
@@ -200,7 +200,7 @@ function ProfileBody({ onEditProfile, onReset }) {
 
       {confirmReset && (
         <Modal onDismiss={() => setConfirmReset(false)}>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px", boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px", boxShadow: "none" }}>
             <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset all progress?</div>
             <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
               Every chapter goes back to zero. Your {p.xp} XP and Level {p.level} stay.

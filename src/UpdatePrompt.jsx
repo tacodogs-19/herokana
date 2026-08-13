@@ -28,8 +28,8 @@ export default function UpdatePrompt() {
   if (!show) return null;
   return (
     <Modal position="bottom" onDismiss={() => setShow(false)}>
-      <div style={{ background: t.surface, color: t.ink, border: `1.5px solid ${t.line}`, borderRadius: 20,
-        padding: "16px 18px", fontFamily: DISPLAY, boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+      <div style={{ background: t.surface, color: t.ink, border: "none", borderRadius: 20,
+        padding: "16px 18px", fontFamily: DISPLAY, boxShadow: "none" }}>
         <div style={{ fontSize: 15.5, fontWeight: 800 }}>A new version is available</div>
         <div style={{ fontSize: 13, color: t.sub, fontWeight: 600, margin: "4px 0 14px" }}>
           Update now to get the latest HeroKana.

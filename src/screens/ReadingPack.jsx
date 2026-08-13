@@ -49,7 +49,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
       <p style={{ margin: "72px 0 11px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE</p>
       <button onClick={() => onStartReading(packId)} className="hk-press"
         style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "15px 16px", cursor: "pointer", marginBottom: 11,
-          background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 18, textAlign: "left", boxShadow: `0 16px 34px -26px ${t.shadow}` }}>
+          background: t.surface, border: "none", borderRadius: 18, textAlign: "left", boxShadow: "none" }}>
         <span style={{ display: "flex", width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: t.primarySoft, alignItems: "center", justifyContent: "center" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="6.5" cy="14.5" r="3.5" /><circle cx="17.5" cy="14.5" r="3.5" /><path d="M10 14c.7-.9 3.3-.9 4 0" /><path d="M3 14l2-6.5h2M21 14l-2-6.5h-2" /></svg>
         </span>
@@ -87,7 +87,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
             return (
               <button key={d.id} onClick={() => onStartDialogue(d.id, packId)} className="hk-press"
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "14px 16px", cursor: "pointer",
-                  background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 18, textAlign: "left" }}>
+                  background: t.surface, border: "none", borderRadius: 18, textAlign: "left" }}>
                 <span style={{ display: "flex", width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: t.goldSoft, alignItems: "center", justifyContent: "center" }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 9 9 0 0 1-3.9-.9L3 20.5l1.4-5.6a8.4 8.4 0 0 1-.9-3.9A8.4 8.4 0 0 1 12 2.5a8.4 8.4 0 0 1 9 9z" /></svg>
                 </span>

@@ -117,8 +117,8 @@ function ReadingBody({ packId, slow, onExit }) {
       {/* prompt card — the word + a "you'd see this where" hint. Reveal slot is
           fixed-height so the options below never shift. */}
       <div style={{ position: "relative", background: t.surface, borderRadius: 24, padding: "16px 20px", height: 224, flexShrink: 0,
-        border: `1.5px solid ${answered ? (correct ? t.done : t.wrong) : t.line}`, display: "flex", flexDirection: "column", alignItems: "center",
-        gap: 8, boxShadow: `0 16px 34px -26px ${t.shadow}`, transition: "border-color 200ms" }}>
+        border: `1.5px solid ${answered ? (correct ? t.done : t.wrong) : "transparent"}`, display: "flex", flexDirection: "column", alignItems: "center",
+        gap: 8, boxShadow: "none", transition: "border-color 200ms" }}>
         <div style={{ flex: 1, minHeight: 0, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
           <span style={{ fontFamily: JP, fontSize: q.jp.length > 5 ? 40 : q.jp.length > 3 ? 52 : 64, fontWeight: 700, color: t.ink, lineHeight: 1.2, textAlign: "center" }}>{q.jp}</span>
           {/* romaji reading, revealed after answering so you can check you read

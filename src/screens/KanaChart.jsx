@@ -278,7 +278,7 @@ export default function KanaChart({ onClose }) {
         </p>
 
         {/* Hiragana / Katakana toggle */}
-        <div style={{ display: "flex", background: t.sunk, borderRadius: 12, padding: 3, marginBottom: 12, flexShrink: 0 }}>
+        <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 12, flexShrink: 0 }}>
           {[{ id: "hira", label: "Hiragana" }, { id: "kata", label: "Katakana" }].map((k) => {
             const on = kana === k.id;
             return (
@@ -344,9 +344,9 @@ export default function KanaChart({ onClose }) {
                 transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
                 {/* Front: kana + mnemonic */}
                 <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
-                  background: t.surface, borderRadius: 26, border: `1.5px solid ${t.line}`,
+                  background: t.surface, borderRadius: 26, border: "none",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  padding: "28px 28px 20px", gap: 12, boxShadow: `0 20px 44px -28px ${t.shadow}` }}>
+                  padding: "28px 28px 20px", gap: 12, boxShadow: "none" }}>
                   {strokes && STROKES[map[rj]]
                     ? <StrokeGlyph ch={map[rj]} size={110} ink={t.ink} guide={t.line} />
                     : <span style={{ fontFamily: JP, fontSize: 96, fontWeight: 700, lineHeight: 1, color: t.ink }}>{map[rj]}</span>}
@@ -359,9 +359,9 @@ export default function KanaChart({ onClose }) {
                 </div>
                 {/* Back: romaji + both scripts */}
                 <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
-                  transform: "rotateY(180deg)", background: t.primarySoft, borderRadius: 26, border: `1.5px solid ${t.primary}`,
+                  transform: "rotateY(180deg)", background: t.primarySoft, borderRadius: 26, border: "none",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  padding: "28px 28px 20px", gap: 10, boxShadow: `0 20px 44px -28px ${t.shadow}` }}>
+                  padding: "28px 28px 20px", gap: 10, boxShadow: "none" }}>
                   <span style={{ fontSize: 60, fontWeight: 800, color: t.primary, fontFamily: DISPLAY, letterSpacing: "-0.02em" }}>{rj}</span>
                   <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
                     {[{ glyph: HIRA[rj], label: "Hiragana" }, { glyph: KATA[rj], label: "Katakana" }].map(({ glyph, label }) => (

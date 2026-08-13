@@ -198,8 +198,8 @@ function LessonBody({ session, onComplete, onExit }) {
       <div className={checked && !correct ? "hk-shake" : ""}
         style={{ position: "relative", background: t.surface, borderRadius: 24, padding: "16px 20px",
         height: q.input ? 168 : 224, flexShrink: 0,
-        border: `1.5px solid ${checked ? (correct ? t.done : t.wrong) : t.line}`,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, boxShadow: `0 16px 34px -26px ${t.shadow}`, transition: "border-color 250ms var(--ease-out-quart)" }}>
+        border: `1.5px solid ${checked ? (correct ? t.done : t.wrong) : "transparent"}`,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, boxShadow: "none", transition: "border-color 250ms var(--ease-out-quart)" }}>
         {checked && (
           <div className="hk-pop" style={{ position: "absolute", top: 0, right: 0, transform: "translate(38%,-38%)",
             width: 38, height: 38, borderRadius: "50%", background: correct ? t.done : t.wrong, display: "flex",
@@ -428,8 +428,8 @@ function LessonBody({ session, onComplete, onExit }) {
 
       {confirmExit && (
         <Modal onDismiss={() => setConfirmExit(false)}>
-          <div style={{ background: t.surface, color: t.ink, border: `1.5px solid ${t.line}`, borderRadius: 20,
-            padding: "20px 20px 18px", fontFamily: DISPLAY, boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+          <div style={{ background: t.surface, color: t.ink, border: "none", borderRadius: 20,
+            padding: "20px 20px 18px", fontFamily: DISPLAY, boxShadow: "none" }}>
             <div style={{ fontSize: 17, fontWeight: 800 }}>Leave this lesson?</div>
             <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", lineHeight: 1.45 }}>
               Your progress in this round won't be saved.

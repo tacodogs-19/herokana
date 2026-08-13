@@ -9,8 +9,8 @@ function LockedState({ t, progress }) {
   const gate = readingGate();
   const doneThemes = Math.min(progress.done[gate.chapterIdx] || 0, gate.total);
   return (
-    <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 22, padding: "28px 22px",
-      display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", boxShadow: `0 16px 34px -26px ${t.shadow}` }}>
+    <div style={{ background: t.surface, border: "none", borderRadius: 22, padding: "28px 22px",
+      display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", boxShadow: "none" }}>
       <span style={{ display: "flex", width: 66, height: 66, borderRadius: "50%", background: t.sunk, alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="1.9"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" /></svg>
       </span>
@@ -105,9 +105,9 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
       {/* body — transparent row that morphs into the focus card */}
       <div ref={bodyRef} style={{ flex: 1, minWidth: 0, borderRadius: 18, marginBottom: 10,
         background: active ? t.surface : "transparent",
-        border: `1.5px solid ${active ? t.line : "transparent"}`,
+        border: `1.5px solid transparent`,
         padding: active ? "6px 14px" : "0px",
-        boxShadow: active ? `0 16px 34px -26px ${t.shadow}` : "none",
+        boxShadow: active ? "none" : "none",
         transition: morph("background-color", "border-color", "padding", "box-shadow") }}>
         <button onClick={select} className="hk-press"
           style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "12px 0",
@@ -241,8 +241,8 @@ function ReadingBody({ onOpenPack }) {
 
       {confirmReset && (
         <Modal onDismiss={() => setConfirmReset(false)}>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px",
-            boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px",
+            boxShadow: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
               <span style={{ width: 34, height: 34, borderRadius: 10, background: t.sunk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

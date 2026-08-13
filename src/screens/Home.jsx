@@ -58,8 +58,8 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
   const scenesStarted = READING_PACKS.filter(p => progress.reading[p.id]?.plays > 0).length;
 
   return (
-    <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 26,
-      padding: "20px 20px 18px", boxShadow: `0 18px 38px -26px ${t.shadow}` }}>
+    <div style={{ background: t.surface, border: "none", borderRadius: 26,
+      padding: "20px 20px 18px", boxShadow: "none" }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
         <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, flex: 1,
           color: st === "current" ? t.primary : st === "done" ? t.done : t.faint }}>
@@ -496,7 +496,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
               </svg>
             </button>
             {hardInfoOpen && (
-              <div className="hk-reveal" style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 16, padding: "14px 16px", marginTop: 8 }}>
+              <div className="hk-reveal" style={{ background: t.surface, border: "none", borderRadius: 16, padding: "14px 16px", marginTop: 8 }}>
                 <p style={{ margin: "0 0 12px", fontSize: 13, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
                   Replays words & sentences (not the alphabets) with answers in English and no hints — a tougher second pass for extra XP.
                 </p>
@@ -524,8 +524,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             return (
               <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start",
                 minWidth: "100%", width: "max-content", padding: "8px 0 4px" }}>
-                <div style={{ position: "absolute", top: 31.5, left: 35.5, right: 35.5, height: 3, background: t.line, borderRadius: 2 }} />
-                <div style={{ position: "absolute", top: 31.5, left: 35.5, height: 3, borderRadius: 2, background: t.doneMid,
+                <div style={{ position: "absolute", top: 32, left: 35.5, height: 2, borderRadius: 2, background: t.doneMid,
                   width: `calc((100% - 71px) * ${fillPos} / ${Math.max(1, railIdx.length - 1)})` }} />
                 {railIdx.map((i) => {
                   const c = CHAPTERS[i];
@@ -538,14 +537,14 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                   })();
                   const on = i === sel;
                   const dotBg = cst === "done" ? t.doneMid : cst === "current" ? t.primary : t.surface;
-                  const dotBorder = cst === "done" ? t.doneMid : cst === "locked" ? t.line : dotBg;
+                  const dotBorder = cst === "done" ? t.doneMid : dotBg;
                   return (
                     <button key={c.id} data-rail={i} onClick={() => pick(i)} className="hk-press"
                       style={{ position: "relative", zIndex: 1, background: "transparent", border: "none", cursor: "pointer", padding: 0,
                         display: "flex", flexDirection: "column", alignItems: "center", gap: 7, width: 71, flexShrink: 0 }}>
                       <span style={{ width: 50, height: 50, borderRadius: "50%", background: dotBg,
                         border: `2.5px solid ${dotBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {cst === "done" ? <svg width="18" height="18" viewBox="0 0 12 12" fill="none" stroke={t.done} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
+                        {cst === "done" ? <svg width="18" height="18" viewBox="0 0 12 12" fill="none" stroke={t.done} strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
                           : cst === "locked" ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="2.2"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
                           : <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, color: "#fff" }}>{c.units[0].jp}</span>}
                       </span>
@@ -576,8 +575,8 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
       {resetTarget != null && (
         <Modal onDismiss={() => setResetTarget(null)}>
-          <div style={{ background: t.surface, border: `1.5px solid ${t.line}`, borderRadius: 20, padding: "20px 20px 18px",
-            boxShadow: `0 18px 40px -16px ${t.shadow}` }}>
+          <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px",
+            boxShadow: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
               <span style={{ width: 34, height: 34, borderRadius: 10, background: t.sunk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
