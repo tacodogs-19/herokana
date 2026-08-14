@@ -34,7 +34,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
       </div>
 
       {/* word preview — what you'll meet here, fills the page with real content */}
-      <p style={{ margin: "32px 0 10px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>WHAT YOU'LL READ</p>
+      <p style={{ margin: "32px 0 10px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>WHAT YOU'LL READ</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {pack.words.map((w) => (
           <span key={w.jp} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 1,
@@ -46,7 +46,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
       </div>
 
       {/* two ways to practice — cards self-categorise (read = blue, listen = gold) */}
-      <p style={{ margin: "72px 0 11px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>PRACTICE</p>
+      <p style={{ margin: "72px 0 11px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>PRACTICE</p>
       <button onClick={() => onStartReading(packId)} className="hk-press"
         style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "15px 16px", cursor: "pointer", marginBottom: 11,
           background: t.surface, border: "none", borderRadius: 18, textAlign: "left", boxShadow: t.cardShadow }}>

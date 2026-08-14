@@ -461,7 +461,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginBottom: 36,
-            borderRadius: 18, cursor: "pointer", background: t.primarySoft, border: `1.5px solid ${t.primary}`, textAlign: "left" }}>
+            borderRadius: 18, cursor: "pointer", background: t.primarySoft, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.surface,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
@@ -477,7 +477,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       )}
 
       <div style={{ margin: "6px 0 20px" }}>
-        <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>YOUR PROGRESS</p>
+        <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>YOUR PROGRESS</p>
 
         {hardUnlocked && (
           <div style={{ marginBottom: 14 }}>

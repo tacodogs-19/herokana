@@ -182,7 +182,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
           <Cat key={cur.cat} mood={cur.cat} size={132} style={{ animation: "hkReveal 280ms var(--ease-out) both" }} />
         </div>
-        <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.sub }}>
+        <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>
           ABOUT YOU · {step + 1} OF {steps.length}
         </p>
         <h2 style={{ margin: "10px 0 0", fontSize: 25, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>{cur.title}</h2>
