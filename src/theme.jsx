@@ -5,7 +5,7 @@ export const LIGHT = {
   bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#E8EBF4", raise: "#FFFFFF",
   ink: "#1E2540", sub: "#71789A", faint: "#AAB0C6",
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
-  primarySoft: "#DAE4FB", done: "#27A567", doneSoft: "#E4F5EC",
+  primarySoft: "#CDDBF8", done: "#27A567", doneSoft: "#E4F5EC",
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "#EEF1F8", // segmented-control track — lighter than the white active pill sits fine on it
@@ -15,7 +15,7 @@ export const DARK = {
   bg: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
   ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286",
   line: "#27304C", primary: "#5A85FF", primaryDark: "#3D63D8",
-  primarySoft: "#223258", done: "#34C07C", doneSoft: "#16301F",
+  primarySoft: "#273D6E", done: "#34C07C", doneSoft: "#16301F",
   gold: "#FFCB57", goldSoft: "#2A2410", wrong: "#FF6166", wrongSoft: "#34191B",
   lock: "#4A5378", shadow: "rgba(0,0,0,0.4)", doneMid: "#234C35",
   seg: "#10162A", // recessed track — darker than the surface active pill so the selection pops

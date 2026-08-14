@@ -524,7 +524,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             return (
               <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start",
                 minWidth: "100%", width: "max-content", padding: "8px 0 4px" }}>
-                <div style={{ position: "absolute", top: 32, left: 35.5, height: 2, borderRadius: 2, background: t.doneMid,
+                <div style={{ position: "absolute", top: 31.5, left: 35.5, height: 3, borderRadius: 2, background: t.doneMid,
                   width: `calc((100% - 71px) * ${fillPos} / ${Math.max(1, railIdx.length - 1)})` }} />
                 {railIdx.map((i) => {
                   const c = CHAPTERS[i];
