@@ -8,7 +8,8 @@ export const LIGHT = {
   primarySoft: "#E9EEFC", done: "#27A567", doneSoft: "#E4F5EC",
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
-  seg: "#EEF1F8", // segmented-control track — a touch lighter than sunk
+  seg: "#EEF1F8", // segmented-control track — lighter than the white active pill sits fine on it
+  cardShadow: "0 20px 45px -22px rgba(30,37,64,0.16)", // large soft card lift
 };
 export const DARK = {
   bg: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
@@ -17,7 +18,8 @@ export const DARK = {
   primarySoft: "#1E2A4A", done: "#34C07C", doneSoft: "#16301F",
   gold: "#FFCB57", goldSoft: "#2A2410", wrong: "#FF6166", wrongSoft: "#34191B",
   lock: "#4A5378", shadow: "rgba(0,0,0,0.4)", doneMid: "#234C35",
-  seg: "#1D2440", // segmented-control track — a touch lighter than sunk
+  seg: "#10162A", // recessed track — darker than the surface active pill so the selection pops
+  cardShadow: "0 22px 48px -20px rgba(0,0,0,0.55)", // large soft card lift
 };
 
 export const DISPLAY = "'Outfit', system-ui, sans-serif";

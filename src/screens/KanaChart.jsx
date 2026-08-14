@@ -346,7 +346,7 @@ export default function KanaChart({ onClose }) {
                 <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
                   background: t.surface, borderRadius: 26, border: "none",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  padding: "28px 28px 20px", gap: 12, boxShadow: "none" }}>
+                  padding: "28px 28px 20px", gap: 12, boxShadow: t.cardShadow }}>
                   {strokes && STROKES[map[rj]]
                     ? <StrokeGlyph ch={map[rj]} size={110} ink={t.ink} guide={t.line} />
                     : <span style={{ fontFamily: JP, fontSize: 96, fontWeight: 700, lineHeight: 1, color: t.ink }}>{map[rj]}</span>}
@@ -361,7 +361,7 @@ export default function KanaChart({ onClose }) {
                 <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
                   transform: "rotateY(180deg)", background: t.primarySoft, borderRadius: 26, border: "none",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  padding: "28px 28px 20px", gap: 10, boxShadow: "none" }}>
+                  padding: "28px 28px 20px", gap: 10, boxShadow: t.cardShadow }}>
                   <span style={{ fontSize: 60, fontWeight: 800, color: t.primary, fontFamily: DISPLAY, letterSpacing: "-0.02em" }}>{rj}</span>
                   <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
                     {[{ glyph: HIRA[rj], label: "Hiragana" }, { glyph: KATA[rj], label: "Katakana" }].map(({ glyph, label }) => (

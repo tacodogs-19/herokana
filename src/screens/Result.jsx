@@ -27,7 +27,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   const isScenesUnlock = isUnit && passed && !isGraduation && chapter.id === READING_UNLOCK && newDone >= chapter.units.length;
 
   const Tile = ({ label, value, color, i }) => (
-    <div className="hk-tile-enter" style={{ '--i': i, flex: 1, background: t.surface, border: "none", borderRadius: 16, padding: "13px 10px", textAlign: "center" }}>
+    <div className="hk-tile-enter" style={{ '--i': i, flex: 1, background: t.surface, border: "none", borderRadius: 16, padding: "13px 10px", textAlign: "center", boxShadow: t.cardShadow }}>
       <div style={{ fontSize: 22, fontWeight: 800, color: color || t.ink, lineHeight: 1 }}>{value}</div>
       <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 4 }}>{label}</div>
     </div>
@@ -58,7 +58,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
         </div>
 
         {isUnit && (
-          <div style={{ width: "100%", marginTop: 16, background: t.surface, border: "none", borderRadius: 16, padding: "14px 16px", textAlign: "left" }}>
+          <div style={{ width: "100%", marginTop: 16, background: t.surface, border: "none", borderRadius: 16, padding: "14px 16px", textAlign: "left", boxShadow: t.cardShadow }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 9 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: t.ink }}>{chapter.name} progress</span>
               <span style={{ fontSize: 13, fontWeight: 800, color: t.done }}>{newDone}/{chapter.units.length}</span>

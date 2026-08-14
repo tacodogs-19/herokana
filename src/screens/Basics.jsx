@@ -21,7 +21,7 @@ export default function Basics({ title, intro, cards, onClose }) {
         <p style={{ margin: "0 0 16px", fontSize: 14, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>{intro}</p>
         <div style={{ display: "grid", gap: 12 }}>
           {cards.map((c, i) => (
-            <div key={i} style={{ background: t.surface, border: "none", borderRadius: 18, padding: "16px 16px 14px" }}>
+            <div key={i} style={{ background: t.surface, border: "none", borderRadius: 18, padding: "16px 16px 14px", boxShadow: t.cardShadow }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 8, background: t.primarySoft, color: t.primary,
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 800, marginTop: 1 }}>{i + 1}</span>

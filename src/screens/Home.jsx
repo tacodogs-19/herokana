@@ -59,7 +59,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
   return (
     <div style={{ background: t.surface, border: "none", borderRadius: 26,
-      padding: "20px 20px 18px", boxShadow: "none" }}>
+      padding: "20px 20px 18px", boxShadow: t.cardShadow }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
         <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, flex: 1,
           color: st === "current" ? t.primary : st === "done" ? t.done : t.faint }}>
@@ -576,7 +576,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       {resetTarget != null && (
         <Modal onDismiss={() => setResetTarget(null)}>
           <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px",
-            boxShadow: "none" }}>
+            boxShadow: t.cardShadow }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
               <span style={{ width: 34, height: 34, borderRadius: 10, background: t.sunk, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
