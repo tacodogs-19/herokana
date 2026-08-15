@@ -134,10 +134,12 @@ function LessonBody({ session, onComplete, onExit }) {
     return t.surface;
   };
   const optBorder = (o) => {
-    if (!checked) return sel === o ? t.primary : t.line;
-    if (o === q.answer) return t.done;
-    if (o === sel) return t.wrong;
-    return t.line;
+    // no outline by default (selection reads via optBg + the card shadow); an
+    // outline appears only on the answered result — green for the correct answer,
+    // red for the wrong pick
+    if (checked && o === q.answer) return t.done;
+    if (checked && o === sel) return t.wrong;
+    return "transparent";
   };
   const optColor = (o) => {
     if (checked && o === q.answer) return t.done;
@@ -198,8 +200,8 @@ function LessonBody({ session, onComplete, onExit }) {
       <div className={checked && !correct ? "hk-shake" : ""}
         style={{ position: "relative", background: t.surface, borderRadius: 24, padding: "16px 20px",
         height: q.input ? 168 : 224, flexShrink: 0,
-        border: `1.5px solid ${checked ? (correct ? t.done : t.wrong) : "transparent"}`,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, boxShadow: t.cardShadow, transition: "border-color 250ms var(--ease-out-quart)" }}>
+        border: "none",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, boxShadow: t.cardShadow }}>
         {checked && (
           <div className="hk-pop" style={{ position: "absolute", top: 0, right: 0, transform: "translate(38%,-38%)",
             width: 38, height: 38, borderRadius: "50%", background: correct ? t.done : t.wrong, display: "flex",
@@ -379,8 +381,8 @@ function LessonBody({ session, onComplete, onExit }) {
               onKeyDown={(e) => { if (e.key === "Enter" && canCheck) onAction(); }}
               style={{ width: "100%", padding: "16px", borderRadius: 16, fontFamily: DISPLAY, fontSize: 18, fontWeight: 700,
                 textAlign: "center", outline: "none", color: checked ? (correct ? t.done : t.wrong) : t.ink,
-                background: checked ? (correct ? t.doneSoft : t.wrongSoft) : t.surface,
-                border: `2px solid ${checked ? (correct ? t.done : t.wrong) : t.line}` }} />
+                background: checked ? (correct ? t.doneSoft : t.wrongSoft) : t.surface, boxShadow: t.cardShadow,
+                border: `2px solid ${checked ? (correct ? t.done : t.wrong) : "transparent"}` }} />
             {checked && !correct && (
               <p className="hk-reveal" style={{ margin: "10px 0 0", textAlign: "center",
                 fontSize: 14.5, fontWeight: 800, color: t.done }}>
@@ -396,7 +398,7 @@ function LessonBody({ session, onComplete, onExit }) {
                 disabled={checked}
                 style={{ '--i': oi, ...(checked && !correct && o === q.answer ? { '--guide': `${t.done}66` } : {}),
                   padding: longOptions ? "12px 8px" : "16px 8px", borderRadius: 16, cursor: checked ? "default" : "pointer", background: optBg(o),
-                  border: `2px solid ${optBorder(o)}`, color: optColor(o), fontFamily: DISPLAY,
+                  border: `2px solid ${optBorder(o)}`, boxShadow: t.cardShadow, color: optColor(o), fontFamily: DISPLAY,
                   fontSize: q.type === "phrase" || concept ? 15.5 : 19, fontWeight: 800,
                   textTransform: q.type === "phrase" || concept ? "none" : "lowercase",
                   transition: "background 220ms var(--ease-out-quart), border-color 220ms var(--ease-out-quart), color 220ms" }}>

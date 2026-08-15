@@ -51,7 +51,7 @@ export function Button({ variant = "primary", color, className = "", style, chil
   const c = color || t.primary;
   const V = {
     primary: { background: c, color: "#fff", boxShadow: t.glow(c) },
-    soft:    { background: t.sunk, color: c },
+    soft:    { background: t.sunk, color: c, fontWeight: 700 }, // secondary: lighter than the 800 primary
     outline: { background: t.surface, color: c, border: `1.5px solid ${t.line}` },
   };
   return (

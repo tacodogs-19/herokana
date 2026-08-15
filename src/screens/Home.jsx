@@ -119,7 +119,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           ].map((b) => (
             <button key={b.label} onClick={b.onClick} className="hk-press"
               style={{ flex: 1, minWidth: 0, padding: "11px 8px", borderRadius: 13, cursor: "pointer",
-                background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800,
+                background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{b.icon}</svg>
               {b.label}
@@ -132,7 +132,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <button onClick={onOpenVerbChart} className="hk-press"
             style={{ flex: 1, minWidth: 0, padding: "11px 8px", borderRadius: 13, cursor: "pointer",
-              background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800,
+              background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h10M4 18h13" /></svg>
             Verb list
@@ -144,7 +144,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
           <button onClick={onOpenScenes} className="hk-press"
             style={{ flex: 1, minWidth: 0, padding: "11px 8px", borderRadius: 13, cursor: "pointer",
-              background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800,
+              background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
@@ -164,7 +164,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           ].map((b) => (
             <button key={b.label} onClick={b.onClick} className="hk-press"
               style={{ flex: 1, minWidth: 0, padding: "11px 8px", borderRadius: 13, cursor: "pointer",
-                background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800,
+                background: t.sunk, border: "none", color: st === "done" ? t.done : t.primary, fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{b.icon}</svg>
               {b.label}
