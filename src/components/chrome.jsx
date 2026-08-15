@@ -212,11 +212,15 @@ export function Shell({ children, active = "Learn", onNav, nav = true, scrollSha
       <div ref={ref} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens
-            read as stacked layers. Gradients planeTop DOWN to bg so it melts into the page
-            with no seam. Fixed to the Shell top; content (transparent bg) scrolls over it. */}
+            read as stacked layers. Gradient runs from bg (seamless with the status bar) DOWN
+            to planeTop. Content (transparent bg) scrolls over it — the plane is static.
+            backgroundSize is pinned to `100vh` (the large, stable viewport) so the gradient
+            never RESCALES when the mobile dynamic viewport (dvh) shrinks/grows on scroll — the
+            element just reveals or clips a fixed-scale gradient instead of stretching it. */}
         {plane && (
           <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
-            pointerEvents: "none", background: `linear-gradient(180deg, ${t.bg}, ${t.planeTop})` }} />
+            pointerEvents: "none", background: `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`,
+            backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat" }} />
         )}
         <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           {children}
