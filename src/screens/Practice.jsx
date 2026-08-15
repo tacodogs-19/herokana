@@ -130,7 +130,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
     : tab === "numbers" ? "Select at least one range"
     : needThemes ? "Pick at least one theme" : "Select at least one chapter";
 
-  const segLabel = { margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint };
+  const segLabel = { margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint };
   const segBox = { display: "flex", gap: 0, background: t.seg, borderRadius: 12, padding: 3, marginBottom: 13 };
   // Difficulty + Answer-in controls, shared by the Words and Numbers tabs and
   // shown above the selection.
@@ -177,7 +177,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Practice</h1>
       </header>
 
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>REFERENCE</p>
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>REFERENCE</p>
       {/* Reference sheets — passive look-up, not drills */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
         <button onClick={onOpenChart} className="hk-press"
@@ -209,7 +209,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       </div>
 
       {/* Practice modes — the one-tap path, front and centre */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>PRACTICE MODES</p>
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>PRACTICE MODES</p>
       <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = modeCategory === tb.id;
@@ -240,7 +240,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
 
       {/* Build a custom set — the deliberate path for drilling exact
           chapters/themes at a chosen difficulty. */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>BUILD A CUSTOM SET</p>
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>BUILD A CUSTOM SET</p>
       <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.faint }}>
         {tab === "numbers" ? "Pick the number ranges to practise." : "Pick the chapters to draw questions from."}
       </p>
@@ -272,7 +272,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <div style={{ marginBottom: 16 }}>
           {diffAnswer("Digits")}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 7px" }}>
-            <p style={{ margin: 0, fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>RANGES</p>
+            <p style={{ margin: 0, fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>RANGES</p>
             {(() => {
               const allOn = numGroups.size === NUMBER_GROUPS.length;
               return (
@@ -344,7 +344,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
                   live above the selection now) */}
               {banked && on && (
                 <div className="hk-reveal" style={{ padding: "10px 4px 2px 8px" }}>
-                  <p style={{ margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>THEMES</p>
+                  <p style={{ margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>THEMES</p>
                   {c.id === "sentence" && (
                     <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
                       {[

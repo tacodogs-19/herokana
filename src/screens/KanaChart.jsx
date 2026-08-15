@@ -320,7 +320,7 @@ export default function KanaChart({ onClose }) {
                 <Grid rows={ROWS} />
                 {EXTRA.map((sec) => (
                   <div key={sec.label} style={{ marginTop: 20 }}>
-                    <p style={{ margin: "0 0 9px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>{sec.label}</p>
+                    <p style={{ margin: "0 0 9px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>{sec.label}</p>
                     <Grid rows={sec.rows} />
                   </div>
                 ))}

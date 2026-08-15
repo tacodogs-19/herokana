@@ -25,7 +25,7 @@ function ProfileBody({ onEditProfile, onReset }) {
   const SettingRow = ({ label, sub, danger, onClick }) => (
     <button onClick={onClick} className="hk-press"
       style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-        background: t.surface, border: "none", textAlign: "left" }}>
+        background: t.surface, border: "none", boxShadow: t.cardShadow, textAlign: "left" }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: danger ? t.wrong : t.ink, fontFamily: DISPLAY }}>{label}</div>
         {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
@@ -42,7 +42,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </header>
 
       {/* overall + level */}
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>YOUR PROGRESS</p>
+      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>YOUR PROGRESS</p>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
         <div style={{ flex: 1, background: t.surface, border: "none", borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: t.cardShadow }}>
           {(() => {
@@ -107,7 +107,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </div>
 
       {/* settings */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>SETTINGS</p>
+      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>SETTINGS</p>
       <div style={{ display: "grid", gap: 10 }}>
         {/* Hard mode — unlocks once the whole track is complete. Also shown while
             hard is ON even if new appended chapters un-completed the track, so a
@@ -115,7 +115,7 @@ function ProfileBody({ onEditProfile, onReset }) {
         {(p.trackComplete || p.hard) ? (
           <button onClick={() => p.setHard(!p.hard)} className="hk-press"
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-              background: p.hard ? t.primarySoft : t.surface, border: `1.5px solid ${p.hard ? t.primary : t.line}`, textAlign: "left" }}>
+              background: p.hard ? t.primarySoft : t.surface, border: "none", boxShadow: t.cardShadow, textAlign: "left" }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
               <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
@@ -130,7 +130,7 @@ function ProfileBody({ onEditProfile, onReset }) {
           </button>
         ) : (
           <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
-            background: t.surface, border: "none", opacity: 0.7 }}>
+            background: t.surface, border: "none", boxShadow: t.cardShadow, opacity: 0.7 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
               <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>Finish the whole track to unlock</div>
@@ -140,7 +140,7 @@ function ProfileBody({ onEditProfile, onReset }) {
         )}
         {/* Theme: Auto follows the device; Light/Dark pins a manual choice */}
         <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16,
-          background: t.surface, border: "none" }}>
+          background: t.surface, border: "none", boxShadow: t.cardShadow }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Theme</div>
             <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>

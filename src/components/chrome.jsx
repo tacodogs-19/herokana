@@ -128,7 +128,7 @@ export function Modal({ children, onDismiss, position = "center" }) {
 }
 
 // App shell — fills the viewport, phone-width on larger screens.
-export function Shell({ children, active = "Learn", onNav, nav = true, scrollShadow = true }) {
+export function Shell({ children, active = "Learn", onNav, nav = true, scrollShadow = true, plane = nav }) {
   const { t, mode } = useTheme();
   const ref = React.useRef(null);
   const [scrolled, setScrolled] = React.useState(false);
@@ -150,7 +150,16 @@ export function Shell({ children, active = "Learn", onNav, nav = true, scrollSha
       display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden" }}>
       <div ref={ref} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
-        {children}
+        {/* Felix-depth: soft tinted plane behind the header + first card so tab screens
+            read as stacked layers. Gradients planeTop DOWN to bg so it melts into the page
+            with no seam. Fixed to the Shell top; content (transparent bg) scrolls over it. */}
+        {plane && (
+          <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, height: 340, zIndex: 0,
+            pointerEvents: "none", background: `radial-gradient(135% 90% at 50% -8%, ${t.planeTop}, ${t.bg} 62%)` }} />
+        )}
+        <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+          {children}
+        </div>
         {/* subtle shadow under the status bar, only while scrolled */}
         <div aria-hidden style={{ position: "absolute", top: "env(safe-area-inset-top)", left: 0, right: 0, height: 12,
           pointerEvents: "none", zIndex: 5, transition: "opacity 220ms ease", opacity: scrollShadow && scrolled ? 1 : 0,

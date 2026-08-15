@@ -2,14 +2,15 @@ import React from "react";
 
 // Palettes lifted verbatim from the design handoff (core.jsx).
 export const LIGHT = {
-  bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#E8EBF4", raise: "#FFFFFF",
+  bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
   ink: "#1E2540", sub: "#71789A", faint: "#AAB0C6",
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
   primarySoft: "#CDDBF8", done: "#27A567", doneSoft: "#E4F5EC",
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
-  seg: "#EEF1F8", // segmented-control track — lighter than the white active pill sits fine on it
-  cardShadow: "0 20px 45px -22px rgba(30,37,64,0.16)", // large soft card lift
+  seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
+  cardShadow: "0 26px 52px -20px rgba(30,37,64,0.24)", // Felix-depth: card floats over the header plane
+  planeTop: "#E5EBF9", // Felix-depth: plane tint (softened — less saturated blue at the radial's peak); Shell gradients this DOWN to `bg` so it melts in seamlessly
 };
 export const DARK = {
   bg: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
@@ -18,11 +19,12 @@ export const DARK = {
   primarySoft: "#273D6E", done: "#34C07C", doneSoft: "#16301F",
   gold: "#FFCB57", goldSoft: "#2A2410", wrong: "#FF6166", wrongSoft: "#34191B",
   lock: "#4A5378", shadow: "rgba(0,0,0,0.4)", doneMid: "#234C35",
-  seg: "#10162A", // recessed track — darker than the surface active pill so the selection pops
-  cardShadow: "0 22px 48px -20px rgba(0,0,0,0.55)", // large soft card lift
+  seg: "rgba(8,14,40,0.45)", // translucent navy-blue wash — recesses a step below ANY dark bg/surface while carrying the same blue cast as the plane; `surface` active pill lifts out of it
+  cardShadow: "0 26px 52px -18px rgba(0,0,0,0.62)", // Felix-depth: card floats over the header plane
+  planeTop: "#1B2340", // Felix-depth: plane tint; Shell gradients this DOWN to `bg` so it melts in seamlessly
 };
 
-export const DISPLAY = "'Outfit', system-ui, sans-serif";
+export const DISPLAY = "'Figtree', system-ui, sans-serif";
 const glow = (c) => `0 3px 8px -3px ${c}73`;
 export const JP = "'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', serif";
 

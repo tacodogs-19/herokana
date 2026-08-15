@@ -6,8 +6,14 @@ import { Shell, Ring, Modal } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
-  const bg = st === "done" ? t.doneSoft : st === "current" ? t.primary : t.sunk;
-  const fg = st === "current" ? "#fff" : st === "done" ? t.done : t.faint;
+  // Completed units are an INACTIVE state — they carry no fill colour (product
+  // register bans heavy colour on inactive states). Neutral tile + crisp ink
+  // glyph (never grey-on-tint, which reads muddy); the green tick is the sole
+  // "done" signal. Green lives in the tick + the hero ring, not 22 surfaces.
+  const bg = st === "current" ? t.primary : t.sunk;
+  // done text one step lighter than ink (t.sub) — fine now the tile is neutral,
+  // not the muddy grey-on-green it would be over a tinted fill
+  const fg = st === "current" ? "#fff" : st === "done" ? t.sub : t.faint;
   return (
     <button onClick={onClick} disabled={st === "locked"} className="hk-press" title={unit.label}
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,
@@ -52,6 +58,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
   const unit = st === "done" ? chapter.units[chapter.units.length - 1] : chapter.units[Math.min(doneCount, chapter.units.length - 1)];
   const accent = st === "done" ? t.done : st === "current" ? t.primary : t.lock;
+  const cta = st === "locked" ? t.sunk : accent;
   const upNext = chapter.units.slice(doneCount + 1, doneCount + 3);
   const firstUse = !hard && progress.totalDone === 0 && progress.answered === 0;
   const canReset = doneCount > 0 && !(hard && isAlpha(chapterIdx));
@@ -60,7 +67,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
   return (
     <div style={{ background: t.surface, border: "none", borderRadius: 26,
       padding: "20px 20px 18px", boxShadow: t.cardShadow }}>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
+      <div style={{ display: "flex", alignItems: "center", margin: "8px 0 20px" }}>
         <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, flex: 1,
           color: st === "current" ? t.primary : st === "done" ? t.done : t.faint }}>
           {st === "current" ? (firstUse ? "START YOUR JOURNEY" : "CONTINUE LEARNING") : st === "done" ? "CHAPTER COMPLETE" : "UP AHEAD"}
@@ -99,9 +106,9 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
       <button onClick={() => st !== "locked" && (st === "done" ? onReviewChapter(chapterIdx) : onStart(chapterIdx))}
         disabled={st === "locked"} className="hk-press"
         style={{ width: "100%", marginTop: 12, padding: "15px", borderRadius: 16, border: "none",
-          cursor: st === "locked" ? "default" : "pointer", background: st === "locked" ? t.sunk : accent,
+          cursor: st === "locked" ? "default" : "pointer", background: cta,
           color: st === "locked" ? t.faint : "#fff", fontFamily: DISPLAY, fontSize: 16, fontWeight: 800,
-          boxShadow: st === "locked" ? "none" : t.glow(accent) }}>
+          boxShadow: st === "locked" ? "none" : t.glow(cta) }}>
         {st === "locked" ? "Locked" : st === "done" ? "Review chapter" : firstUse ? "Get Started →" : "Continue lesson →"}
       </button>
 
@@ -477,7 +484,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       )}
 
       <div style={{ margin: "6px 0 20px" }}>
-        <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 700, color: t.ink }}>YOUR PROGRESS</p>
+        <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>YOUR PROGRESS</p>
 
         {hardUnlocked && (
           <div style={{ marginBottom: 14 }}>
@@ -561,11 +568,14 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
       {/* carousel — full-width canvas; card width unchanged via slot padding matching page padding.
           Container height is pinned to center slot via useLayoutEffect so dots never drift. */}
-      <div ref={containerRef} style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", margin: "0 -20px" }}
+      {/* Bottom padding gives the card's soft lift room inside this overflow:hidden clip box
+          (height is pinned to slot.scrollHeight, which now includes the padding, so the pin
+          stays consistent). Negative margin cancels it so surrounding layout is unchanged. */}
+      <div ref={containerRef} style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", margin: "0 -20px -58px" }}
         {...touchHandlers} {...mouseHandlers}>
         <div ref={trackRef} style={{ display: "flex", width: "300%", alignItems: "flex-start", willChange: "transform" }}>
           {[prevIdx, sel, nextIdx].map((idx, i) => (
-            <div key={i === 1 ? `c-${sel}` : i} ref={slotRefs[i]} style={{ flex: "0 0 33.333%", minWidth: 0, padding: "0 20px" }}>
+            <div key={i === 1 ? `c-${sel}` : i} ref={slotRefs[i]} style={{ flex: "0 0 33.333%", minWidth: 0, padding: "0 20px 58px" }}>
               <ChapterCard chapterIdx={idx} {...cardProps} />
             </div>
           ))}

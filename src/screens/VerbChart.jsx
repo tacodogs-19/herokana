@@ -52,16 +52,16 @@ export default function VerbChart({ onClose }) {
 
       {/* Verb list */}
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px 28px" }}>
-        <p style={{ margin: "0 0 12px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 700, color: t.faint }}>
+        <p style={{ margin: "0 0 12px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>
           {group.sub.toUpperCase()}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {group.verbs.map((v) => {
             const on = active === v.romaji;
             return (
-              <div key={v.romaji} style={{ borderRadius: 18, overflow: "hidden",
-                border: `1.5px solid ${on ? t.primary : t.line}`, transition: "border-color 150ms" }}>
-                {/* Verb row */}
+              <div key={v.romaji} style={{ borderRadius: 18, overflow: "hidden", border: "none",
+                boxShadow: t.cardShadow }}>
+                {/* Verb row — standard borderless card (surface + cardShadow), like everywhere else */}
                 <button onClick={() => tap(v)} className="hk-press"
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "13px 15px",
                     background: on ? t.primarySoft : t.surface, border: "none", cursor: "pointer", textAlign: "left",
