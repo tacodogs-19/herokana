@@ -173,8 +173,8 @@ function LessonBody({ session, onComplete, onExit }) {
             const track = k === i ? t.primary : t.line;
             // inner bar sweeps left-to-right to the result colour as the segment resolves
             return (
-              <div key={k} style={{ flex: 1, height: 7, borderRadius: 4, background: track, overflow: "hidden" }}>
-                <div style={{ width: done ? "100%" : "0%", height: "100%", borderRadius: 4,
+              <div key={k} style={{ flex: 1, height: 5, borderRadius: 3, background: track, overflow: "hidden" }}>
+                <div style={{ width: done ? "100%" : "0%", height: "100%", borderRadius: 3,
                   background: ok ? t.done : t.wrong, transition: "width 300ms var(--ease-out-quart)" }} />
               </div>
             );
@@ -205,7 +205,7 @@ function LessonBody({ session, onComplete, onExit }) {
         {checked && (
           <div className="hk-pop" style={{ position: "absolute", top: 0, right: 0, transform: "translate(38%,-38%)",
             width: 38, height: 38, borderRadius: "50%", background: correct ? t.done : t.wrong, display: "flex",
-            alignItems: "center", justifyContent: "center", boxShadow: "0 3px 10px -3px rgba(0,0,0,0.3)", border: `3px solid ${t.surface}` }}>
+            alignItems: "center", justifyContent: "center", boxShadow: "0 3px 10px -3px rgba(0,0,0,0.3)", border: "none" }}>
             {correct
               ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
               : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>}
