@@ -11,9 +11,9 @@ function UnitChip({ unit, st, t, onClick }) {
   // glyph (never grey-on-tint, which reads muddy); the green tick is the sole
   // "done" signal. Green lives in the tick + the hero ring, not 22 surfaces.
   const bg = st === "current" ? t.primary : st === "done" ? t.doneSoft : t.sunk;
-  // done tile carries a subtle green tint; glyph stays crisp ink (grey-on-green
-  // reads muddy) and the green tick is the done signal
-  const fg = st === "current" ? "#fff" : st === "done" ? t.ink : t.faint;
+  // done tile: green tint + green text (per Figma) — the done state is fully green;
+  // current is blue-on-white, locked is faint-on-neutral
+  const fg = st === "current" ? "#fff" : st === "done" ? t.done : t.faint;
   return (
     <button onClick={onClick} disabled={st === "locked"} className="hk-press" title={unit.label}
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,

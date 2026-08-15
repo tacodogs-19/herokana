@@ -241,7 +241,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       {/* Build a custom set — the deliberate path for drilling exact
           chapters/themes at a chosen difficulty. */}
       <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>BUILD A CUSTOM SET</p>
-      <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.faint }}>
+      <p style={{ margin: "0 0 14px", fontSize: 13.5, fontWeight: 600, color: t.sub }}>
         {tab === "numbers" ? "Pick the number ranges to practise." : "Pick the chapters to draw questions from."}
       </p>
       <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "16px 16px 18px", boxShadow: t.cardShadow }}>
