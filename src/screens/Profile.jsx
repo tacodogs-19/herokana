@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, Modal } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
@@ -42,7 +42,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </header>
 
       {/* overall + level */}
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>YOUR PROGRESS</p>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 11px" }}>YOUR PROGRESS</Text>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
         <div style={{ flex: 1, background: t.surface, border: "none", borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: t.cardShadow }}>
           {(() => {
@@ -107,7 +107,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </div>
 
       {/* settings */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>SETTINGS</p>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "60px 0 11px" }}>SETTINGS</Text>
       <div style={{ display: "grid", gap: 10 }}>
         {/* Hard mode — unlocks once the whole track is complete. Also shown while
             hard is ON even if new appended chapters un-completed the track, so a

@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, Modal } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
@@ -68,10 +68,10 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
     <div style={{ background: t.surface, border: "none", borderRadius: 26,
       padding: "20px 20px 18px", boxShadow: t.cardShadow }}>
       <div style={{ display: "flex", alignItems: "center", margin: "8px 0 20px" }}>
-        <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, flex: 1,
-          color: st === "current" ? t.primary : st === "done" ? t.done : t.faint }}>
+        <Text variant="eyebrow" style={{ flex: 1 }}
+          color={st === "current" ? t.primary : st === "done" ? t.done : t.faint}>
           {st === "current" ? (firstUse ? "START YOUR JOURNEY" : "CONTINUE LEARNING") : st === "done" ? "CHAPTER COMPLETE" : "UP AHEAD"}
-        </p>
+        </Text>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, margin: "0 0 4px" }}>
@@ -484,7 +484,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       )}
 
       <div style={{ margin: "6px 0 20px" }}>
-        <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>YOUR PROGRESS</p>
+        <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
 
         {hardUnlocked && (
           <div style={{ marginBottom: 14 }}>

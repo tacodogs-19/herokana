@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS, NUMBER_GROUPS } from "../data";
-import { Shell } from "../components/chrome.jsx";
+import { Shell, Text } from "../components/chrome.jsx";
 import { useJaVoice } from "../speech.js";
 
 const PModeIcon = ({ name, c }) => {
@@ -177,7 +177,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Practice</h1>
       </header>
 
-      <p style={{ margin: "0 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>REFERENCE</p>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 11px" }}>REFERENCE</Text>
       {/* Reference sheets — passive look-up, not drills */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
         <button onClick={onOpenChart} className="hk-press"
@@ -209,7 +209,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       </div>
 
       {/* Practice modes — the one-tap path, front and centre */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>PRACTICE MODES</p>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "60px 0 11px" }}>PRACTICE MODES</Text>
       <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "sentences", label: "Sentences" }, { id: "numbers", label: "Numbers" }].map((tb) => {
           const on = modeCategory === tb.id;
@@ -240,10 +240,10 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
 
       {/* Build a custom set — the deliberate path for drilling exact
           chapters/themes at a chosen difficulty. */}
-      <p style={{ margin: "60px 0 11px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>BUILD A CUSTOM SET</p>
-      <p style={{ margin: "0 0 14px", fontSize: 13.5, fontWeight: 600, color: t.sub }}>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "60px 0 11px" }}>BUILD A CUSTOM SET</Text>
+      <Text variant="subtitle" style={{ margin: "0 0 14px" }}>
         {tab === "numbers" ? "Pick the number ranges to practise." : "Pick the chapters to draw questions from."}
-      </p>
+      </Text>
       <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "16px 16px 18px", boxShadow: t.cardShadow }}>
       <div style={{ display: "flex", background: t.seg, borderRadius: 12, padding: 3, marginBottom: 14 }}>
         {[{ id: "alpha", label: "Kana" }, { id: "words", label: "Words" }, { id: "verbs", label: "Verbs" }, { id: "numbers", label: "Numbers" }].map((tb) => {

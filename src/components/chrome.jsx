@@ -1,6 +1,30 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 
+// ── Text ──────────────────────────────────────────────────────────────────
+// One source of truth for the app's text roles. Screens use <Text variant>
+// instead of hand-rolling size/weight/tracking inline, so a change to e.g.
+// "subtitle" propagates everywhere instead of drifting per screen.
+// Colour has a per-variant default but is overridable (eyebrows are ink on a
+// section heading, primary on the card, etc.); margins/layout stay per-caller.
+const TEXT_VARIANTS = {
+  eyebrow:  { fontSize: 11.5, fontWeight: 800, letterSpacing: "0.14em" },
+  heading:  { fontSize: 20,   fontWeight: 800 },
+  title:    { fontSize: 22,   fontWeight: 800 },
+  subtitle: { fontSize: 13.5, fontWeight: 600, lineHeight: 1.5 },
+  body:     { fontSize: 14,   fontWeight: 600, lineHeight: 1.5 },
+  caption:  { fontSize: 11.5, fontWeight: 700 },
+};
+const TEXT_DEFAULT_COLOR = { eyebrow: "sub", heading: "ink", title: "ink", subtitle: "sub", body: "ink", caption: "faint" };
+export function Text({ variant = "body", as: Tag = "p", color, style, children, ...rest }) {
+  const { t } = useTheme();
+  return (
+    <Tag style={{ margin: 0, fontFamily: DISPLAY, color: color || t[TEXT_DEFAULT_COLOR[variant]], ...TEXT_VARIANTS[variant], ...style }} {...rest}>
+      {children}
+    </Tag>
+  );
+}
+
 // The cat sticker set from the handoff — by the user's direction it appears
 // only as the app icon and on the result (success / keep-practising) screen.
 const CAT_SRC = {

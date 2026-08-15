@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Modal } from "../components/chrome.jsx";
+import { Shell, Modal, Text } from "../components/chrome.jsx";
 import { READING_PACKS, readingUnlocked, readingGate } from "../reading.js";
 import { dialoguesForPack } from "../dialogue.js";
 
@@ -209,11 +209,11 @@ function ReadingBody({ onOpenPack }) {
       </header>
 
       <p style={{ margin: "0 0 6px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>IN THE REAL WORLD</p>
-      <p style={{ margin: "0 0 16px", fontSize: 13.5, fontWeight: 600, color: t.sub, lineHeight: 1.5 }}>
+      <Text variant="subtitle" style={{ margin: "0 0 16px" }}>
         {doneCount === packs.length
           ? "Every stop on the trip is done — revisit any scene to keep the words fresh."
           : "One trip through Japan, stop by stop: the words and conversations you'll meet at each one."}
-      </p>
+      </Text>
 
       {!unlocked ? (
         <LockedState t={t} progress={progress} />
