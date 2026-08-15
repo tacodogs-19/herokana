@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, Modal, Text } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Card, Button } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
@@ -23,15 +23,14 @@ function ProfileBody({ onEditProfile, onReset }) {
   };
 
   const SettingRow = ({ label, sub, danger, onClick }) => (
-    <button onClick={onClick} className="hk-press"
-      style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, cursor: "pointer",
-        background: t.surface, border: "none", boxShadow: t.cardShadow, textAlign: "left" }}>
+    <Card as="button" onClick={onClick}
+      style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: danger ? t.wrong : t.ink, fontFamily: DISPLAY }}>{label}</div>
         {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
       </div>
       <span style={{ color: t.faint, fontSize: 18, flexShrink: 0 }}>›</span>
-    </button>
+    </Card>
   );
 
   return (
@@ -177,21 +176,16 @@ function ProfileBody({ onEditProfile, onReset }) {
                   This replaces your current progress with the backup{restore.exportedAt ? ` from ${restore.exportedAt.slice(0, 10)}` : ""}. This can't be undone.
                 </div>
                 <div style={{ display: "grid", gap: 10 }}>
-                  <button onClick={() => setRestore(null)} className="hk-press"
-                    style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
-                      color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>Cancel</button>
-                  <button onClick={() => { applyBackup(restore.parsed); window.location.reload(); }} className="hk-press"
-                    style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
-                      color: t.ink, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>Restore &amp; reload</button>
+                  <Button onClick={() => setRestore(null)} style={{ width: "100%", padding: "14px", borderRadius: 14, fontSize: 15 }}>Cancel</Button>
+                  <Button variant="outline" color={t.ink} onClick={() => { applyBackup(restore.parsed); window.location.reload(); }}
+                    style={{ width: "100%", padding: "13px", borderRadius: 14, fontSize: 14.5 }}>Restore &amp; reload</Button>
                 </div>
               </>
             ) : (
               <>
                 <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Couldn't restore</div>
                 <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>{restore.error}</div>
-                <button onClick={() => setRestore(null)} className="hk-press"
-                  style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
-                    color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>OK</button>
+                <Button onClick={() => setRestore(null)} style={{ width: "100%", padding: "14px", borderRadius: 14, fontSize: 15 }}>OK</Button>
               </>
             )}
           </div>
@@ -206,12 +200,9 @@ function ProfileBody({ onEditProfile, onReset }) {
               Every chapter goes back to zero. Your {p.xp} XP and Level {p.level} stay.
             </div>
             <div style={{ display: "grid", gap: 10 }}>
-              <button onClick={() => setConfirmReset(false)} className="hk-press"
-                style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: t.primary,
-                  color: "#fff", fontFamily: DISPLAY, fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>Cancel</button>
-              <button onClick={() => { onReset(); setConfirmReset(false); }} className="hk-press"
-                style={{ width: "100%", padding: "13px", borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
-                  color: t.wrong, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 800, cursor: "pointer" }}>Reset progress</button>
+              <Button onClick={() => setConfirmReset(false)} style={{ width: "100%", padding: "14px", borderRadius: 14, fontSize: 15 }}>Cancel</Button>
+              <Button variant="outline" color={t.wrong} onClick={() => { onReset(); setConfirmReset(false); }}
+                style={{ width: "100%", padding: "13px", borderRadius: 14, fontSize: 14.5 }}>Reset progress</Button>
             </div>
           </div>
         </Modal>

@@ -25,6 +25,43 @@ export function Text({ variant = "body", as: Tag = "p", color, style, children, 
   );
 }
 
+// ── Card ────────────────────────────────────────────────────────────────────
+// The app's floating surface: white, rounded, soft lift. One definition so the
+// shadow/shape can't drift per screen. `as="button"` for clickable cards
+// (reference rows, settings rows). Radius/padding come from the caller's style.
+export function Card({ as: Tag = "div", className = "", style, children, ...rest }) {
+  const { t } = useTheme();
+  const isBtn = Tag === "button";
+  return (
+    <Tag className={isBtn ? ("hk-press " + className).trim() : (className || undefined)}
+      style={{ background: t.surface, border: "none", borderRadius: 20, boxShadow: t.cardShadow,
+        ...(isBtn && { cursor: "pointer", textAlign: "left", font: "inherit", width: "100%" }), ...style }} {...rest}>
+      {children}
+    </Tag>
+  );
+}
+
+// ── Button ──────────────────────────────────────────────────────────────────
+// primary = filled accent + glow (the glow lives HERE, so every primary action
+// gets it automatically and consistently). soft = recessed sunk chip.
+// outline = bordered surface. Accent colour overridable; radius/padding/size
+// via style. Interactive press (.hk-press) is baked in.
+export function Button({ variant = "primary", color, className = "", style, children, ...rest }) {
+  const { t } = useTheme();
+  const c = color || t.primary;
+  const V = {
+    primary: { background: c, color: "#fff", boxShadow: t.glow(c) },
+    soft:    { background: t.sunk, color: c },
+    outline: { background: t.surface, color: c, border: `1.5px solid ${t.line}` },
+  };
+  return (
+    <button className={("hk-press " + className).trim()}
+      style={{ border: "none", cursor: "pointer", fontFamily: DISPLAY, fontWeight: 800, borderRadius: 16, ...V[variant], ...style }} {...rest}>
+      {children}
+    </button>
+  );
+}
+
 // The cat sticker set from the handoff — by the user's direction it appears
 // only as the app icon and on the result (success / keep-practising) screen.
 const CAT_SRC = {

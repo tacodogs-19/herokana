@@ -3,13 +3,17 @@
 The single source of truth for HeroKana's visual language. All tokens live in code at
 [`src/theme.jsx`](../src/theme.jsx) (colour + fonts + shadow helper) and
 [`src/styles.css`](../src/styles.css) (the few global classes/keyframes). There is **no CSS
-framework and no design-token build step** — styling is inline `style={}` objects pulling
-from the theme context (`useTheme()`), so this document and `theme.jsx` must be kept in sync.
+framework and no design-token build step**. Recurring roles are shared **component primitives**
+in [`chrome.jsx`](../src/components/chrome.jsx): `Text` (typographic roles), `Card` (the floating
+surface), `Button` (actions). **Reach for these before hand-rolling inline styles for text, cards,
+or buttons** — a change to a role then propagates app-wide instead of drifting per screen (see
+[Component primitives](#component-primitives)). One-off *layout* stays inline `style={}` reading
+`useTheme()`. Keep this doc + `theme.jsx` in sync.
 
 ## Look and feel
 
 Soft, rounded, "calm app" aesthetic. A single phone-width column on any screen. Generous
-border-radii, hairline `1.5px` borders rather than heavy shadows, one confident blue accent,
+border-radii, soft ambient shadows for depth (cards are borderless), one confident blue accent,
 and restrained motion. Friendly but not childish: the cat mascot is deliberately rationed
 (see [Mascot rules](#mascot-rules)). Light and dark are first-class equals, both hand-tuned.
 
@@ -59,7 +63,7 @@ PWA's status bar live. Keep these two in sync if palette `bg` values change.
 
 Loaded from Google Fonts in `index.html`.
 
-- **Display / UI** — `DISPLAY` = `'Outfit', system-ui, sans-serif` (weights 400–800). Used for
+- **Display / UI** — `DISPLAY` = `'Figtree', system-ui, sans-serif` (weights 400–800). Used for
   everything that isn't Japanese.
 - **Japanese** — `JP` = `'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', serif` (weights 500/700).
   Used for all kana/kanji glyphs. The rounded "Maru" gothic matches the soft aesthetic.
@@ -71,7 +75,7 @@ There is no rigid modular scale; sizes are chosen per role (values in px). Repre
 | Screen title (HeroKana / Practice / Profile) | 19 / 800, `letterSpacing -0.02em` |
 | Result headline | 27 / 800 |
 | Card heading (`h2`) | 20–25 / 800 |
-| Section eyebrow label | 11–11.5 / 700, `letterSpacing 0.12–0.14em`, `sub`/`faint`, UPPERCASE |
+| Section eyebrow label | 11.5 / 800, `letterSpacing 0.14em`, UPPERCASE (`Text variant="eyebrow"`, colour per use) |
 | Body / secondary | 13–14.5 / 600, `sub` |
 | Button label | 15–16.5 / 800 |
 | Tiny meta / captions | 9.5–11.5 / 600–700, `faint` |
@@ -81,6 +85,29 @@ There is no rigid modular scale; sizes are chosen per role (values in px). Repre
 Body copy weight is **600 minimum** — there is effectively no 400 text in the UI. Headings are
 800. Eyebrow labels carry positive letter-spacing; large headings carry `-0.02em`.
 
+## Component primitives
+
+Defined in [`chrome.jsx`](../src/components/chrome.jsx). These are the single source of truth for
+the app's recurring roles — **use them instead of re-deriving the styles inline**, so a change to
+a role lands everywhere at once (the reason this section exists: text/card/button styling used to
+be hand-rolled per screen and drift). Colour, radius, padding and margin are overridable; the
+primitive owns the role's *intrinsic* spec (size/weight/tracking, surface + shadow, glow).
+
+- **`<Text variant>`** — `eyebrow` · `heading` · `title` · `subtitle` · `body` · `caption`. Sets
+  font size/weight/tracking + a per-variant default colour (`color` overrides; `as` picks the tag).
+  Secondary text on a background is `variant="subtitle"` (never the lighter `faint` tier).
+- **`<Card>`** — the floating surface: `surface` background, no border, `t.cardShadow` lift,
+  `borderRadius: 20` (override via `style`). `as="button"` makes it a tappable card (settings rows,
+  reference rows) with `.hk-press` + pointer baked in.
+- **`<Button variant>`** — `primary` (filled accent + `t.glow`, the glow lives here so every primary
+  action gets it automatically), `soft` (recessed `sunk` chip), `outline` (bordered surface).
+  `color` sets the accent; `.hk-press` is baked in. Filled primaries pass their accent via `color`
+  (e.g. a done-state CTA is `color={t.done}`).
+
+Migration is incremental: the tab screens (Home, Practice, Profile, Scenes) use the primitives for
+text + the settings-card / primary-action patterns; other screens adopt them as they're touched and
+stay token-consistent (`surface` + `cardShadow`) in the meantime.
+
 ## Spacing, radius, borders, shadows
 
 - **Spacing** — informal 3/4-based rhythm. Common gaps 6–14; screen padding `14px 20px` (top/sides)
@@ -88,13 +115,14 @@ Body copy weight is **600 minimum** — there is effectively no 400 text in the 
 - **Radius** — small tags/segmented items `7–13`, inputs/answer options/buttons `14–16`,
   cards/sheets `16–26`, pills/toggles `999`, circular (rings, dots, mascot) `50%`. Bigger surfaces
   get bigger radii; the home "focus card" is the largest at `26`.
-- **Borders** — the signature is **`1.5px solid t.line`** on virtually every card, button, and
-  input. Selected/active state swaps the border to the relevant accent (`2px` on answer options).
-- **Shadows** — kept subtle by design (see [decisions](decisions.md)). Two patterns:
-  - Button glow: `t.glow(color)` → `0 3px 8px -3px {color}73` (the `73` is ~45% alpha hex).
-    Applied to filled primary/accent buttons.
-  - Card lift: `0 16–18px 34–40px -16…-26px {t.shadow}` — large blur, large negative spread, so
-    it reads as a soft ambient lift rather than a drop shadow.
+- **Borders** — cards and buttons are **borderless**; the floating surface is defined by
+  `t.cardShadow`, not a hairline (a deliberate shift to soft depth — see [decisions](decisions.md)).
+  `1.5px solid t.line` remains for inputs, `outline` buttons, and dividers; selected answer options
+  use a `2px` accent border.
+- **Shadows** — two patterns, both single-sourced (and baked into the primitives):
+  - Button glow: `t.glow(color)` → `0 3px 8px -3px {color}73`. Lives in `<Button variant="primary">`.
+  - Card lift: `t.cardShadow` — a large, soft, blue-tinted ambient lift. Lives in `<Card>`. A tinted
+    header **plane** (`linear-gradient(bg → planeTop)`) sits behind the tab screens for extra depth.
 
 ## Motion
 

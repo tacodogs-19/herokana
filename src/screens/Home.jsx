@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, Modal, Text } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Button } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
@@ -58,7 +58,6 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
   const unit = st === "done" ? chapter.units[chapter.units.length - 1] : chapter.units[Math.min(doneCount, chapter.units.length - 1)];
   const accent = st === "done" ? t.done : st === "current" ? t.primary : t.lock;
-  const cta = st === "locked" ? t.sunk : accent;
   const upNext = chapter.units.slice(doneCount + 1, doneCount + 3);
   const firstUse = !hard && progress.totalDone === 0 && progress.answered === 0;
   const canReset = doneCount > 0 && !(hard && isAlpha(chapterIdx));
@@ -103,14 +102,12 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         </div>
       </div>
 
-      <button onClick={() => st !== "locked" && (st === "done" ? onReviewChapter(chapterIdx) : onStart(chapterIdx))}
-        disabled={st === "locked"} className="hk-press"
-        style={{ width: "100%", marginTop: 12, padding: "15px", borderRadius: 16, border: "none",
-          cursor: st === "locked" ? "default" : "pointer", background: cta,
-          color: st === "locked" ? t.faint : "#fff", fontFamily: DISPLAY, fontSize: 16, fontWeight: 800,
-          boxShadow: st === "locked" ? "none" : t.glow(cta) }}>
+      <Button color={accent} disabled={st === "locked"}
+        onClick={() => st !== "locked" && (st === "done" ? onReviewChapter(chapterIdx) : onStart(chapterIdx))}
+        style={{ width: "100%", marginTop: 12, padding: "15px", borderRadius: 16, fontSize: 16,
+          ...(st === "locked" && { background: t.sunk, color: t.faint, boxShadow: "none", cursor: "default" }) }}>
         {st === "locked" ? "Locked" : st === "done" ? "Review chapter" : firstUse ? "Get Started →" : "Continue lesson →"}
-      </button>
+      </Button>
 
       {(chapter.id === "hira" || chapter.id === "kata") && st !== "locked" && (
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
