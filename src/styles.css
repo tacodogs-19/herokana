@@ -2,7 +2,9 @@
 /* the OS tap flash paints as a square over rounded tiles (Android Chrome);
    .hk-press on every interactive element is the tap feedback instead */
 * { -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+/* `contain` (not `none`) keeps pull-to-refresh + nav-swipe disabled while
+   re-allowing the native elastic overscroll bounce (iOS) / stretch (Android) */
+html, body { margin: 0; padding: 0; overscroll-behavior: contain; }
 button, input { font-family: inherit; }
 
 :root {

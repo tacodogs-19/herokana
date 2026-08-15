@@ -10,15 +10,15 @@ function UnitChip({ unit, st, t, onClick }) {
   // register bans heavy colour on inactive states). Neutral tile + crisp ink
   // glyph (never grey-on-tint, which reads muddy); the green tick is the sole
   // "done" signal. Green lives in the tick + the hero ring, not 22 surfaces.
-  const bg = st === "current" ? t.primary : t.sunk;
-  // done text one step lighter than ink (t.sub) — fine now the tile is neutral,
-  // not the muddy grey-on-green it would be over a tinted fill
-  const fg = st === "current" ? "#fff" : st === "done" ? t.sub : t.faint;
+  const bg = st === "current" ? t.primary : st === "done" ? t.doneSoft : t.sunk;
+  // done tile carries a subtle green tint; glyph stays crisp ink (grey-on-green
+  // reads muddy) and the green tick is the done signal
+  const fg = st === "current" ? "#fff" : st === "done" ? t.ink : t.faint;
   return (
     <button onClick={onClick} disabled={st === "locked"} className="hk-press" title={unit.label}
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
-        background: bg, border: st === "current" ? "none" : `1.5px solid ${st === "done" ? "transparent" : t.line}`,
+        background: bg, border: "none",
         boxShadow: st === "current" ? t.glow(t.primary) : "none", color: fg }}>
       {st === "done" && (
         <span style={{ position: "absolute", top: 0, right: 0, transform: "translate(30%,-30%)",
@@ -531,7 +531,9 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             return (
               <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start",
                 minWidth: "100%", width: "max-content", padding: "8px 0 4px" }}>
-                <div style={{ position: "absolute", top: 31.5, left: 35.5, height: 3, borderRadius: 2, background: t.doneMid,
+                {/* white track under the not-yet-complete stops; green fill covers the completed part on top */}
+                <div style={{ position: "absolute", top: 32, left: 35.5, right: 35.5, height: 2, borderRadius: 2, background: t.surface }} />
+                <div style={{ position: "absolute", top: 32, left: 35.5, height: 2, borderRadius: 2, background: t.doneMid,
                   width: `calc((100% - 71px) * ${fillPos} / ${Math.max(1, railIdx.length - 1)})` }} />
                 {railIdx.map((i) => {
                   const c = CHAPTERS[i];

@@ -9,8 +9,8 @@ export const LIGHT = {
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
-  cardShadow: "0 26px 52px -20px rgba(30,37,64,0.24)", // Felix-depth: card floats over the header plane
-  planeTop: "#E5EBF9", // Felix-depth: plane tint (softened — less saturated blue at the radial's peak); Shell gradients this DOWN to `bg` so it melts in seamlessly
+  cardShadow: "0 26px 52px -20px rgba(34,52,118,0.20)", // Felix-depth: card floats over the header plane — mild blue tint (not neutral grey), lightened
+  planeTop: "#EDF1FB", // Felix-depth: the plane's DEEP end — gentle tint (kept close to `bg` so the full-height gradient isn't too dark at the bottom); Shell gradients from `bg` DOWN to this
 };
 export const DARK = {
   bg: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",

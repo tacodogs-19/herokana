@@ -154,8 +154,8 @@ export function Shell({ children, active = "Learn", onNav, nav = true, scrollSha
             read as stacked layers. Gradients planeTop DOWN to bg so it melts into the page
             with no seam. Fixed to the Shell top; content (transparent bg) scrolls over it. */}
         {plane && (
-          <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, height: 340, zIndex: 0,
-            pointerEvents: "none", background: `radial-gradient(135% 90% at 50% -8%, ${t.planeTop}, ${t.bg} 62%)` }} />
+          <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
+            pointerEvents: "none", background: `linear-gradient(180deg, ${t.bg}, ${t.planeTop})` }} />
         )}
         <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           {children}
