@@ -209,7 +209,7 @@ function ReadingBody({ onOpenPack }) {
       </header>
 
       <p style={{ margin: "0 0 6px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>IN THE REAL WORLD</p>
-      <p style={{ margin: "0 0 16px", fontSize: 13.5, color: t.faint, lineHeight: 1.5 }}>
+      <p style={{ margin: "0 0 16px", fontSize: 13.5, fontWeight: 600, color: t.sub, lineHeight: 1.5 }}>
         {doneCount === packs.length
           ? "Every stop on the trip is done — revisit any scene to keep the words fresh."
           : "One trip through Japan, stop by stop: the words and conversations you'll meet at each one."}

@@ -19,12 +19,12 @@ function UnitChip({ unit, st, t, onClick }) {
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
         background: bg, border: "none",
-        boxShadow: st === "current" ? t.glow(t.primary) : "none", color: fg }}>
+        boxShadow: "none", color: fg }}>
       {st === "done" && (
         <span style={{ position: "absolute", top: 0, right: 0, transform: "translate(30%,-30%)",
-          width: 22, height: 22, borderRadius: "50%", background: t.doneMid, border: `2px solid ${t.surface}`,
+          width: 22, height: 22, borderRadius: "50%", background: t.done, border: `2px solid ${t.surface}`,
           display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke={t.done} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
         </span>
       )}
       <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700 }}>{unit.jp}</span>
