@@ -21,7 +21,7 @@ export default function WhatsNew() {
     <Modal onDismiss={() => setShow(false)}>
       <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px",
         fontFamily: DISPLAY, boxShadow: t.cardShadow }}>
-        <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 800, color: t.primary }}>WHAT'S NEW</p>
+        <p style={{ margin: 0, fontSize: 11, letterSpacing: "0.14em", fontWeight: 900, color: t.primary }}>WHAT'S NEW</p>
         <h2 style={{ margin: "6px 0 14px", fontSize: 20, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Fresh in HeroKana</h2>
         <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
           {RELEASE_NOTES.map((n, i) => (

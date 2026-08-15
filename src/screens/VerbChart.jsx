@@ -52,7 +52,7 @@ export default function VerbChart({ onClose }) {
 
       {/* Verb list */}
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px 28px" }}>
-        <p style={{ margin: "0 0 12px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>
+        <p style={{ margin: "0 0 12px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 900, color: t.faint }}>
           {group.sub.toUpperCase()}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

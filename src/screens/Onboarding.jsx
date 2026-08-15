@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { saveProfile, COUNTRIES, HOBBIES } from "../data";
-import { Shell, Cat } from "../components/chrome.jsx";
+import { Shell, Cat, Button } from "../components/chrome.jsx";
 
 // First-run (and editable) questionnaire — one question per page, skippable at
 // any stage. Answers personalise the Sentences "About me" and "Likes" units.
@@ -182,7 +182,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
           <Cat key={cur.cat} mood={cur.cat} size={132} style={{ animation: "hkReveal 280ms var(--ease-out) both" }} />
         </div>
-        <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 800, color: t.ink }}>
+        <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 900, color: t.ink }}>
           ABOUT YOU · {step + 1} OF {steps.length}
         </p>
         <h2 style={{ margin: "10px 0 0", fontSize: 25, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>{cur.title}</h2>
@@ -191,11 +191,9 @@ function OnboardingBody({ initial, onDone, registerBack }) {
       </div>
 
       <div style={{ display: "grid", gap: 10, marginTop: 28 }}>
-        <button onClick={advance} className="hk-press"
-          style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none", cursor: "pointer",
-            background: t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16, fontWeight: 800, boxShadow: t.glow(t.primary) }}>
+        <Button onClick={advance} style={{ width: "100%", padding: "16px", borderRadius: 16, fontSize: 16 }}>
           {last ? "Save & start learning" : "Next →"}
-        </button>
+        </Button>
         <button onClick={skipStep} className="hk-press"
           style={{ width: "100%", padding: "12px", borderRadius: 16, border: "none", cursor: "pointer",
             background: "transparent", color: t.sub, fontFamily: DISPLAY, fontSize: 14, fontWeight: 700 }}>

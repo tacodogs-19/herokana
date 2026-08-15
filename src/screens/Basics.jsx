@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
+import { Card, Button } from "../components/chrome.jsx";
 
 // Generic read-through explainer. Renders a titled list of {title, body, ex?}
 // cards as a full-screen overlay. Used for both Kana basics and Sentence basics
@@ -21,7 +22,7 @@ export default function Basics({ title, intro, cards, onClose }) {
         <p style={{ margin: "0 0 16px", fontSize: 14, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>{intro}</p>
         <div style={{ display: "grid", gap: 12 }}>
           {cards.map((c, i) => (
-            <div key={i} style={{ background: t.surface, border: "none", borderRadius: 18, padding: "16px 16px 14px", boxShadow: t.cardShadow }}>
+            <Card key={i} style={{ borderRadius: 18, padding: "16px 16px 14px" }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 8, background: t.primarySoft, color: t.primary,
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 800, marginTop: 1 }}>{i + 1}</span>
@@ -37,14 +38,12 @@ export default function Basics({ title, intro, cards, onClose }) {
                   <div style={{ fontSize: 12.5, color: t.faint, fontWeight: 600, marginTop: 2 }}>{c.ex.en}</div>
                 </div>
               )}
-            </div>
+            </Card>
           ))}
         </div>
-        <button onClick={onClose} className="hk-press"
-          style={{ width: "100%", marginTop: 18, padding: "15px", borderRadius: 16, border: "none", cursor: "pointer",
-            background: t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16, fontWeight: 800, boxShadow: t.glow(t.primary) }}>
+        <Button onClick={onClose} style={{ width: "100%", marginTop: 18, padding: "15px", borderRadius: 16, fontSize: 16 }}>
           Got it
-        </button>
+        </Button>
       </div>
     </div>
   );

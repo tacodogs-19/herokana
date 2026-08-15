@@ -8,7 +8,7 @@ import { useTheme, DISPLAY } from "../theme.jsx";
 // Colour has a per-variant default but is overridable (eyebrows are ink on a
 // section heading, primary on the card, etc.); margins/layout stay per-caller.
 const TEXT_VARIANTS = {
-  eyebrow:  { fontSize: 11.5, fontWeight: 800, letterSpacing: "0.14em" },
+  eyebrow:  { fontSize: 11.5, fontWeight: 900, letterSpacing: "0.14em" },
   heading:  { fontSize: 20,   fontWeight: 800 },
   title:    { fontSize: 22,   fontWeight: 800 },
   subtitle: { fontSize: 13.5, fontWeight: 600, lineHeight: 1.5 },

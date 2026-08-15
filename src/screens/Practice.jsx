@@ -130,7 +130,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
     : tab === "numbers" ? "Select at least one range"
     : needThemes ? "Pick at least one theme" : "Select at least one chapter";
 
-  const segLabel = { margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint };
+  const segLabel = { margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 900, color: t.faint };
   const segBox = { display: "flex", gap: 0, background: t.seg, borderRadius: 12, padding: 3, marginBottom: 13 };
   // Difficulty + Answer-in controls, shared by the Words and Numbers tabs and
   // shown above the selection.
@@ -272,7 +272,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <div style={{ marginBottom: 16 }}>
           {diffAnswer("Digits")}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 7px" }}>
-            <p style={{ margin: 0, fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>RANGES</p>
+            <p style={{ margin: 0, fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 900, color: t.faint }}>RANGES</p>
             {(() => {
               const allOn = numGroups.size === NUMBER_GROUPS.length;
               return (
@@ -344,7 +344,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
                   live above the selection now) */}
               {banked && on && (
                 <div className="hk-reveal" style={{ padding: "10px 4px 2px 8px" }}>
-                  <p style={{ margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>THEMES</p>
+                  <p style={{ margin: "0 0 7px", fontSize: 10.5, letterSpacing: "0.12em", fontWeight: 900, color: t.faint }}>THEMES</p>
                   {c.id === "sentence" && (
                     <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
                       {[

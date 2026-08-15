@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Cat } from "../components/chrome.jsx";
+import { Shell, Cat, Button } from "../components/chrome.jsx";
 import { packById, buildReadingSession, slowWords, band, BAND_COPY } from "../reading.js";
 
 // Maneki-neko reaction by reading speed (the brief: paw up = fast, sleepy =
@@ -68,7 +68,7 @@ function ReadingBody({ packId, slow, onExit }) {
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", textAlign: "center", overflowY: "auto" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
           <Cat mood="run" size={132} />
-          <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 800, color: t.primary }}>
+          <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 900, color: t.primary }}>
             {pack.place.toUpperCase()} · READING
           </p>
           {/* hero number — average seconds per word */}
@@ -84,10 +84,9 @@ function ReadingBody({ packId, slow, onExit }) {
         </div>
 
         <div style={{ display: "grid", gap: 10, flexShrink: 0, marginTop: 16 }}>
-          <button onClick={onExit} className="hk-press" style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none",
-            background: t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16.5, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>
+          <Button onClick={onExit} style={{ width: "100%", padding: "16px", borderRadius: 16, fontSize: 16.5 }}>
             Done
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -109,7 +108,7 @@ function ReadingBody({ packId, slow, onExit }) {
         </div>
       </div>
 
-      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 800, color: t.primary }}>
+      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>
         {pack.place.toUpperCase()} · READ THE REAL WORLD
       </p>
       <h2 style={{ margin: "0 0 18px", fontSize: 21, fontWeight: 800, color: t.ink }}>What does this say?</h2>

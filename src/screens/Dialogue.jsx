@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Cat } from "../components/chrome.jsx";
+import { Shell, Cat, Button } from "../components/chrome.jsx";
 import { dialogueById, prepareDialogue, SUPPORT } from "../dialogue.js";
 import { speakLine, stopSpeech, useSpeechRecognition, useRecorder, looseMatch, toKana } from "../speech.js";
 
@@ -30,7 +30,7 @@ function SpeakBeat({ line, onHearModel, t }) {
   );
   return (
     <div style={{ background: t.sunk, borderRadius: 14, padding: "12px 14px", marginBottom: 10 }}>
-      <p style={{ margin: "0 0 8px", fontSize: 10, letterSpacing: "0.12em", fontWeight: 800, color: t.primary }}>YOUR TURN · SAY IT</p>
+      <p style={{ margin: "0 0 8px", fontSize: 10, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>YOUR TURN · SAY IT</p>
       <div style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{line.jp}</div>
       <div style={{ fontSize: 11.5, fontWeight: 600, color: t.sub, marginTop: 2 }}>{line.romaji} · {line.en}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 11 }}>
@@ -132,7 +132,7 @@ function DialogueBody({ dialogueId, onExit }) {
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", overflowY: "auto" }}>
         <div style={{ textAlign: "center" }}>
           <Cat mood={passed ? "run" : "general"} size={120} style={{ margin: "0 auto" }} />
-          <p style={{ margin: "4px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 800, color: t.primary }}>
+          <p style={{ margin: "4px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 900, color: t.primary }}>
             {SUPPORT[levelIdx].label.toUpperCase()} · {d.title.toUpperCase()}
           </p>
           <div style={{ margin: "8px 0 0" }}>
@@ -145,7 +145,7 @@ function DialogueBody({ dialogueId, onExit }) {
 
         {/* full transcript — reading reinforcement after the listening */}
         <div style={{ marginTop: 18 }}>
-          <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 800, color: t.faint }}>TRANSCRIPT</p>
+          <p style={{ margin: "0 0 12px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 900, color: t.faint }}>TRANSCRIPT</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {lines.map((ln, k) => {
               const you = ln.who === "you";
@@ -167,10 +167,9 @@ function DialogueBody({ dialogueId, onExit }) {
 
         <div style={{ display: "grid", gap: 10, flexShrink: 0, marginTop: 16 }}>
           {canStepDown && (
-            <button onClick={() => setLevel(levelIdx + 1)} className="hk-press" style={{ width: "100%", padding: "16px", borderRadius: 16, border: "none",
-              background: t.primary, color: "#fff", fontFamily: DISPLAY, fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: t.glow(t.primary) }}>
+            <Button onClick={() => setLevel(levelIdx + 1)} style={{ width: "100%", padding: "16px", borderRadius: 16, fontSize: 16 }}>
               Try it at {SUPPORT[levelIdx + 1].label} level →
-            </button>
+            </Button>
           )}
           <button onClick={() => setLevel(levelIdx)} className="hk-press" style={{ width: "100%", padding: canStepDown ? "14px" : "16px", borderRadius: 16,
             border: canStepDown ? `1.5px solid ${t.line}` : "none", background: canStepDown ? t.surface : t.primary,
@@ -228,7 +227,7 @@ function DialogueBody({ dialogueId, onExit }) {
       </div>
       <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 600, color: t.faint, textAlign: "center" }}>{level.blurb}</p>
 
-      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 800, color: t.primary }}>{d.title.toUpperCase()}</p>
+      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>{d.title.toUpperCase()}</p>
       <h2 style={{ margin: "0 0 12px", fontSize: 20, fontWeight: 800, color: t.ink }}>{heading}</h2>
 
       {/* transcript so far */}

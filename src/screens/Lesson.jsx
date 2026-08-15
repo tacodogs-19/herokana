@@ -186,7 +186,7 @@ function LessonBody({ session, onComplete, onExit }) {
         </div>
       )}
 
-      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 800, color: t.primary }}>
+      <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>
         {sessionLabel(session, qs)}
       </p>
       <h2 style={{ margin: "0 0 18px", fontSize: 21, fontWeight: 800, color: t.ink }}>{heading}</h2>
