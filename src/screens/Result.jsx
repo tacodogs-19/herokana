@@ -115,6 +115,6 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
 }
 
 export default function Result(props) {
-  return <Shell nav={false}><ResultBody {...props} /></Shell>;
+  return <Shell nav={false} modal><ResultBody {...props} /></Shell>;
 }
 

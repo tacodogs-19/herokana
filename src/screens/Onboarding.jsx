@@ -207,5 +207,5 @@ const inputStyle = (t) => ({
 });
 
 export default function Onboarding({ initial, onDone, registerBack }) {
-  return <Shell nav={false}><OnboardingBody initial={initial} onDone={onDone} registerBack={registerBack} /></Shell>;
+  return <Shell nav={false} modal><OnboardingBody initial={initial} onDone={onDone} registerBack={registerBack} /></Shell>;
 }

@@ -128,7 +128,7 @@ function DialogueBody({ dialogueId, onExit }) {
     const passed = pct >= 80;
     const canStepDown = passed && levelIdx < SUPPORT.length - 1;
     return (
-      <Shell nav={false}>
+      <Shell nav={false} modal>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", overflowY: "auto" }}>
         <div style={{ textAlign: "center" }}>
           <Cat mood={passed ? "run" : "general"} size={120} style={{ margin: "0 auto" }} />
@@ -190,7 +190,7 @@ function DialogueBody({ dialogueId, onExit }) {
   const heading = isCheck ? line.ask : "Listen";
 
   return (
-    <Shell nav={false} scrollShadow={false}>
+    <Shell nav={false} scrollShadow={false} modal>
     <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px" }}>
       {/* top bar: exit + segmented progress */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 12 }}>

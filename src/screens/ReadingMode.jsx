@@ -178,5 +178,5 @@ function ReadingBody({ packId, slow, onExit }) {
 }
 
 export default function ReadingMode({ packId, slow, onExit }) {
-  return <Shell nav={false}><ReadingBody packId={packId} slow={slow} onExit={onExit} /></Shell>;
+  return <Shell nav={false} modal><ReadingBody packId={packId} slow={slow} onExit={onExit} /></Shell>;
 }

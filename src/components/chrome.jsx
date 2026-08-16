@@ -258,7 +258,7 @@ export function Modal({ children, onDismiss, position = "center" }) {
 }
 
 // App shell — fills the viewport, phone-width on larger screens.
-export function Shell({ children, active = "Learn", onNav, nav = true, plane = nav, whiteTop = false }) {
+export function Shell({ children, active = "Learn", onNav, nav = true, plane = nav, whiteTop = false, modal = false }) {
   const { t } = useTheme();
   // whiteTop: the static plane turns white just below the header (so content
   // reads as a white pane tucked under the inverse corners) and fades to the
@@ -268,7 +268,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
     ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 72px), ${t.planeTop} 100%)`
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
-    <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: t.bg,
+    <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
       display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative" }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
@@ -283,7 +283,11 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
             pointerEvents: "none", backgroundImage: planeBg,
             backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat" }} />
         )}
-        <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        {/* modal: content is a grey sheet with rounded top corners over the
+            darker chrome (which shows through the status-bar strip + corners),
+            so full-screen takeovers read like a default iOS modal. */}
+        <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+          ...(modal && { background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20 }) }}>
           {children}
         </div>
       </div>

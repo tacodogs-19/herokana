@@ -456,5 +456,5 @@ function LessonBody({ session, onComplete, onExit }) {
 }
 
 export default function Lesson({ session, onComplete, onExit }) {
-  return <Shell nav={false}><LessonBody session={session} onComplete={onComplete} onExit={onExit} /></Shell>;
+  return <Shell nav={false} modal><LessonBody session={session} onComplete={onComplete} onExit={onExit} /></Shell>;
 }
