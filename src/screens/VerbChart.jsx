@@ -63,10 +63,9 @@ export default function VerbChart({ onClose }) {
                 boxShadow: t.cardShadow }}>
                 {/* Verb row — standard borderless card (surface + cardShadow), like everywhere else */}
                 <button onClick={() => tap(v)} className="hk-press"
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "13px 15px",
-                    background: on ? t.primarySoft : t.surface, border: "none", cursor: "pointer", textAlign: "left",
-                    transition: "background 150ms" }}>
-                  <span style={{ fontFamily: JP, fontSize: 28, fontWeight: 700, lineHeight: 1, color: t.ink, flexShrink: 0, minWidth: 56 }}>{v.jp}</span>
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, padding: "16px 15px",
+                    background: t.surface, border: "none", cursor: "pointer", textAlign: "left" }}>
+                  <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, lineHeight: 1, color: t.ink, flexShrink: 0, minWidth: 40 }}>{v.jp}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: on ? t.primary : t.sub, fontFamily: JP, lineHeight: 1.3 }}>{v.r}</div>
                     <div style={{ fontSize: 12.5, fontWeight: 700, color: on ? t.primary : t.faint, fontFamily: DISPLAY, letterSpacing: "0.02em" }}>{v.romaji}</div>
@@ -80,10 +79,10 @@ export default function VerbChart({ onClose }) {
 
                 {/* Conjugation forms */}
                 {on && (
-                  <div style={{ padding: "12px 15px 14px", background: t.bg, borderTop: `1px solid ${t.line}` }}>
+                  <div style={{ padding: "4px 15px 14px", background: t.surface, borderTop: `1px solid ${t.line}` }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {FORMS.map(({ key, romKey, label }) => (
-                        <div key={key} style={{ background: t.surface, borderRadius: 13, padding: "10px 12px",
+                        <div key={key} style={{ background: t.sunk, borderRadius: 13, padding: "10px 12px",
                           border: "none" }}>
                           <div style={{ fontSize: 10, fontWeight: 700, color: t.faint, letterSpacing: "0.1em", marginBottom: 5 }}>{label.toUpperCase()}</div>
                           <div style={{ fontFamily: JP, fontSize: 20, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{v[key]}</div>
