@@ -35,7 +35,8 @@ for text/icons on a filled accent button.
 | `line` | borders/dividers (the signature `1.5px`) | `#E6E9F2` | `#27304C` |
 | `primary` | brand blue — primary actions, "current" | `#1D4FD7` | `#5A85FF` |
 | `primaryDark` | pressed/darker blue | `#1740B0` | `#3D63D8` |
-| `primarySoft` | blue tint fill | `#E9EEFC` | `#1E2A4A` |
+| `primarySoft` | blue tint fill (selected rows, review CTA) | `#CDDBF8` | `#273D6E` |
+| `primaryTint` | lighter blue chip fill (icon chips) | `#E5EDFE` | `#2C4478` |
 | `done` | green — success, completed | `#27A567` | `#34C07C` |
 | `doneSoft` | green tint fill | `#E4F5EC` | `#16301F` |
 | `doneMid` | mid-green (rail fill, done dots) | `#C5EBD5` | `#234C35` |

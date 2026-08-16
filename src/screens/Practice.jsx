@@ -104,7 +104,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   const weakCount = Object.keys(progress.wrong).length;
 
   const modes = [
-    { id: "review", icon: "shuffle", title: "Quick review", sub: "Mix what you know", color: t.primary, soft: t.primarySoft },
+    { id: "review", icon: "shuffle", title: "Quick review", sub: "Mix what you know", color: t.primary, soft: t.primaryTint },
     { id: "weak", icon: "target", title: "Weak spots", sub: weakCount ? `${weakCount} tricky ${weakCount === 1 ? "item" : "items"}` : "Replay your misses", color: t.wrong, soft: t.wrongSoft },
     { id: "speed", icon: "speed", title: "Speed round", sub: "Beat the clock", color: t.gold, soft: t.goldSoft },
     // Listening needs the OS Japanese voice — disable it on devices without one
@@ -183,7 +183,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <button onClick={onOpenChart} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
             borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
-          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
+          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primaryTint,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M9 3v18M3 9h18M3 15h18M15 3v18" /></svg>
           </span>
@@ -196,7 +196,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <button onClick={onOpenVerbChart} className="hk-press"
           style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px",
             borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
-          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
+          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primaryTint,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h10M4 18h13" /></svg>
           </span>
@@ -289,8 +289,8 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
               return (
                 <button key={g.id} onClick={() => toggleNum(g.id)} className="hk-press"
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "12px 14px", borderRadius: 16, cursor: "pointer",
-                    background: on ? t.primarySoft : t.surface, border: `1.5px solid ${on ? t.primary : t.line}`, textAlign: "left" }}>
-                  <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
+                    background: "transparent", border: "none", textAlign: "left" }}>
+                  <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primaryTint,
                     display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: t.primary }}>{g.jp}</span>
                   </span>
@@ -321,8 +321,8 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
             <div key={c.id}>
               <button onClick={() => toggle(i)} className="hk-press"
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "12px 14px", borderRadius: 16, cursor: "pointer",
-                  background: on ? t.primarySoft : t.surface, border: `1.5px solid ${on ? t.primary : t.line}`, textAlign: "left" }}>
-                <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: st === "done" ? t.doneSoft : t.primarySoft,
+                  background: "transparent", border: "none", textAlign: "left" }}>
+                <span style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: st === "done" ? t.doneSoft : t.primaryTint,
                   display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: st === "done" ? t.done : t.primary }}>{c.units[0].jp}</span>
                 </span>
