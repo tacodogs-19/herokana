@@ -158,9 +158,13 @@ export function BottomNav({ active = "Learn", onNav }) {
   const navShadow = mode === "dark" ? "0 10px 30px -6px rgba(0,0,0,0.82)" : "0 12px 28px -5px rgba(30,37,64,0.55)";
   // absolute so content scrolls right to the bottom behind it (no reserved bg strip);
   // tab screens add bottom padding to clear it. Inset from all edges, deep shadow.
+  // Frosted glass: slightly translucent surface + backdrop blur so content
+  // scrolling underneath softly shows through.
+  const navBg = mode === "dark" ? "rgba(26,33,56,0.82)" : "rgba(255,255,255,0.82)";
   return (
     <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(8px + env(safe-area-inset-bottom))", zIndex: 20 }}>
-      <div style={{ display: "flex", background: t.surface, borderRadius: 20, boxShadow: navShadow }}>
+      <div style={{ display: "flex", background: navBg, borderRadius: 20, boxShadow: navShadow,
+        backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
         {["Learn", "Practice", "Scenes", "Profile"].map((label) => {
           const on = label === active;
           const c = on ? t.primary : t.faint;
