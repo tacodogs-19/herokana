@@ -1,12 +1,12 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, Modal, Text, Card, Button, StickyHeader } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Card, Button, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, onHeaderScroll] = useHeaderScroll();
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
   const days = ["M", "T", "W", "T", "F", "S", "S"];
@@ -35,7 +35,7 @@ function ProfileBody({ onEditProfile, onReset }) {
   );
 
   return (
-    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+    <div onScroll={onHeaderScroll}
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />

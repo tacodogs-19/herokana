@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS, NUMBER_GROUPS } from "../data";
-import { Shell, Text, StickyHeader } from "../components/chrome.jsx";
+import { Shell, Text, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
 import { useJaVoice } from "../speech.js";
 
 const PModeIcon = ({ name, c }) => {
@@ -39,7 +39,7 @@ const MODE_COUNT = 10; // the one-tap practice modes use a fixed round size — 
 
 function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   const { t } = useTheme();
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, onHeaderScroll] = useHeaderScroll();
   const progress = useProgress();
   const [picked, setPicked] = React.useState(() => loadSessionSet("hk-prac-chapters"));
   const [themes, setThemes] = React.useState(loadSessionThemes);
@@ -172,7 +172,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   );
 
   return (
-    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+    <div onScroll={onHeaderScroll}
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />

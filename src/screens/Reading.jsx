@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Modal, Text, StickyHeader } from "../components/chrome.jsx";
+import { Shell, Modal, Text, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
 import { READING_PACKS, readingUnlocked, readingGate } from "../reading.js";
 import { dialoguesForPack } from "../dialogue.js";
 
@@ -166,7 +166,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
 
 function ReadingBody({ onOpenPack }) {
   const { t } = useTheme();
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, onHeaderScroll] = useHeaderScroll();
   const progress = useProgress();
   const unlocked = readingUnlocked(progress);
   // survives the trip into a pack and back (the screen remounts); resets on a
@@ -191,7 +191,7 @@ function ReadingBody({ onOpenPack }) {
   const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
 
   return (
-    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+    <div onScroll={onHeaderScroll}
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />

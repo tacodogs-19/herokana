@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, Modal, Text, Button, StickyHeader } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Button, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
@@ -230,7 +230,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
 function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
   const { t } = useTheme();
-  const [scrolled, setScrolled] = React.useState(false);
+  const [scrolled, onHeaderScroll] = useHeaderScroll();
   const progress = useProgress();
   const hard = progress.hard;
   const isAlpha = (i) => !BANKS[CHAPTERS[i].id];
@@ -456,7 +456,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   };
 
   return (
-    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+    <div onScroll={onHeaderScroll}
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />

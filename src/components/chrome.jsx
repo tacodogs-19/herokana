@@ -25,6 +25,20 @@ export function Text({ variant = "body", as: Tag = "p", color, style, children, 
   );
 }
 
+// Drives StickyHeader's compact state from a scroll box's onScroll. Hysteresis
+// (on above 30, off below 6) is deliberate: the header shrinks ~20px when
+// compact, which — being in the sticky flow — shifts scrollTop back via scroll
+// anchoring. A single threshold would let that shift re-cross the line and the
+// header would oscillate; a dead-zone wider than the height change stops it.
+export function useHeaderScroll() {
+  const [scrolled, setScrolled] = React.useState(false);
+  const onScroll = React.useCallback((e) => {
+    const y = e.currentTarget.scrollTop;
+    setScrolled((s) => (y > 30 ? true : y < 6 ? false : s));
+  }, []);
+  return [scrolled, onScroll];
+}
+
 // ── StickyHeader ─────────────────────────────────────────────────────────────
 // The cat + screen title row. Transparent and roomy at the top of the page;
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
