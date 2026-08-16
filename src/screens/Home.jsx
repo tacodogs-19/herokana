@@ -198,7 +198,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
               <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden", marginBottom: 12 }}>
                 <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: ringCta, transition: "width 500ms ease" }} />
               </div>
-              <div style={{ display: "grid", gap: 8, gridTemplateColumns: `repeat(${BANKS[chapter.id] ? 4 : 5}, minmax(0, 1fr))` }}>
+              <div style={{ display: "grid", gap: 8, gridTemplateColumns: `repeat(4, minmax(0, 1fr))` }}>
                 {chapter.units.map((u, i) => {
                   const ust = i < doneCount ? "done" : i === doneCount && st === "current" ? "current" : "locked";
                   return <UnitChip key={i} unit={u} st={ust} t={t} onClick={() => ust !== "locked" && onStart(chapterIdx, i)} />;

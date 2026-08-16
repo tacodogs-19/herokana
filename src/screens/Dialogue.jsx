@@ -273,8 +273,8 @@ function DialogueBody({ dialogueId, onExit }) {
           <div style={{ display: "grid", gap: 9 }}>
             {line.options.map((o) => (
               <button key={o} onClick={() => choose(o)} className="hk-press"
-                style={{ width: "100%", padding: "13px 14px", borderRadius: 14, cursor: "pointer", textAlign: "left",
-                  background: t.surface, border: `1.5px solid ${t.line}`, color: t.ink, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 700 }}>
+                style={{ width: "100%", padding: "14px 14px", borderRadius: 14, cursor: "pointer", textAlign: "left",
+                  background: t.surface, border: "none", boxShadow: t.cardShadow, color: t.ink, fontFamily: DISPLAY, fontSize: 14.5, fontWeight: 700 }}>
                 {o}
               </button>
             ))}
