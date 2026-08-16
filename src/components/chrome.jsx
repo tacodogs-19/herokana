@@ -45,18 +45,18 @@ export function useHeaderScroll() {
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
 export function StickyHeader({ scrolled, children }) {
-  const { t } = useTheme();
+  const { t, mode } = useTheme();
   // On scroll the header frosts: a backdrop-blur layer whose background ramps
   // from solid t.bg at the top (seamless with the status bar) into a translucent
-  // frost, then a mask fades its bottom edge so there's no hard line over the
-  // scrolling content. The content row sits above it, unmasked and crisp.
+  // frost. The bottom is a crisp, defined edge (soft shadow), not a fade. The
+  // content row sits above it, crisp.
   const frostBg = `linear-gradient(to bottom, ${t.bg} 0%, ${t.bg} 32%, color-mix(in srgb, ${t.bg} 62%, transparent) 100%)`;
-  const frostMask = "linear-gradient(to bottom, #000 0%, #000 76%, transparent 100%)";
+  const shadow = mode === "dark" ? "0 6px 18px -8px rgba(0,0,0,0.6)" : "0 6px 18px -8px rgba(7,15,36,0.22)";
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px" }}>
       <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none",
         background: frostBg, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-        WebkitMaskImage: frostMask, maskImage: frostMask,
+        boxShadow: scrolled ? shadow : "none",
         opacity: scrolled ? 1 : 0, transition: "opacity 220ms ease" }} />
       <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 9,
         padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
