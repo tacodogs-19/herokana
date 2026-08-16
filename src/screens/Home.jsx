@@ -202,7 +202,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
                 })}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 2px 4px" }}>
-                <p style={{ margin: 0, flex: 1, fontSize: 11.5, color: t.sub }}>
+                <p style={{ margin: 0, flex: 1, fontSize: 11.5, fontWeight: 600, color: t.sub }}>
                   Tap a unit to jump straight in · score 80% to mark it complete.
                 </p>
                 {canReset && (
