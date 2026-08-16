@@ -472,7 +472,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
   return (
     <div onScroll={onHeaderScroll}
-      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
+      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>HeroKana</span>
@@ -481,6 +481,16 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
       </StickyHeader>
+
+      {/* Content sits on a white pane with concave (inverse) top corners that
+          tuck under the grey header. The header/status-bar strip stays grey and
+          seamless; the corners only need the header↔pane colour contrast. */}
+      <div style={{ position: "relative", margin: "0 -20px", padding: "22px 20px calc(94px + env(safe-area-inset-bottom))",
+        background: t.surface, minHeight: "calc(100dvh - 130px)" }}>
+        <span aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, width: 20, height: 20, background: t.bg,
+          WebkitMaskImage: "radial-gradient(circle at 100% 100%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 100% 100%, transparent 0 20px, #000 20px)" }} />
+        <span aria-hidden="true" style={{ position: "absolute", top: 0, right: 0, width: 20, height: 20, background: t.bg,
+          WebkitMaskImage: "radial-gradient(circle at 0% 100%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 0% 100%, transparent 0 20px, #000 20px)" }} />
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
@@ -599,6 +609,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             </div>
           ))}
         </div>
+      </div>
       </div>
 
 
