@@ -50,7 +50,7 @@ export function StickyHeader({ scrolled, children }) {
   // from solid t.bg at the top (seamless with the status bar) into a translucent
   // frost. The bottom is a crisp, defined edge (soft shadow), not a fade. The
   // content row sits above it, crisp.
-  const frostBg = `linear-gradient(to bottom, ${t.bg} 0%, ${t.bg} 32%, color-mix(in srgb, ${t.bg} 62%, transparent) 100%)`;
+  const frostBg = `linear-gradient(to bottom, ${t.bg} 0%, ${t.bg} 32%, color-mix(in srgb, ${t.bg} 80%, transparent) 100%)`;
   const shadow = mode === "dark" ? "0 6px 18px -8px rgba(0,0,0,0.6)" : "0 6px 18px -8px rgba(7,15,36,0.22)";
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px" }}>
