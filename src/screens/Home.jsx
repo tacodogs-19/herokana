@@ -472,7 +472,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
   return (
     <div onScroll={onHeaderScroll}
-      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px" }}>
+      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>HeroKana</span>
@@ -481,11 +481,6 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
       </StickyHeader>
-
-      {/* Content sits on a white pane; the concave corners that tuck it under
-          the header live on the header itself (so they stay pinned on scroll). */}
-      <div style={{ position: "relative", margin: "0 -20px", padding: "22px 20px calc(94px + env(safe-area-inset-bottom))",
-        background: t.surface, minHeight: "calc(100dvh - 130px)" }}>
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
@@ -605,7 +600,6 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
           ))}
         </div>
       </div>
-      </div>
 
 
       {resetTarget != null && (
@@ -646,5 +640,5 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 }
 
 export default function Home({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenVerbChart }) {
-  return <Shell active="Learn" onNav={onNav}><HomeBody onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} onOpenVerbChart={onOpenVerbChart} /></Shell>;
+  return <Shell active="Learn" onNav={onNav} whiteTop><HomeBody onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} onOpenVerbChart={onOpenVerbChart} /></Shell>;
 }
