@@ -29,7 +29,7 @@ for text/icons on a filled accent button.
 | `surface` | cards, sheets, buttons | `#FFFFFF` | `#1A2138` |
 | `sunk` | inset wells, tracks, segmented bg | `#EEF1F7` | `#141A2C` |
 | `raise` | raised surface (rarely used) | `#FFFFFF` | `#222B45` |
-| `ink` | primary text | `#1E2540` | `#F0F2F8` |
+| `ink` | primary text | `#070F24` | `#F0F2F8` |
 | `sub` | secondary text | `#71789A` | `#9098B8` |
 | `faint` | tertiary text, inactive icons | `#AAB0C6` | `#5A6286` |
 | `line` | borders/dividers (the signature `1.5px`) | `#E6E9F2` | `#27304C` |
