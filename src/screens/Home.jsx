@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, Modal, Text, Button } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Button, StickyHeader } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 function UnitChip({ unit, st, t, onClick }) {
@@ -229,10 +229,8 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 }
 
 function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
-  const { t, mode } = useTheme();
+  const { t } = useTheme();
   const [scrolled, setScrolled] = React.useState(false);
-  // sticky header: transparent at the top, gains bg + shadow + tighter padding on scroll
-  const headerShadow = mode === "dark" ? "0 6px 18px -8px rgba(0,0,0,0.6)" : "0 6px 18px -8px rgba(7,15,36,0.22)";
   const progress = useProgress();
   const hard = progress.hard;
   const isAlpha = (i) => !BANKS[CHAPTERS[i].id];
@@ -460,17 +458,14 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   return (
     <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px", display: "flex", alignItems: "center", gap: 9,
-        padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
-        background: scrolled ? t.bg : "transparent", boxShadow: scrolled ? headerShadow : "none",
-        transition: "padding 220ms var(--ease-out-quart), box-shadow 220ms ease, background 220ms ease" }}>
+      <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>HeroKana</span>
         {hard && (
           <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: t.wrong,
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
-      </div>
+      </StickyHeader>
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className="hk-press"

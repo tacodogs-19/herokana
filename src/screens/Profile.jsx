@@ -1,11 +1,12 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, Modal, Text, Card, Button } from "../components/chrome.jsx";
+import { Shell, Ring, Modal, Text, Card, Button, StickyHeader } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
 function ProfileBody({ onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
+  const [scrolled, setScrolled] = React.useState(false);
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
   const days = ["M", "T", "W", "T", "F", "S", "S"];
@@ -34,11 +35,12 @@ function ProfileBody({ onEditProfile, onReset }) {
   );
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px calc(94px + env(safe-area-inset-bottom))" }}>
-      <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
+      <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
-      </header>
+      </StickyHeader>
 
       {/* overall + level */}
       <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 11px" }}>YOUR PROGRESS</Text>

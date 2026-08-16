@@ -25,6 +25,24 @@ export function Text({ variant = "body", as: Tag = "p", color, style, children, 
   );
 }
 
+// ── StickyHeader ─────────────────────────────────────────────────────────────
+// The cat + screen title row. Transparent and roomy at the top of the page;
+// on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
+// compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
+// the scroll box must have paddingTop 0 so the header sits flush at the top.
+export function StickyHeader({ scrolled, children }) {
+  const { t, mode } = useTheme();
+  const shadow = mode === "dark" ? "0 6px 18px -8px rgba(0,0,0,0.6)" : "0 6px 18px -8px rgba(7,15,36,0.22)";
+  return (
+    <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px", display: "flex", alignItems: "center", gap: 9,
+      padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
+      background: scrolled ? t.bg : "transparent", boxShadow: scrolled ? shadow : "none",
+      transition: "padding 220ms var(--ease-out-quart), box-shadow 220ms ease, background 220ms ease" }}>
+      {children}
+    </div>
+  );
+}
+
 // ── Card ────────────────────────────────────────────────────────────────────
 // The app's floating surface: white, rounded, soft lift. One definition so the
 // shadow/shape can't drift per screen. `as="button"` for clickable cards
@@ -197,27 +215,12 @@ export function Modal({ children, onDismiss, position = "center" }) {
 }
 
 // App shell — fills the viewport, phone-width on larger screens.
-export function Shell({ children, active = "Learn", onNav, nav = true, scrollShadow = true, plane = nav }) {
-  const { t, mode } = useTheme();
-  const ref = React.useRef(null);
-  const [scrolled, setScrolled] = React.useState(false);
-  // Capture phase lets us observe each screen's own scroll container without
-  // wiring it up per screen.
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onScroll = (e) => {
-      const top = e.target && e.target.scrollTop;
-      if (typeof top === "number") setScrolled(top > 2);
-    };
-    el.addEventListener("scroll", onScroll, true);
-    return () => el.removeEventListener("scroll", onScroll, true);
-  }, []);
-  const shadowColor = mode === "dark" ? "rgba(0,0,0,0.22)" : "rgba(30,37,64,0.13)";
+export function Shell({ children, active = "Learn", onNav, nav = true, plane = nav }) {
+  const { t } = useTheme();
   return (
     <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: t.bg,
       display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative" }}>
-      <div ref={ref} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens
             read as stacked layers. Gradient runs from bg (seamless with the status bar) DOWN
@@ -233,10 +236,6 @@ export function Shell({ children, active = "Learn", onNav, nav = true, scrollSha
         <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           {children}
         </div>
-        {/* subtle shadow under the status bar, only while scrolled */}
-        <div aria-hidden style={{ position: "absolute", top: "env(safe-area-inset-top)", left: 0, right: 0, height: 12,
-          pointerEvents: "none", zIndex: 5, transition: "opacity 220ms ease", opacity: scrollShadow && scrolled ? 1 : 0,
-          background: `linear-gradient(to bottom, ${shadowColor}, transparent)` }} />
       </div>
       {nav && <BottomNav active={active} onNav={onNav} />}
     </div>

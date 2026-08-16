@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Modal, Text } from "../components/chrome.jsx";
+import { Shell, Modal, Text, StickyHeader } from "../components/chrome.jsx";
 import { READING_PACKS, readingUnlocked, readingGate } from "../reading.js";
 import { dialoguesForPack } from "../dialogue.js";
 
@@ -166,6 +166,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
 
 function ReadingBody({ onOpenPack }) {
   const { t } = useTheme();
+  const [scrolled, setScrolled] = React.useState(false);
   const progress = useProgress();
   const unlocked = readingUnlocked(progress);
   // survives the trip into a pack and back (the screen remounts); resets on a
@@ -190,8 +191,9 @@ function ReadingBody({ onOpenPack }) {
   const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px calc(94px + env(safe-area-inset-bottom))" }}>
-      <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
+    <div onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 6)}
+      style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
+      <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Scenes</h1>
         <div style={{ flex: 1 }} />
@@ -206,7 +208,7 @@ function ReadingBody({ onOpenPack }) {
             <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.04em" }}>RESET</span>
           </button>
         )}
-      </header>
+      </StickyHeader>
 
       <p style={{ margin: "0 0 6px", fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 900, color: t.ink }}>IN THE REAL WORLD</p>
       <Text variant="subtitle" style={{ margin: "0 0 16px" }}>
