@@ -71,7 +71,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
       padding: "20px 20px 20px", boxShadow: t.cardShadow }}>
       <div style={{ display: "flex", alignItems: "center", margin: "8px 0 20px" }}>
         <Text variant="eyebrow" style={{ flex: 1 }}
-          color={st === "current" ? t.primary : st === "done" ? t.done : t.faint}>
+          color={st === "locked" ? t.faint : t.primary}>
           {st === "current" ? (firstUse ? "START YOUR JOURNEY" : "CONTINUE LEARNING") : st === "done" ? "CHAPTER COMPLETE" : "UP AHEAD"}
         </Text>
       </div>
@@ -196,7 +196,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           {expanded && (
             <div className={suppressReveal.current ? "" : "hk-reveal"} style={{ marginTop: 12 }}>
               <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden", marginBottom: 12 }}>
-                <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: accent, transition: "width 500ms ease" }} />
+                <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: ringCta, transition: "width 500ms ease" }} />
               </div>
               <div style={{ display: "grid", gap: 8, gridTemplateColumns: `repeat(${BANKS[chapter.id] ? 4 : 5}, minmax(0, 1fr))` }}>
                 {chapter.units.map((u, i) => {

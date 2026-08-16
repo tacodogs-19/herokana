@@ -116,7 +116,7 @@ function ReadingBody({ packId, slow, onExit }) {
       {/* prompt card — the word + a "you'd see this where" hint. Reveal slot is
           fixed-height so the options below never shift. */}
       <div style={{ position: "relative", background: t.surface, borderRadius: 24, padding: "16px 20px", height: 224, flexShrink: 0,
-        border: `1.5px solid ${answered ? (correct ? t.done : t.wrong) : "transparent"}`, display: "flex", flexDirection: "column", alignItems: "center",
+        border: "none", display: "flex", flexDirection: "column", alignItems: "center",
         gap: 8, boxShadow: t.cardShadow, transition: "border-color 200ms" }}>
         <div style={{ flex: 1, minHeight: 0, width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
           <span style={{ fontFamily: JP, fontSize: q.jp.length > 5 ? 40 : q.jp.length > 3 ? 52 : 64, fontWeight: 700, color: t.ink, lineHeight: 1.2, textAlign: "center" }}>{q.jp}</span>
@@ -153,12 +153,12 @@ function ReadingBody({ packId, slow, onExit }) {
           {q.options.map((o) => {
             const isAns = o === q.answer, isPick = o === picked;
             const bg = !answered ? t.surface : isAns ? t.doneSoft : isPick ? t.wrongSoft : t.surface;
-            const bc = !answered ? t.line : isAns ? t.done : isPick ? t.wrong : t.line;
+            const bc = !answered ? "transparent" : isAns ? t.done : isPick ? t.wrong : "transparent";
             const fg = answered && isAns ? t.done : answered && isPick ? t.wrong : t.ink;
             return (
               <button key={o} onClick={() => choose(o)} className="hk-press" disabled={answered}
                 style={{ padding: "16px 8px", borderRadius: 16, cursor: answered ? "default" : "pointer", background: bg,
-                  border: `2px solid ${bc}`, color: fg, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800 }}>
+                  border: `2px solid ${bc}`, boxShadow: t.cardShadow, color: fg, fontFamily: DISPLAY, fontSize: 15.5, fontWeight: 800 }}>
                 {o}
               </button>
             );
