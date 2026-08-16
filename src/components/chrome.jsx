@@ -45,8 +45,7 @@ export function useHeaderScroll() {
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
 export function StickyHeader({ scrolled, children }) {
-  const { t, mode } = useTheme();
-  const shadow = mode === "dark" ? "0 6px 18px -8px rgba(0,0,0,0.6)" : "0 6px 18px -8px rgba(7,15,36,0.22)";
+  const { t } = useTheme();
   // Solid header (same grey as the status bar / page, so the top strip stays
   // seamless) with concave bottom corners, so a white content pane tucks under
   // it. The corners live on the header, so they hold their place on scroll
@@ -56,8 +55,8 @@ export function StickyHeader({ scrolled, children }) {
     <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px",
       display: "flex", alignItems: "center", gap: 9,
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
-      background: t.chrome, boxShadow: scrolled ? shadow : "none",
-      transition: "padding 220ms var(--ease-out-quart), box-shadow 220ms ease" }}>
+      background: t.chrome,
+      transition: "padding 220ms var(--ease-out-quart)" }}>
       {children}
       <span aria-hidden="true" style={{ position: "absolute", top: "100%", left: 0, width: 20, height: 20, background: t.chrome,
         WebkitMaskImage: notchMask("100% 100%"), maskImage: notchMask("100% 100%") }} />
