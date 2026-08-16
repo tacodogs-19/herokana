@@ -197,10 +197,12 @@ export function BottomNav({ active = "Learn", onNav }) {
   const { t, mode } = useTheme();
   // floating pill: inset from all edges, deep shadow so it reads as lifted off the page
   const navShadow = mode === "dark" ? "0 8px 30px -6px rgba(0,0,0,0.77)" : "0 10px 28px -5px rgba(30,37,64,0.50)";
-  // absolute so content scrolls right to the bottom behind it (no reserved bg strip);
-  // tab screens add bottom padding to clear it. Inset from all edges, deep shadow.
-  // Frosted glass: slightly translucent surface + backdrop blur so content
-  // scrolling underneath softly shows through.
+  // fixed (not absolute) so it anchors to the visual viewport bottom and stays
+  // put — an absolute bar sits at the bottom of the 100dvh Shell, which can
+  // briefly exceed the visible viewport on reload and drop the bar off-screen.
+  // Content scrolls right to the bottom behind it (no reserved bg strip); tab
+  // screens add bottom padding to clear it. Frosted glass: translucent surface +
+  // backdrop blur so content scrolling underneath softly shows through.
   const navBg = mode === "dark" ? "rgba(26,33,56,0.82)" : "rgba(255,255,255,0.82)";
   // Frosted-glass surface shared by both nav segments.
   const frost = { background: navBg, boxShadow: navShadow,
@@ -224,7 +226,7 @@ export function BottomNav({ active = "Learn", onNav }) {
   const onProfile = active === "Profile";
   const H = 54; // fixed nav height so the bar stays put across tabs and the profile circle is round
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
+    <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
       display: "flex", justifyContent: "center", padding: "0 16px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ height: H, minWidth: 264, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
