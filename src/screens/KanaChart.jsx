@@ -238,10 +238,9 @@ export default function KanaChart({ onClose }) {
   });
 
   return (
-    <>
-    <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 1499, background: t.chrome }} />
-    <div style={{ position: "fixed", top: "env(safe-area-inset-top)", right: 0, bottom: 0, left: 0, zIndex: 1500, background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, display: "flex", flexDirection: "column",
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)", display: "flex", flexDirection: "column",
       maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink, animation: "hkFade 160ms ease both" }}>
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
 
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"
@@ -417,7 +416,7 @@ export default function KanaChart({ onClose }) {
           </div>
         )}
       </div>
+      </div>
     </div>
-    </>
   );
 }
