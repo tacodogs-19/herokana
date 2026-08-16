@@ -482,15 +482,10 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         )}
       </StickyHeader>
 
-      {/* Content sits on a white pane with concave (inverse) top corners that
-          tuck under the grey header. The header/status-bar strip stays grey and
-          seamless; the corners only need the header↔pane colour contrast. */}
+      {/* Content sits on a white pane; the concave corners that tuck it under
+          the header live on the header itself (so they stay pinned on scroll). */}
       <div style={{ position: "relative", margin: "0 -20px", padding: "22px 20px calc(94px + env(safe-area-inset-bottom))",
         background: t.surface, minHeight: "calc(100dvh - 130px)" }}>
-        <span aria-hidden="true" style={{ position: "absolute", top: 0, left: 0, width: 20, height: 20, background: t.bg,
-          WebkitMaskImage: "radial-gradient(circle at 100% 100%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 100% 100%, transparent 0 20px, #000 20px)" }} />
-        <span aria-hidden="true" style={{ position: "absolute", top: 0, right: 0, width: 20, height: 20, background: t.bg,
-          WebkitMaskImage: "radial-gradient(circle at 0% 100%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 0% 100%, transparent 0 20px, #000 20px)" }} />
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
@@ -559,7 +554,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
               <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start",
                 minWidth: "100%", width: "max-content", padding: "8px 0 4px" }}>
                 {/* white track under the not-yet-complete stops; green fill covers the completed part on top */}
-                <div style={{ position: "absolute", top: 32, left: 35.5, right: 35.5, height: 2, borderRadius: 2, background: t.surface }} />
+                <div style={{ position: "absolute", top: 32, left: 35.5, right: 35.5, height: 2, borderRadius: 2, background: t.line }} />
                 <div style={{ position: "absolute", top: 32, left: 35.5, height: 2, borderRadius: 2, background: t.doneMid,
                   width: `calc((100% - 71px) * ${fillPos} / ${Math.max(1, railIdx.length - 1)})` }} />
                 {railIdx.map((i) => {
@@ -572,7 +567,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                     return "locked";
                   })();
                   const on = i === sel;
-                  const dotBg = cst === "done" ? t.doneMid : cst === "current" ? t.primary : t.surface;
+                  const dotBg = cst === "done" ? t.doneMid : cst === "current" ? t.primary : t.sunk;
                   const dotBorder = cst === "done" ? t.doneMid : dotBg;
                   return (
                     <button key={c.id} data-rail={i} onClick={() => pick(i)} className="hk-press"
