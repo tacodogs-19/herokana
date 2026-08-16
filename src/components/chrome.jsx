@@ -203,22 +203,40 @@ export function BottomNav({ active = "Learn", onNav }) {
   // Frosted glass: slightly translucent surface + backdrop blur so content
   // scrolling underneath softly shows through.
   const navBg = mode === "dark" ? "rgba(26,33,56,0.82)" : "rgba(255,255,255,0.82)";
+  // Frosted-glass surface shared by both nav segments.
+  const frost = { background: navBg, boxShadow: navShadow,
+    backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" };
+  // Google-Photos-style bar: inactive destinations are a bare label; the active
+  // one morphs into a filled pill with its icon. Profile is pulled out into its
+  // own frosted circle on the right (their Search).
+  const tab = (label) => {
+    const on = label === active;
+    return (
+      <button key={label} onClick={() => onNav && onNav(label)} className="hk-press"
+        style={{ display: "flex", alignItems: "center", gap: on ? 7 : 0, cursor: "pointer", border: "none",
+          background: on ? t.primaryTint : "transparent", borderRadius: 999,
+          padding: on ? "9px 15px" : "9px 10px", transition: "background 200ms var(--ease-out-quart)" }}>
+        {on && <NavIcon name={label} active c={t.primary} />}
+        <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: on ? t.primary : t.sub,
+          fontFamily: DISPLAY, whiteSpace: "nowrap" }}>{label}</span>
+      </button>
+    );
+  };
+  const onProfile = active === "Profile";
+  const H = 54; // fixed nav height so the bar stays put across tabs and the profile circle is round
   return (
-    <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20 }}>
-      <div style={{ display: "flex", background: navBg, borderRadius: 20, boxShadow: navShadow,
-        backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
-        {["Learn", "Practice", "Scenes", "Profile"].map((label) => {
-          const on = label === active;
-          const c = on ? t.primary : t.faint;
-          return (
-            <button key={label} onClick={() => onNav && onNav(label)} className="hk-press" style={{ flex: 1, padding: "12px 0 11px",
-              background: "transparent", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-              <NavIcon name={label} active={on} c={c} />
-              <span style={{ fontSize: 11, fontWeight: on ? 700 : 500, color: c, fontFamily: DISPLAY }}>{label}</span>
-            </button>
-          );
-        })}
+    <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
+      display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ flex: 1, height: H, display: "flex", alignItems: "center", justifyContent: "space-evenly",
+        borderRadius: 999, padding: "0 6px", ...frost }}>
+        {["Learn", "Practice", "Scenes"].map(tab)}
       </div>
+      <button onClick={() => onNav && onNav("Profile")} className="hk-press" aria-label="Profile"
+        style={{ width: H, height: H, flexShrink: 0, borderRadius: "50%", border: "none", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          ...frost, ...(onProfile && { background: t.primaryTint }) }}>
+        <NavIcon name="Profile" active={onProfile} c={onProfile ? t.primary : t.faint} />
+      </button>
     </div>
   );
 }
