@@ -79,7 +79,7 @@ export default function VerbChart({ onClose }) {
 
                 {/* Conjugation forms */}
                 {on && (
-                  <div style={{ padding: "4px 15px 14px", background: t.surface, borderTop: `1px solid ${t.line}` }}>
+                  <div style={{ padding: "14px 15px 14px", background: t.surface, borderTop: `1px solid ${t.line}` }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {FORMS.map(({ key, romKey, label }) => (
                         <div key={key} style={{ background: t.sunk, borderRadius: 13, padding: "10px 12px",

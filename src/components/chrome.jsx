@@ -155,10 +155,12 @@ function NavIcon({ name, active, c }) {
 export function BottomNav({ active = "Learn", onNav }) {
   const { t, mode } = useTheme();
   // floating pill: inset from all edges, deep shadow so it reads as lifted off the page
-  const navShadow = mode === "dark" ? "0 10px 34px -6px rgba(0,0,0,0.65)" : "0 12px 34px -8px rgba(30,37,64,0.30)";
+  const navShadow = mode === "dark" ? "0 10px 32px -6px rgba(0,0,0,0.72)" : "0 12px 30px -6px rgba(30,37,64,0.42)";
+  // absolute so content scrolls right to the bottom behind it (no reserved bg strip);
+  // tab screens add bottom padding to clear it. Inset from all edges, deep shadow.
   return (
-    <div style={{ flexShrink: 0, padding: "8px 16px", marginBottom: "calc(6px + env(safe-area-inset-bottom))" }}>
-      <div style={{ display: "flex", background: t.surface, borderRadius: 26, boxShadow: navShadow }}>
+    <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(8px + env(safe-area-inset-bottom))", zIndex: 20 }}>
+      <div style={{ display: "flex", background: t.surface, borderRadius: 20, boxShadow: navShadow }}>
         {["Learn", "Practice", "Scenes", "Profile"].map((label) => {
           const on = label === active;
           const c = on ? t.primary : t.faint;
@@ -210,7 +212,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, scrollSha
   const shadowColor = mode === "dark" ? "rgba(0,0,0,0.22)" : "rgba(30,37,64,0.13)";
   return (
     <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: t.bg,
-      display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden" }}>
+      display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative" }}>
       <div ref={ref} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens

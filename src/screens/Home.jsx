@@ -65,7 +65,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
   return (
     <div style={{ background: t.surface, border: "none", borderRadius: 26,
-      padding: "20px 20px 18px", boxShadow: t.cardShadow }}>
+      padding: "20px 20px 20px", boxShadow: t.cardShadow }}>
       <div style={{ display: "flex", alignItems: "center", margin: "8px 0 20px" }}>
         <Text variant="eyebrow" style={{ flex: 1 }}
           color={st === "current" ? t.primary : st === "done" ? t.done : t.faint}>
@@ -176,7 +176,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
       {st !== "locked" && (
         <>
           <button onClick={() => setExpanded((e) => !e)} className="hk-press"
-            style={{ width: "100%", marginTop: 12, paddingTop: 13, borderTop: `1px solid ${t.line}`, background: "transparent",
+            style={{ width: "100%", marginTop: 16, padding: "20px 0 0", borderTop: `1px solid ${t.line}`, background: "transparent",
               borderLeft: "none", borderRight: "none", borderBottom: "none", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "space-between", color: t.ink }}>
             <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -201,7 +201,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
                   return <UnitChip key={i} unit={u} st={ust} t={t} onClick={() => ust !== "locked" && onStart(chapterIdx, i)} />;
                 })}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "11px 2px 0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 2px 4px" }}>
                 <p style={{ margin: 0, flex: 1, fontSize: 11.5, color: t.sub }}>
                   Tap a unit to jump straight in · score 80% to mark it complete.
                 </p>
@@ -452,7 +452,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   };
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 22px" }}>
+    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
         <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>HeroKana</span>
