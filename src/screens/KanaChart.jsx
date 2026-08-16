@@ -238,10 +238,12 @@ export default function KanaChart({ onClose }) {
   });
 
   return (
-    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, display: "flex", flexDirection: "column",
+    <>
+    <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 1499, background: t.chrome }} />
+    <div style={{ position: "fixed", top: "env(safe-area-inset-top)", right: 0, bottom: 0, left: 0, zIndex: 1500, background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, display: "flex", flexDirection: "column",
       maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink, animation: "hkFade 160ms ease both" }}>
 
-      <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "calc(14px + env(safe-area-inset-top)) 20px 12px" }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"
           style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0, display: "flex" }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
@@ -416,5 +418,6 @@ export default function KanaChart({ onClose }) {
         )}
       </div>
     </div>
+    </>
   );
 }
