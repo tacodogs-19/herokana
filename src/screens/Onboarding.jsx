@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { saveProfile, COUNTRIES, HOBBIES } from "../data";
-import { Shell, Cat, Button } from "../components/chrome.jsx";
+import { Shell, Button } from "../components/chrome.jsx";
 
 // First-run (and editable) questionnaire — one question per page, skippable at
 // any stage. Answers personalise the Sentences "About me" and "Likes" units.
@@ -103,7 +103,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
 
   const steps = [
     {
-      key: "name", title: "What's your name?", cat: "general",
+      key: "name", title: "What's your name?",
       blurb: "We'll use it in sentences like “My name is …”.",
       render: () => (
         <input value={data.name} onChange={(e) => set("name", e.target.value.slice(0, 24))} autoFocus
@@ -112,17 +112,17 @@ function OnboardingBody({ initial, onDone, registerBack }) {
       ),
     },
     {
-      key: "dob", title: "When's your birthday?", cat: "load",
+      key: "dob", title: "When's your birthday?",
       blurb: "So “I am … years old” always matches your age.",
       render: () => <DobInput t={t} value={data.dob} onChange={(v) => set("dob", v)} />,
     },
     {
-      key: "country", title: "Where are you from?", cat: "run",
+      key: "country", title: "Where are you from?",
       blurb: "For sentences like “I'm from …”.",
       render: () => <Chips t={t} options={COUNTRY_OPTS} value={data.country} onChange={(v) => set("country", v)} />,
     },
     {
-      key: "pets", title: "Do you have any pets?", cat: "smash",
+      key: "pets", title: "Do you have any pets?",
       blurb: "We'll mention them when you talk about yourself.",
       render: () => <Chips t={t} options={[
         { id: "cat", label: "Cat" }, { id: "dog", label: "Dog" },
@@ -130,14 +130,14 @@ function OnboardingBody({ initial, onDone, registerBack }) {
       ]} value={data.pets} onChange={(v) => set("pets", v)} />,
     },
     {
-      key: "occupation", title: "Do you study or work?", cat: "point",
+      key: "occupation", title: "Do you study or work?",
       blurb: "For “I am a student” / “I work”.",
       render: () => <Chips t={t} options={[
         { id: "study", label: "I study" }, { id: "work", label: "I work" },
       ]} value={data.occupation} onChange={(v) => set("occupation", v)} />,
     },
     {
-      key: "hobby", title: "What do you enjoy?", cat: "crossed",
+      key: "hobby", title: "What do you enjoy?",
       blurb: "Pick any you like — we'll lead the Likes unit with them.",
       render: () => <ChipsMulti t={t} options={HOBBY_OPTS} values={data.hobbies} onToggle={toggleHobby} />,
     },
@@ -179,9 +179,6 @@ function OnboardingBody({ initial, onDone, registerBack }) {
       </div>
 
       <div style={{ flex: 1 }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
-          <Cat key={cur.cat} mood={cur.cat} size={132} style={{ animation: "hkReveal 280ms var(--ease-out) both" }} />
-        </div>
         <p style={{ margin: 0, fontSize: 11.5, letterSpacing: "0.14em", fontWeight: 900, color: t.ink }}>
           ABOUT YOU · {step + 1} OF {steps.length}
         </p>
