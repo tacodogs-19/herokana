@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 // loads. performance.now() here is ms since navigation start.
 const splash = document.getElementById("splash");
 if (splash) {
-  const wait = Math.max(0, 1000 - performance.now());
+  const wait = Math.max(0, 1500 - performance.now());
   setTimeout(() => {
     splash.classList.add("hk-splash-hide");
     setTimeout(() => splash.remove(), 450);
