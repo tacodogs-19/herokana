@@ -36,7 +36,7 @@ function ProfileBody({ onEditProfile, onReset }) {
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-        <img src="/assets/cat-header.png" alt="" aria-hidden="true" style={{ width: 28, height: 28, flexShrink: 0 }} />
+        <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
       </header>
 
