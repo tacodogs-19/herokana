@@ -30,6 +30,11 @@ if (splash) {
   const wait = Math.max(0, 1500 - performance.now());
   setTimeout(() => {
     splash.classList.add("hk-splash-hide");
+    // Signal the Learn screen to play its entrance as the splash crossfades out.
+    window.__hkSplashHidden = true;
+    window.dispatchEvent(new Event("hk-splash-hidden"));
     setTimeout(() => splash.remove(), 450);
   }, wait);
+} else {
+  window.__hkSplashHidden = true;
 }

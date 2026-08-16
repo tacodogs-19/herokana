@@ -54,6 +54,14 @@ button, input { font-family: inherit; }
   100% { transform: translateX(0); }
 }
 
+/* Learn first-load entrance — sections rise + crossfade, staggered via --i.
+   Fires when the splash lifts (main.jsx dispatches hk-splash-hidden), not on
+   mount, so it isn't spent behind the splash. */
+.hk-enter {
+  animation: hkEnter 520ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
 /* answer option entrance — staggered via --i custom property */
 .hk-opt-enter {
   animation: hkOptIn 300ms var(--ease-out-expo) both;

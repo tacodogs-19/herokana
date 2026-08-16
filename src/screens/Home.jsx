@@ -5,6 +5,10 @@ import { CHAPTERS, BANKS } from "../data";
 import { Shell, Ring, Modal, Text, Button, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
+// Play the Learn entrance once per app load — and only after the splash has
+// lifted (main.jsx dispatches hk-splash-hidden), so it isn't spent behind it.
+let homeEntered = false;
+
 function UnitChip({ unit, st, t, onClick }) {
   // Completed units are an INACTIVE state — they carry no fill colour (product
   // register bans heavy colour on inactive states). Neutral tile + crisp ink
@@ -249,6 +253,17 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   const [resetTarget, setResetTarget] = React.useState(null);
   const hardUnlocked = progress.trackComplete;
 
+  // Entrance: rise + crossfade the content in when the splash lifts.
+  const [anim, setAnim] = React.useState(() => !homeEntered && window.__hkSplashHidden === true);
+  React.useEffect(() => {
+    if (homeEntered) return;
+    if (anim) { homeEntered = true; return; } // splash already gone (e.g. after onboarding)
+    const on = () => { homeEntered = true; setAnim(true); };
+    window.addEventListener("hk-splash-hidden", on, { once: true });
+    return () => window.removeEventListener("hk-splash-hidden", on);
+  }, []); // eslint-disable-line
+  const enterCls = anim ? "hk-enter" : "";
+
   React.useEffect(() => { try { localStorage.setItem("hk-home-sel", String(sel)); } catch (e) {} }, [sel]);
   React.useEffect(() => {
     if (hard) setSel(currentChapterIdx);
@@ -468,8 +483,8 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       </StickyHeader>
 
       {progress.reviewDue > 0 && (
-        <button onClick={onStartReview} className="hk-press"
-          style={{ width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginBottom: 36,
+        <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
+          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginBottom: 36,
             borderRadius: 18, cursor: "pointer", background: t.primarySoft, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.surface,
             alignItems: "center", justifyContent: "center" }}>
@@ -485,7 +500,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         </button>
       )}
 
-      <div style={{ margin: "0 0 20px" }}>
+      <div className={enterCls} style={{ "--i": 1, margin: "0 0 20px" }}>
         <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
 
         {hardUnlocked && (
@@ -575,7 +590,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       {/* Bottom padding gives the card's soft lift room inside this overflow:hidden clip box
           (height is pinned to slot.scrollHeight, which now includes the padding, so the pin
           stays consistent). Negative margin cancels it so surrounding layout is unchanged. */}
-      <div ref={containerRef} style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", margin: "0 -20px -58px" }}
+      <div ref={containerRef} className={enterCls} style={{ "--i": 2, overflow: "hidden", touchAction: "pan-y", userSelect: "none", margin: "0 -20px -58px" }}
         {...touchHandlers} {...mouseHandlers}>
         <div ref={trackRef} style={{ display: "flex", width: "300%", alignItems: "flex-start", willChange: "transform" }}>
           {[prevIdx, sel, nextIdx].map((idx, i) => (
