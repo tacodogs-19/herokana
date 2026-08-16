@@ -58,6 +58,9 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
   const unit = st === "done" ? chapter.units[chapter.units.length - 1] : chapter.units[Math.min(doneCount, chapter.units.length - 1)];
   const accent = st === "done" ? t.done : st === "current" ? t.primary : t.lock;
+  // ring + primary CTA stay blue even on a completed chapter (green is reserved for
+  // the "what's in this chapter" section — pill, bar, unit ticks)
+  const ringCta = st === "locked" ? t.lock : t.primary;
   const upNext = chapter.units.slice(doneCount + 1, doneCount + 3);
   const firstUse = !hard && progress.totalDone === 0 && progress.answered === 0;
   const canReset = doneCount > 0 && !(hard && isAlpha(chapterIdx));
@@ -74,7 +77,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, margin: "0 0 4px" }}>
-        <Ring size={164} stroke={12} pct={st === "locked" ? 0 : cpct} color={accent} track={t.sunk}>
+        <Ring size={164} stroke={12} pct={st === "locked" ? 0 : cpct} color={ringCta} track={t.sunk}>
           {st === "locked"
             ? <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="1.8"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" /></svg>
             : <span style={{ fontFamily: JP, fontSize: 68, fontWeight: 700, color: t.ink, lineHeight: 1 }}>{unit.jp}</span>}
@@ -102,7 +105,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         </div>
       </div>
 
-      <Button color={accent} disabled={st === "locked"}
+      <Button color={ringCta} disabled={st === "locked"}
         onClick={() => st !== "locked" && (st === "done" ? onReviewChapter(chapterIdx) : onStart(chapterIdx))}
         style={{ width: "100%", marginTop: 12, padding: "15px", borderRadius: 16, fontSize: 16,
           ...(st === "locked" && { background: t.sunk, color: t.faint, boxShadow: "none", cursor: "default" }) }}>
