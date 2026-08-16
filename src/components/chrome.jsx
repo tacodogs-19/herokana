@@ -162,7 +162,7 @@ export function BottomNav({ active = "Learn", onNav }) {
   // scrolling underneath softly shows through.
   const navBg = mode === "dark" ? "rgba(26,33,56,0.82)" : "rgba(255,255,255,0.82)";
   return (
-    <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(8px + env(safe-area-inset-bottom))", zIndex: 20 }}>
+    <div style={{ position: "absolute", left: 16, right: 16, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20 }}>
       <div style={{ display: "flex", background: navBg, borderRadius: 20, boxShadow: navShadow,
         backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
         {["Learn", "Practice", "Scenes", "Profile"].map((label) => {
