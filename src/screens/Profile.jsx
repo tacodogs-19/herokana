@@ -43,7 +43,7 @@ function ProfileBody({ onEditProfile, onReset }) {
       </StickyHeader>
 
       {/* overall + level */}
-      <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 11px" }}>YOUR PROGRESS</Text>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
         <div style={{ flex: 1, background: t.surface, border: "none", borderRadius: 20, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: t.cardShadow }}>
           {(() => {

@@ -34,7 +34,7 @@ export default defineConfig({
         lang: "en",
         categories: ["education"],
         prefer_related_applications: false,
-        background_color: "#0e4fb0",
+        background_color: "#F3F5FA",
         // Light default; the runtime swaps the live theme-color meta per theme so
         // the standalone status bar matches the app in both light and dark.
         theme_color: "#F3F5FA",

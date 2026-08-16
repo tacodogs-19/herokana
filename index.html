@@ -35,13 +35,46 @@
   </head>
   <body>
     <style>
-      /* html/body track the resolved theme so no light strip shows at the top.
-         No loading screen (owner call, 2026-07): while React mounts — including
-         the reload after accepting an update — the page is just the themed
-         background. The TWA/OS splash covers cold launches. */
+      /* html/body track the resolved theme so no light strip shows at the top. */
       html, body { background: var(--hk-bg, #f3f5fa); }
+
+      /* In-page splash: themed background + masked cat with a loading ring,
+         shown until React mounts (main.jsx fades it out). Bg follows the live
+         theme, so it matches the app background in both light and dark. */
+      #splash {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--hk-bg, #f3f5fa);
+        transition: opacity 0.4s ease;
+      }
+      #splash.hk-splash-hide { opacity: 0; pointer-events: none; }
+      .splash-stage { position: relative; width: 128px; height: 128px; display: grid; place-items: center; }
+      .splash-cat { width: 58px; height: 58px; }
+      .splash-ring { position: absolute; inset: 0; width: 128px; height: 128px; animation: hk-spin 1.4s linear infinite; }
+      .splash-ring circle { fill: none; stroke-width: 2.6; }
+      .splash-track { stroke: rgba(29, 79, 215, 0.13); }
+      .splash-arc { stroke: #1d4fd7; stroke-linecap: round; transform-origin: center; animation: hk-dash 1.4s ease-in-out infinite; }
+      @keyframes hk-spin { 100% { transform: rotate(360deg); } }
+      @keyframes hk-dash {
+        0%   { stroke-dasharray: 1 132; stroke-dashoffset: 0; }
+        50%  { stroke-dasharray: 90 132; stroke-dashoffset: -20; }
+        100% { stroke-dasharray: 90 132; stroke-dashoffset: -122; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .splash-ring { animation: none; }
+        .splash-arc { animation: none; stroke-dasharray: 90 132; }
+      }
     </style>
     <div id="root"></div>
+    <div id="splash" aria-hidden="true">
+      <div class="splash-stage">
+        <img class="splash-cat" src="/assets/cat-header.svg" alt="" />
+        <svg class="splash-ring" viewBox="0 0 50 50">
+          <circle class="splash-track" cx="25" cy="25" r="21" />
+          <circle class="splash-arc" cx="25" cy="25" r="21" />
+        </svg>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

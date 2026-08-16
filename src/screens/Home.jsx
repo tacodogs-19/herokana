@@ -485,7 +485,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         </button>
       )}
 
-      <div style={{ margin: "6px 0 20px" }}>
+      <div style={{ margin: "0 0 20px" }}>
         <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
 
         {hardUnlocked && (

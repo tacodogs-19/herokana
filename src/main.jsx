@@ -21,3 +21,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </ThemeProvider>
   </React.StrictMode>
 );
+
+// Fade out the in-page splash once React has painted the first screen.
+// State is all synchronous (localStorage), so a short beat is enough.
+const splash = document.getElementById("splash");
+if (splash) {
+  setTimeout(() => {
+    splash.classList.add("hk-splash-hide");
+    setTimeout(() => splash.remove(), 450);
+  }, 200);
+}
