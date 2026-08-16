@@ -22,12 +22,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </React.StrictMode>
 );
 
-// Fade out the in-page splash once React has painted the first screen.
-// State is all synchronous (localStorage), so a short beat is enough.
+// Fade out the in-page splash once React has painted, but keep it up for at
+// least a second so the settle animation reads and it doesn't flash on fast
+// loads. performance.now() here is ms since navigation start.
 const splash = document.getElementById("splash");
 if (splash) {
+  const wait = Math.max(0, 1000 - performance.now());
   setTimeout(() => {
     splash.classList.add("hk-splash-hide");
     setTimeout(() => splash.remove(), 450);
-  }, 200);
+  }, wait);
 }
