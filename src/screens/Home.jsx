@@ -184,7 +184,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
               display: "flex", alignItems: "center", justifyContent: "space-between", color: t.ink }}>
             <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13.5, fontWeight: 700, whiteSpace: "nowrap" }}>What's in this chapter</span>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: accent, background: st === "current" ? t.primarySoft : t.doneSoft, padding: "2px 8px", borderRadius: 7 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: ringCta, background: t.primarySoft, padding: "2px 8px", borderRadius: 7 }}>
                 {doneCount}/{chapter.units.length}
               </span>
             </span>
