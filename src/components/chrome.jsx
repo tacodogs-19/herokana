@@ -56,12 +56,12 @@ export function StickyHeader({ scrolled, children }) {
     <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px",
       display: "flex", alignItems: "center", gap: 9,
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
-      background: t.bg, boxShadow: scrolled ? shadow : "none",
+      background: t.chrome, boxShadow: scrolled ? shadow : "none",
       transition: "padding 220ms var(--ease-out-quart), box-shadow 220ms ease" }}>
       {children}
-      <span aria-hidden="true" style={{ position: "absolute", top: "100%", left: 0, width: 20, height: 20, background: t.bg,
+      <span aria-hidden="true" style={{ position: "absolute", top: "100%", left: 0, width: 20, height: 20, background: t.chrome,
         WebkitMaskImage: notchMask("100% 100%"), maskImage: notchMask("100% 100%") }} />
-      <span aria-hidden="true" style={{ position: "absolute", top: "100%", right: 0, width: 20, height: 20, background: t.bg,
+      <span aria-hidden="true" style={{ position: "absolute", top: "100%", right: 0, width: 20, height: 20, background: t.chrome,
         WebkitMaskImage: notchMask("0% 100%"), maskImage: notchMask("0% 100%") }} />
     </div>
   );
@@ -266,7 +266,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
   // grey planeTop at the bottom. It stays grey through the status bar + header
   // so the top strip is still seamless. Content scrolls over it — no cut-off.
   const planeBg = whiteTop
-    ? `linear-gradient(180deg, ${t.bg} 0, ${t.bg} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 72px), ${t.planeTop} 100%)`
+    ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 72px), ${t.planeTop} 100%)`
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
     <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: t.bg,

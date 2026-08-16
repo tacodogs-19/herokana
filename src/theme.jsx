@@ -2,7 +2,7 @@ import React from "react";
 
 // Palettes lifted verbatim from the design handoff (core.jsx).
 export const LIGHT = {
-  bg: "#F3F5FA", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
+  bg: "#F3F5FA", chrome: "#E7EBF4", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
   ink: "#070F24", sub: "#71789A", faint: "#AAB0C6",
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
   primarySoft: "#CDDBF8", primaryTint: "#E5EDFE", done: "#27A567", doneSoft: "#E4F5EC",
@@ -13,7 +13,7 @@ export const LIGHT = {
   planeTop: "#EDF1FB", // Felix-depth: the plane's DEEP end — gentle tint (kept close to `bg` so the full-height gradient isn't too dark at the bottom); Shell gradients from `bg` DOWN to this
 };
 export const DARK = {
-  bg: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
+  bg: "#0E1322", chrome: "#090D18", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
   ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286",
   line: "#27304C", primary: "#5A85FF", primaryDark: "#3D63D8",
   primarySoft: "#273D6E", primaryTint: "#2C4478", done: "#34C07C", doneSoft: "#16301F",
@@ -103,6 +103,8 @@ export function ThemeProvider({ children }) {
   React.useEffect(() => {
     const bg = mode === "dark" ? DARK.bg : LIGHT.bg;
     const ink = mode === "dark" ? DARK.ink : LIGHT.ink;
+    // Status bar matches the (slightly darker) header chrome, not the page bg.
+    const chrome = mode === "dark" ? DARK.chrome : LIGHT.chrome;
     const r = document.documentElement;
     r.style.setProperty("--hk-bg", bg);
     r.style.setProperty("--hk-ink", ink);
@@ -119,7 +121,7 @@ export function ThemeProvider({ children }) {
       if (old) old.remove();
       const meta = document.createElement("meta");
       meta.setAttribute("name", "theme-color");
-      meta.setAttribute("content", bg);
+      meta.setAttribute("content", chrome);
       document.head.appendChild(meta);
     }
   }, [mode]);

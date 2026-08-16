@@ -484,7 +484,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
-          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 20, marginBottom: 36,
+          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 36,
             borderRadius: 18, cursor: "pointer", background: t.primarySoft, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.surface,
             alignItems: "center", justifyContent: "center" }}>
@@ -500,7 +500,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         </button>
       )}
 
-      <div className={enterCls} style={{ "--i": 1, margin: "20px 0 20px" }}>
+      <div className={enterCls} style={{ "--i": 1, margin: "32px 0 20px" }}>
         <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
 
         {hardUnlocked && (
