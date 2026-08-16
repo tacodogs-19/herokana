@@ -43,26 +43,37 @@
          theme, so it matches the app background in both light and dark. */
       #splash {
         position: fixed; inset: 0; z-index: 9999;
-        display: flex; align-items: center; justify-content: center;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
         background: var(--hk-bg, #f3f5fa);
         transition: opacity 0.4s ease;
       }
       #splash.hk-splash-hide { opacity: 0; pointer-events: none; }
-      .splash-stage { position: relative; width: 128px; height: 128px; display: grid; place-items: center; }
+      /* The stage settles down from ~launch-icon size so the hand-off from the
+         OS launch screen (big icon on the same background) reads as one motion. */
+      .splash-stage { position: relative; width: 128px; height: 128px; display: grid; place-items: center; animation: hk-settle 0.6s cubic-bezier(0.2, 0.7, 0.25, 1) both; }
       .splash-cat { width: 58px; height: 58px; }
-      .splash-ring { position: absolute; inset: 0; width: 128px; height: 128px; animation: hk-spin 1.4s linear infinite; }
+      .splash-ring { position: absolute; inset: 0; width: 128px; height: 128px; animation: hk-spin 1.4s linear infinite, hk-ring-in 0.5s ease 0.25s both; }
       .splash-ring circle { fill: none; stroke-width: 2.6; }
       .splash-track { stroke: rgba(29, 79, 215, 0.13); }
       .splash-arc { stroke: #1d4fd7; stroke-linecap: round; transform-origin: center; animation: hk-dash 1.4s ease-in-out infinite; }
+      .splash-word {
+        font-family: "Figtree", system-ui, sans-serif; font-weight: 800; font-size: 19px;
+        letter-spacing: 0.01em; color: var(--hk-ink, #070f24);
+        animation: hk-fade-up 0.5s ease 0.18s both;
+      }
       @keyframes hk-spin { 100% { transform: rotate(360deg); } }
+      @keyframes hk-settle { from { transform: scale(1.28); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      @keyframes hk-ring-in { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes hk-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes hk-dash {
         0%   { stroke-dasharray: 1 132; stroke-dashoffset: 0; }
         50%  { stroke-dasharray: 90 132; stroke-dashoffset: -20; }
         100% { stroke-dasharray: 90 132; stroke-dashoffset: -122; }
       }
       @media (prefers-reduced-motion: reduce) {
-        .splash-ring { animation: none; }
+        .splash-stage, .splash-ring, .splash-word { animation: none; }
         .splash-arc { animation: none; stroke-dasharray: 90 132; }
+        .splash-word { opacity: 1; }
       }
     </style>
     <div id="root"></div>
@@ -74,6 +85,7 @@
           <circle class="splash-arc" cx="25" cy="25" r="21" />
         </svg>
       </div>
+      <div class="splash-word">HeroKana</div>
     </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
