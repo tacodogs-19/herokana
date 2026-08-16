@@ -199,7 +199,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           </button>
           {expanded && (
             <div className={suppressReveal.current ? "" : "hk-reveal"} style={{ marginTop: 12 }}>
-              <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden", marginBottom: 12 }}>
+              <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden", marginBottom: 20 }}>
                 <div style={{ width: `${cpct}%`, height: "100%", borderRadius: 4, background: ringCta, transition: "width 500ms ease" }} />
               </div>
               <div style={{ display: "grid", gap: 8, gridTemplateColumns: `repeat(4, minmax(0, 1fr))` }}>
