@@ -155,7 +155,7 @@ function NavIcon({ name, active, c }) {
 export function BottomNav({ active = "Learn", onNav }) {
   const { t, mode } = useTheme();
   // floating pill: inset from all edges, deep shadow so it reads as lifted off the page
-  const navShadow = mode === "dark" ? "0 10px 32px -6px rgba(0,0,0,0.72)" : "0 12px 30px -6px rgba(30,37,64,0.42)";
+  const navShadow = mode === "dark" ? "0 10px 30px -6px rgba(0,0,0,0.82)" : "0 12px 28px -5px rgba(30,37,64,0.55)";
   // absolute so content scrolls right to the bottom behind it (no reserved bg strip);
   // tab screens add bottom padding to clear it. Inset from all edges, deep shadow.
   return (
