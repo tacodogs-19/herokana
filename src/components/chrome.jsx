@@ -153,15 +153,17 @@ function NavIcon({ name, active, c }) {
 }
 
 export function BottomNav({ active = "Learn", onNav }) {
-  const { t } = useTheme();
+  const { t, mode } = useTheme();
+  // floating pill: inset from all edges, deep shadow so it reads as lifted off the page
+  const navShadow = mode === "dark" ? "0 10px 34px -6px rgba(0,0,0,0.65)" : "0 12px 34px -8px rgba(30,37,64,0.30)";
   return (
-    <div style={{ flexShrink: 0, background: t.surface, borderTop: `1px solid ${t.line}`, paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div style={{ display: "flex" }}>
+    <div style={{ flexShrink: 0, padding: "8px 16px", marginBottom: "calc(6px + env(safe-area-inset-bottom))" }}>
+      <div style={{ display: "flex", background: t.surface, borderRadius: 26, boxShadow: navShadow }}>
         {["Learn", "Practice", "Scenes", "Profile"].map((label) => {
           const on = label === active;
           const c = on ? t.primary : t.faint;
           return (
-            <button key={label} onClick={() => onNav && onNav(label)} className="hk-press" style={{ flex: 1, padding: "11px 0 9px",
+            <button key={label} onClick={() => onNav && onNav(label)} className="hk-press" style={{ flex: 1, padding: "12px 0 11px",
               background: "transparent", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <NavIcon name={label} active={on} c={c} />
               <span style={{ fontSize: 11, fontWeight: on ? 700 : 500, color: c, fontFamily: DISPLAY }}>{label}</span>

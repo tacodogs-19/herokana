@@ -253,7 +253,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
               style={{ flex: 1, padding: "9px 4px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
                 boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
-                fontSize: 13, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
+                fontSize: 11.5, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
               {tb.label}
             </button>
           );
