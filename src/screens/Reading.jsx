@@ -210,7 +210,7 @@ function ReadingBody({ onOpenPack }) {
         )}
       </StickyHeader>
 
-      <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>IN THE REAL WORLD</Text>
+      <Text variant="eyebrow" color={t.ink} style={{ margin: "20px 0 12px" }}>IN THE REAL WORLD</Text>
       <Text variant="subtitle" style={{ margin: "0 0 16px" }}>
         {doneCount === packs.length
           ? "Every stop on the trip is done — revisit any scene to keep the words fresh."
@@ -277,5 +277,5 @@ function ReadingBody({ onOpenPack }) {
 }
 
 export default function Reading({ onNav, onOpenPack }) {
-  return <Shell active="Scenes" onNav={onNav}><ReadingBody onOpenPack={onOpenPack} /></Shell>;
+  return <Shell active="Scenes" onNav={onNav} whiteTop><ReadingBody onOpenPack={onOpenPack} /></Shell>;
 }
