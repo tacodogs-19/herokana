@@ -228,8 +228,8 @@ export function BottomNav({ active = "Learn", onNav }) {
     <div style={{ position: "absolute", left: 0, right: 0, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
       display: "flex", justifyContent: "center", padding: "0 16px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ height: H, display: "flex", alignItems: "center", gap: 4,
-          borderRadius: 999, padding: "0 8px", ...frost }}>
+        <div style={{ height: H, minWidth: 264, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          borderRadius: 999, padding: "0 6px", ...frost }}>
           {["Learn", "Practice", "Scenes"].map(tab)}
         </div>
         <button onClick={() => onNav && onNav("Profile")} className="hk-press" aria-label="Profile"
