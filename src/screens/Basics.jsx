@@ -8,7 +8,7 @@ import { Card, Button } from "../components/chrome.jsx";
 export default function Basics({ title, intro, cards, onClose }) {
   const { t } = useTheme();
   return (
-    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.bg, display: "flex", flexDirection: "column",
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20, display: "flex", flexDirection: "column",
       maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink, animation: "hkFade 160ms ease both" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "calc(14px + env(safe-area-inset-top)) 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"

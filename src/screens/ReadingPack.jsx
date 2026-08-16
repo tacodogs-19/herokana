@@ -109,7 +109,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
 
 export default function ReadingPack({ packId, onNav, onBack, onStartReading, onStartDialogue }) {
   return (
-    <Shell active="Scenes" onNav={onNav}>
+    <Shell active="Scenes" onNav={onNav} modal>
       <ReadingPackBody packId={packId} onBack={onBack} onStartReading={onStartReading} onStartDialogue={onStartDialogue} />
     </Shell>
   );

@@ -16,7 +16,7 @@ export default function VerbChart({ onClose }) {
   };
 
   return (
-    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.bg,
+    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20,
       display: "flex", flexDirection: "column", maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
       animation: "hkFade 160ms ease both" }}>
 
