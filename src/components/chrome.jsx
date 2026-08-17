@@ -229,7 +229,11 @@ export function BottomNav({ active = "Learn", onNav }) {
     <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
       display: "flex", justifyContent: "center", padding: "0 16px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ height: H, minWidth: 264, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        <div style={{ height: H, minWidth: 264, display: "flex", alignItems: "center", gap: 8,
+          // When an outer tab is active, dock the group to that edge so the active pill's
+          // outer padding equals its 6px top/bottom; middle tab stays centred. Width is
+          // pinned by minWidth, so this only shifts the group, never resizes the bar.
+          justifyContent: active === "Learn" ? "flex-start" : active === "Scenes" ? "flex-end" : "center",
           borderRadius: 999, padding: "0 6px", ...frost }}>
           {["Learn", "Practice", "Scenes"].map(tab)}
         </div>
