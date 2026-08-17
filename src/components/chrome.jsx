@@ -280,7 +280,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
             backgroundSize is pinned to `100vh` (the large, stable viewport) so the gradient
             never RESCALES when the mobile dynamic viewport (dvh) shrinks/grows on scroll — the
             element just reveals or clips a fixed-scale gradient instead of stretching it. */}
-        {plane && (
+        {plane && !modal && (
           <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
             pointerEvents: "none", backgroundImage: planeBg,
             backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat" }} />
