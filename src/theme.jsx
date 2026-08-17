@@ -100,6 +100,10 @@ export function ThemeProvider({ children }) {
     try { localStorage.removeItem("hk-theme"); } catch (e) {}
   }, []);
 
+  // The pre-paint script already set the status-bar colour before first paint,
+  // so the FIRST run of this effect must not swap the meta — doing so repaints
+  // the bar and leaves a strip on load. Only swap on an actual in-session change.
+  const swapMeta = React.useRef(false);
   React.useEffect(() => {
     const bg = mode === "dark" ? DARK.bg : LIGHT.bg;
     const ink = mode === "dark" ? DARK.ink : LIGHT.ink;
@@ -116,7 +120,7 @@ export function ThemeProvider({ children }) {
     // after an in-session theme switch. See design-system.md.
     // Skipped in the TWA: bars ignore the meta there, and swapping it triggers
     // Chrome's persistent protective status-bar strip.
-    if (!isTwa) {
+    if (!isTwa && swapMeta.current) {
       const old = document.querySelector('meta[name="theme-color"]');
       if (old) old.remove();
       const meta = document.createElement("meta");
@@ -124,6 +128,7 @@ export function ThemeProvider({ children }) {
       meta.setAttribute("content", chrome);
       document.head.appendChild(meta);
     }
+    swapMeta.current = true;
   }, [mode]);
 
   const t = mode === "dark" ? { ...DARK, glow } : { ...LIGHT, glow };

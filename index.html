@@ -21,6 +21,13 @@
           r.style.setProperty("--hk-ink", ink);
           r.style.background = bg;
           r.style.colorScheme = m;
+          // Set the status-bar colour to the mode's chrome up front, so React's
+          // theme effect never has to CHANGE it after mount — a mid-session
+          // theme-color change is what repaints the bar and leaves a strip
+          // (most visible in dark mode, where the static meta differs).
+          var chrome = m === "dark" ? "#090D18" : "#E7EBF4";
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute("content", chrome);
         } catch (e) {}
       })();
     </script>
