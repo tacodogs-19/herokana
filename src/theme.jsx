@@ -9,7 +9,7 @@ export const LIGHT = {
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
-  cardShadow: "0 1px 2px -1px rgba(34,52,118,0.10), 0 20px 52px -20px rgba(34,52,118,0.20)", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
+  cardShadow: "0 1px 2px -1px rgba(34,52,118,0.16), 0 20px 52px -20px rgba(34,52,118,0.20)", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
   planeTop: "#EDF1FB", // Felix-depth: the plane's DEEP end — gentle tint (kept close to `bg` so the full-height gradient isn't too dark at the bottom); Shell gradients from `bg` DOWN to this
 };
 export const DARK = {
@@ -20,7 +20,7 @@ export const DARK = {
   gold: "#FFCB57", goldSoft: "#2A2410", wrong: "#FF6166", wrongSoft: "#34191B",
   lock: "#4A5378", shadow: "rgba(0,0,0,0.4)", doneMid: "#234C35",
   seg: "rgba(8,14,40,0.45)", // translucent navy-blue wash — recesses a step below ANY dark bg/surface while carrying the same blue cast as the plane; `surface` active pill lifts out of it
-  cardShadow: "0 1px 2px -1px rgba(0,0,0,0.45), 0 20px 52px -18px rgba(0,0,0,0.62)", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
+  cardShadow: "0 1px 2px -1px rgba(0,0,0,0.55), 0 20px 52px -18px rgba(0,0,0,0.62)", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
   planeTop: "#1B2340", // Felix-depth: plane tint; Shell gradients this DOWN to `bg` so it melts in seamlessly
 };
 
