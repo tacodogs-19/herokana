@@ -207,39 +207,35 @@ export function BottomNav({ active = "Learn", onNav }) {
   // Frosted-glass surface shared by both nav segments.
   const frost = { background: navBg, boxShadow: navShadow,
     backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" };
-  // Google-Photos-style bar: three equal slots, bare labels; the active one gains
-  // its icon + blue text. A single highlight pill sits behind them and SLIDES to
-  // the selected slot (translateX by index) instead of fading in per tab.
-  const TABS = ["Learn", "Practice", "Scenes"];
-  const activeIdx = TABS.indexOf(active); // -1 while Profile is the active destination
+  // Google-Photos-style bar: inactive destinations are a bare label; the active
+  // one morphs into a filled pill with its icon. Profile is pulled out into its
+  // own frosted circle on the right (their Search).
+  const tab = (label) => {
+    const on = label === active;
+    return (
+      <button key={label} onClick={() => onNav && onNav(label)} className="hk-press"
+        style={{ display: "flex", alignItems: "center", gap: on ? 7 : 0, cursor: "pointer", border: "none",
+          background: on ? t.primaryTint : "transparent", borderRadius: 999,
+          padding: on ? "9px 15px" : "9px 10px", transition: "background 200ms var(--ease-out-quart)" }}>
+        {on && <NavIcon name={label} active c={t.primary} />}
+        <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: on ? t.primary : t.sub,
+          fontFamily: DISPLAY, whiteSpace: "nowrap" }}>{label}</span>
+      </button>
+    );
+  };
   const onProfile = active === "Profile";
   const H = 54; // fixed nav height so the bar stays put across tabs and the profile circle is round
   return (
     <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(16px + env(safe-area-inset-bottom))", zIndex: 20,
       display: "flex", justifyContent: "center", padding: "0 16px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        {/* Equal slots (fixed bar width) so the pill is exactly one-third wide and a
-            translateX by the active index lands it on the slot — no measurement. */}
-        <div style={{ position: "relative", height: H, width: 264, display: "flex", alignItems: "center",
+        <div style={{ height: H, minWidth: 264, display: "flex", alignItems: "center", gap: 8,
+          // When an outer tab is active, dock the group to that edge so the active pill's
+          // outer padding equals its 6px top/bottom; middle tab stays centred. Width is
+          // pinned by minWidth, so this only shifts the group, never resizes the bar.
+          justifyContent: active === "Learn" ? "flex-start" : active === "Scenes" ? "flex-end" : "center",
           borderRadius: 999, padding: "0 6px", ...frost }}>
-          <div aria-hidden style={{ position: "absolute", top: 6, bottom: 6, left: 6, width: "calc((100% - 12px) / 3)",
-            borderRadius: 999, background: t.primaryTint, pointerEvents: "none",
-            transform: `translateX(${Math.max(activeIdx, 0) * 100}%)`,
-            opacity: activeIdx < 0 ? 0 : 1,
-            transition: "transform 340ms var(--ease-out-expo), opacity 200ms ease" }} />
-          {TABS.map((label) => {
-            const on = label === active;
-            return (
-              <button key={label} onClick={() => onNav && onNav(label)} className="hk-press"
-                style={{ position: "relative", zIndex: 1, flex: 1, minWidth: 0, height: H - 12,
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: on ? 7 : 0,
-                  cursor: "pointer", border: "none", background: "transparent", borderRadius: 999, padding: 0 }}>
-                {on && <NavIcon name={label} active c={t.primary} />}
-                <span style={{ fontSize: 12.5, fontWeight: on ? 700 : 600, color: on ? t.primary : t.sub,
-                  fontFamily: DISPLAY, whiteSpace: "nowrap", transition: "color 200ms ease" }}>{label}</span>
-              </button>
-            );
-          })}
+          {["Learn", "Practice", "Scenes"].map(tab)}
         </div>
         <button onClick={() => onNav && onNav("Profile")} className="hk-press" aria-label="Profile"
           style={{ width: H, height: H, flexShrink: 0, borderRadius: "50%", border: "none", cursor: "pointer",
