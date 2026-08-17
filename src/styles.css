@@ -18,6 +18,10 @@ button, input { font-family: inherit; }
 .hk-scroll-x { overflow-x: auto; scrollbar-width: none; }
 .hk-scroll-x::-webkit-scrollbar { display: none; }
 
+/* App-wide: keep native scrolling but hide the scrollbar (mobile PWA) */
+* { scrollbar-width: none; }
+::-webkit-scrollbar { display: none; }
+
 /* press in fast (90ms), settle out with a gentle spring so a button feels
    pressed-into-a-surface rather than snapped like a light switch */
 .hk-press { transition: transform 260ms var(--ease-spring); }

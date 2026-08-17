@@ -13,7 +13,7 @@ export const LIGHT = {
   planeTop: "#EDF1FB", // Felix-depth: the plane's DEEP end — gentle tint (kept close to `bg` so the full-height gradient isn't too dark at the bottom); Shell gradients from `bg` DOWN to this
 };
 export const DARK = {
-  bg: "#0E1322", chrome: "#090D18", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
+  bg: "#0E1322", chrome: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
   ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286",
   line: "#27304C", primary: "#5A85FF", primaryDark: "#3D63D8",
   primarySoft: "#273D6E", primaryTint: "#2C4478", done: "#34C07C", doneSoft: "#16301F",
