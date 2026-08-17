@@ -2,7 +2,7 @@ import React from "react";
 
 // Palettes lifted verbatim from the design handoff (core.jsx).
 export const LIGHT = {
-  bg: "#F3F5FA", chrome: "#E7EBF4", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
+  bg: "#F3F5FA", chrome: "#DFE4F0", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
   ink: "#070F24", sub: "#71789A", faint: "#AAB0C6",
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
   primarySoft: "#CDDBF8", primaryTint: "#E5EDFE", done: "#27A567", doneSoft: "#E4F5EC",
