@@ -171,12 +171,14 @@ export default function App() {
 
   // Forward nav: slide up from below (feels like drilling in / stacking a new card)
   // Back nav: fade in (feels like the stack is unwinding)
-  // Tab switch: fade in (lateral, no depth change)
+  // Tab switch: fade in + rise, matching the Learn entrance on app load.
   // ponytail: hkFade already defined in styles.css; hkEnter added alongside it
   const animStyle = navDir === "forward"
     ? { animation: "hkEnter 280ms var(--ease-out) both" }
     : navDir === "back"
     ? { animation: "hkFade 180ms ease both" }
+    : navDir === "tab"
+    ? { animation: "hkEnter 360ms var(--ease-out-expo) both" }
     : undefined;
 
   // Outer div always opaque with the correct bg so Chrome never sees a gap
