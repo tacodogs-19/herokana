@@ -62,7 +62,8 @@ button, input { font-family: inherit; }
    sticky header and the fixed nav live OUTSIDE .hk-rise, so they stay put.
    Scoped to .hk-nav-tab (App sets it on the screen wrapper only on a tab switch),
    so the pane is static on first load (Learn uses .hk-enter there) and on back-nav. */
-.hk-nav-tab .hk-rise { animation: hkEnter 360ms var(--ease-out-expo) both; }
+.hk-nav-tab .hk-rise { animation: hkRise 440ms var(--ease-out-expo) both; }
+@keyframes hkRise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
 /* Learn first-load entrance — sections rise + crossfade, staggered via --i.
    Fires when the splash lifts (main.jsx dispatches hk-splash-hidden), not on
