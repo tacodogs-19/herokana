@@ -14,16 +14,17 @@ function UnitChip({ unit, st, t, onClick }) {
   // register bans heavy colour on inactive states). Neutral tile + crisp ink
   // glyph (never grey-on-tint, which reads muddy); the green tick is the sole
   // "done" signal. Green lives in the tick + the hero ring, not 22 surfaces.
-  // done keeps its green tint; current is a white tile that lifts on a deep blue
-  // shadow (no outline) with blue text; locked is a neutral grey fill.
+  // done keeps its green tint; current is a white tile with a blue outline;
+  // locked is a neutral grey fill (inactive).
   const bg = st === "current" ? t.surface : st === "done" ? t.doneSoft : t.sunk;
   const fg = st === "current" ? t.primary : st === "done" ? t.done : t.faint;
+  const border = st === "current" ? `1.5px solid ${t.primary}` : "none";
   return (
     <button onClick={onClick} disabled={st === "locked"} className="hk-press" title={unit.label}
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
-        background: bg, border: "none",
-        boxShadow: st === "current" ? `0 8px 20px -6px ${t.primary}59` : "none", color: fg }}>
+        background: bg, border: border,
+        boxShadow: "none", color: fg }}>
       {st === "done" && (
         <span style={{ position: "absolute", top: 0, right: 0, transform: "translate(30%,-30%)",
           width: 22, height: 22, borderRadius: "50%", background: t.done, border: `2px solid ${t.surface}`,
