@@ -106,14 +106,14 @@ export function Button({ variant = "primary", color, className = "", style, chil
 // The cat sticker set from the handoff — by the user's direction it appears
 // only as the app icon and on the result (success / keep-practising) screen.
 const CAT_SRC = {
-  general: "/assets/cat-general.svg",
-  celebrate: "/assets/cat-success.svg",
-  sad: "/assets/cat-fail.svg",
-  load: "/assets/cat-load.svg",
-  run: "/assets/cat-run.svg",
-  smash: "/assets/cat-smash.svg",
-  point: "/assets/cat-point.svg",
-  crossed: "/assets/cat-crossed.svg",
+  general: "/assets/cat-general.webp",
+  celebrate: "/assets/cat-success.webp",
+  sad: "/assets/cat-fail.webp",
+  load: "/assets/cat-load.webp",
+  run: "/assets/cat-run.webp",
+  smash: "/assets/cat-smash.webp",
+  point: "/assets/cat-point.webp",
+  crossed: "/assets/cat-crossed.webp",
 };
 
 export function Cat({ mood = "general", size = 64, style, className }) {

@@ -39,7 +39,7 @@ function LessonBody({ session, onComplete, onExit }) {
   React.useEffect(() => { if (qs.length === 0) onExit(); }, []); // eslint-disable-line
   // Warm the (heavy) result cats now, so the result screen paints without a
   // fetch/decode stall when the round ends.
-  React.useEffect(() => { ["/assets/cat-success.svg", "/assets/cat-fail.svg"].forEach((s) => { new Image().src = s; }); }, []);
+  React.useEffect(() => { ["/assets/cat-success.webp", "/assets/cat-fail.webp"].forEach((s) => { new Image().src = s; }); }, []);
   const q = qs[i];
   if (!q) return null;
   // confirm before leaving only if the learner is mid-round
