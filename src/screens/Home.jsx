@@ -14,15 +14,16 @@ function UnitChip({ unit, st, t, onClick }) {
   // register bans heavy colour on inactive states). Neutral tile + crisp ink
   // glyph (never grey-on-tint, which reads muddy); the green tick is the sole
   // "done" signal. Green lives in the tick + the hero ring, not 22 surfaces.
-  const bg = st === "current" ? t.primary : st === "done" ? t.doneSoft : t.sunk;
-  // done tile: green tint + green text (per Figma) — the done state is fully green;
-  // current is blue-on-white, locked is faint-on-neutral
-  const fg = st === "current" ? "#fff" : st === "done" ? t.done : t.faint;
+  // done/current sit on white tiles (green tick / blue outline carry the state);
+  // only locked keeps a neutral grey fill so it reads as inactive.
+  const bg = st === "locked" ? t.sunk : t.surface;
+  const fg = st === "current" ? t.primary : st === "done" ? t.ink : t.faint;
+  const border = st === "current" ? `1.5px solid ${t.primary}` : st === "done" ? `1px solid ${t.line}` : "none";
   return (
     <button onClick={onClick} disabled={st === "locked"} className="hk-press" title={unit.label}
       style={{ position: "relative", aspectRatio: "1", borderRadius: 14, cursor: st === "locked" ? "default" : "pointer", padding: 0, minWidth: 0,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3,
-        background: bg, border: "none",
+        background: bg, border: border,
         boxShadow: "none", color: fg }}>
       {st === "done" && (
         <span style={{ position: "absolute", top: 0, right: 0, transform: "translate(30%,-30%)",
@@ -484,7 +485,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
 
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
-          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 36,
+          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 48,
             borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
             alignItems: "center", justifyContent: "center" }}>
