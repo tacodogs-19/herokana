@@ -485,18 +485,18 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
           style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 36,
-            borderRadius: 18, cursor: "pointer", background: t.primarySoft, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
+            borderRadius: 18, cursor: "pointer", background: t.primary, border: "none", textAlign: "left", boxShadow: t.glow(t.primary) }}>
           <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.surface,
             alignItems: "center", justifyContent: "center" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Ready to review</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: "#fff", fontFamily: DISPLAY }}>Ready to review</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", fontFamily: DISPLAY }}>
               {progress.reviewDue} {progress.reviewDue === 1 ? "item" : "items"} to refresh — a quick warm-up
             </div>
           </div>
-          <span style={{ color: t.primary, fontSize: 17, flexShrink: 0 }}>›</span>
+          <span style={{ color: "#fff", fontSize: 17, flexShrink: 0 }}>›</span>
         </button>
       )}
 
