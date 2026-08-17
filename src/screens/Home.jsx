@@ -482,6 +482,11 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         )}
       </StickyHeader>
 
+      {/* .hk-rise: on a tab switch the whole content pane rises as one block (the
+          header/nav stay put). On first load this wrapper is static and the inner
+          blocks below play the staggered .hk-enter instead — the two never overlap
+          (anim is false once homeEntered, i.e. on every tab switch back here). */}
+      <div className="hk-rise">
       {progress.reviewDue > 0 && (
         <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
           style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 48,
@@ -635,6 +640,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
           </div>
         </Modal>
       )}
+      </div>
     </div>
   );
 }

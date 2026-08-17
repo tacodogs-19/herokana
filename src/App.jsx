@@ -171,21 +171,21 @@ export default function App() {
 
   // Forward nav: slide up from below (feels like drilling in / stacking a new card)
   // Back nav: fade in (feels like the stack is unwinding)
-  // Tab switch: fade in + rise, matching the Learn entrance on app load.
-  // ponytail: hkFade already defined in styles.css; hkEnter added alongside it
+  // Tab switch: NO whole-screen transform — that would drag the sticky header and
+  // the fixed nav (a transform makes fixed children relative to it). Instead the
+  // .hk-nav-tab class scopes a fade+rise onto each screen's .hk-rise content pane
+  // (styles.css), leaving the header + nav static.
   const animStyle = navDir === "forward"
     ? { animation: "hkEnter 280ms var(--ease-out) both" }
     : navDir === "back"
     ? { animation: "hkFade 180ms ease both" }
-    : navDir === "tab"
-    ? { animation: "hkEnter 360ms var(--ease-out-expo) both" }
     : undefined;
 
   // Outer div always opaque with the correct bg so Chrome never sees a gap
   // between the status bar and the WebView during the opacity:0 animation frames.
   return (
     <div style={{ background: "var(--hk-bg)", minHeight: "100dvh" }}>
-      <div key={navKey} style={animStyle}>{content}</div>
+      <div key={navKey} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}>{content}</div>
     </div>
   );
 }

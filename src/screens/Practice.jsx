@@ -179,6 +179,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Practice</h1>
       </StickyHeader>
 
+      <div className="hk-rise">
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>REFERENCE</Text>
       {/* Reference sheets — passive look-up, not drills */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
@@ -425,6 +426,7 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
         {startLabel}
       </button>
       </div>{/* end custom set card */}
+      </div>
     </div>
   );
 }

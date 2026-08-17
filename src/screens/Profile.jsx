@@ -42,6 +42,7 @@ function ProfileBody({ onEditProfile, onReset }) {
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>Profile</h1>
       </StickyHeader>
 
+      <div className="hk-rise">
       {/* overall + level */}
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>YOUR PROGRESS</Text>
       <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
@@ -209,6 +210,7 @@ function ProfileBody({ onEditProfile, onReset }) {
           </div>
         </Modal>
       )}
+      </div>
     </div>
   );
 }

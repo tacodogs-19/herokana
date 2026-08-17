@@ -210,6 +210,7 @@ function ReadingBody({ onOpenPack }) {
         )}
       </StickyHeader>
 
+      <div className="hk-rise">
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>IN THE REAL WORLD</Text>
       <Text variant="subtitle" style={{ margin: "0 0 16px" }}>
         {doneCount === packs.length
@@ -272,6 +273,7 @@ function ReadingBody({ onOpenPack }) {
           </div>
         </Modal>
       )}
+      </div>
     </div>
   );
 }
