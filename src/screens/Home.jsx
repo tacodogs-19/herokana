@@ -28,7 +28,7 @@ function UnitChip({ unit, st, t, onClick }) {
         <span style={{ position: "absolute", top: 0, right: 0, transform: "translate(30%,-30%)",
           width: 22, height: 22, borderRadius: "50%", background: t.done, border: `2px solid ${t.surface}`,
           display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>
         </span>
       )}
       <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700 }}>{unit.jp}</span>
@@ -475,7 +475,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
       <StickyHeader scrolled={scrolled}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
-        <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>HeroKana</span>
+        <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>HeroKana</span>
         {hard && (
           <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: t.wrong,
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>

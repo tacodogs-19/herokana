@@ -2,10 +2,10 @@ import React from "react";
 
 // Palettes lifted verbatim from the design handoff (core.jsx).
 export const LIGHT = {
-  bg: "#F3F5FA", chrome: "#E7EBF4", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
-  ink: "#070F24", sub: "#71789A", faint: "#AAB0C6",
+  bg: "#F3F5FA", chrome: "#0E1322", surface: "#FFFFFF", sunk: "#EEF1F8", raise: "#FFFFFF",
+  ink: "#070F24", sub: "#71789A", faint: "#AAB0C6", onChrome: "#FFFFFF", // onChrome: header text/logo, sits on the dark `chrome` bar
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
-  primarySoft: "#CDDBF8", primaryTint: "#D6E2FF", done: "#27A567", doneSoft: "#E4F5EC",
+  primarySoft: "#CDDBF8", primaryTint: "#CDE1FF", done: "#27A567", doneSoft: "#CBF4E2",
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
@@ -14,7 +14,7 @@ export const LIGHT = {
 };
 export const DARK = {
   bg: "#0E1322", chrome: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
-  ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286",
+  ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286", onChrome: "#F0F2F8",
   line: "#27304C", primary: "#5A85FF", primaryDark: "#3D63D8",
   primarySoft: "#273D6E", primaryTint: "#33579D", done: "#34C07C", doneSoft: "#16301F",
   gold: "#FFCB57", goldSoft: "#2A2410", wrong: "#FF6166", wrongSoft: "#34191B",
@@ -112,6 +112,7 @@ export function ThemeProvider({ children }) {
     const r = document.documentElement;
     r.style.setProperty("--hk-bg", bg);
     r.style.setProperty("--hk-ink", ink);
+    r.style.setProperty("--hk-chrome", chrome); // base/letterbox bg (App outer div) matches the dark header bar
     r.style.background = bg;
     document.body.style.background = bg;
     r.style.colorScheme = mode;
