@@ -234,7 +234,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
 
 function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll] = useHeaderScroll();
+  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const progress = useProgress();
   const hard = progress.hard;
   const isAlpha = (i) => !BANKS[CHAPTERS[i].id];
@@ -471,9 +471,8 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   };
 
   return (
-    <div onScroll={onHeaderScroll}
-      style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
-      <StickyHeader scrolled={scrolled}>
+    <>
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>HeroKana</span>
         {hard && (
@@ -481,6 +480,8 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
       </StickyHeader>
+      <div onScroll={onHeaderScroll}
+        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
 
       {/* .hk-rise: on a tab switch the whole content pane rises as one block (the
           header/nav stay put). On first load this wrapper is static and the inner
@@ -642,6 +643,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
       )}
       </div>
     </div>
+    </>
   );
 }
 

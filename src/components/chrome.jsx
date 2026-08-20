@@ -32,11 +32,20 @@ export function Text({ variant = "body", as: Tag = "p", color, style, children, 
 // header would oscillate; a dead-zone wider than the height change stops it.
 export function useHeaderScroll() {
   const [scrolled, setScrolled] = React.useState(false);
+  // The header is an absolute overlay (see StickyHeader), so it no longer
+  // reserves space in the scroll flow — the scroll box pads its top by the
+  // header's (unscrolled) height instead. Measured once before paint; the
+  // compact shrink doesn't change the pad (content just slides further under).
+  const headerRef = React.useRef(null);
+  const [headerH, setHeaderH] = React.useState(0);
+  React.useLayoutEffect(() => {
+    if (headerRef.current) setHeaderH(headerRef.current.offsetHeight);
+  }, []);
   const onScroll = React.useCallback((e) => {
     const y = e.currentTarget.scrollTop;
     setScrolled((s) => (y > 30 ? true : y < 6 ? false : s));
   }, []);
-  return [scrolled, onScroll];
+  return [scrolled, onScroll, headerRef, headerH];
 }
 
 // ── StickyHeader ─────────────────────────────────────────────────────────────
@@ -44,15 +53,20 @@ export function useHeaderScroll() {
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
-export function StickyHeader({ scrolled, children }) {
+export function StickyHeader({ scrolled, children, overlay = false, innerRef }) {
   const { t } = useTheme();
-  // Solid header (same grey as the status bar / page, so the top strip stays
-  // seamless) with concave bottom corners, so a white content pane tucks under
-  // it. The corners live on the header, so they hold their place on scroll
-  // instead of scrolling away. On plain-grey screens the corners blend in.
+  // Solid header (same navy as the status bar, so the top strip stays seamless)
+  // with concave bottom corners, so the white content pane tucks under it.
+  // `overlay`: absolute, OUTSIDE the scroll box — the scroll box's elastic
+  // bounce can't ride content over it or drag its corners out of place. The
+  // scroll box pads its top by the header height (useHeaderScroll) to stand in
+  // for the space this no longer reserves in the flow. Non-overlay stays sticky.
   const notchMask = (at) => `radial-gradient(circle at ${at}, transparent 0 20px, #000 20px)`;
+  const place = overlay
+    ? { position: "absolute", top: 0, left: 0, right: 0, zIndex: 20 }
+    : { position: "sticky", top: 0, zIndex: 10, margin: "0 -20px" };
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 10, margin: "0 -20px",
+    <div ref={innerRef} style={{ ...place,
       display: "flex", alignItems: "center", gap: 9,
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
       background: t.chrome,

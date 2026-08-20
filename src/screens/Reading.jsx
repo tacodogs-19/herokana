@@ -166,7 +166,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
 
 function ReadingBody({ onOpenPack }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll] = useHeaderScroll();
+  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const progress = useProgress();
   const unlocked = readingUnlocked(progress);
   // survives the trip into a pack and back (the screen remounts); resets on a
@@ -191,9 +191,8 @@ function ReadingBody({ onOpenPack }) {
   const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
 
   return (
-    <div onScroll={onHeaderScroll}
-      style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))" }}>
-      <StickyHeader scrolled={scrolled}>
+    <>
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Scenes</h1>
         <div style={{ flex: 1 }} />
@@ -209,6 +208,8 @@ function ReadingBody({ onOpenPack }) {
           </button>
         )}
       </StickyHeader>
+      <div onScroll={onHeaderScroll}
+        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
 
       <div className="hk-rise">
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>IN THE REAL WORLD</Text>
@@ -275,6 +276,7 @@ function ReadingBody({ onOpenPack }) {
       )}
       </div>
     </div>
+    </>
   );
 }
 
