@@ -270,8 +270,12 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
   // reads as a white pane tucked under the inverse corners) and fades to the
   // grey planeTop at the bottom. It stays grey through the status bar + header
   // so the top strip is still seamless. Content scrolls over it — no cut-off.
+  // Hard cut from the navy chrome to white at +40px (no fade): the fade used to
+  // be invisible when chrome was light grey, but a navy→white fade reads as a
+  // heavy shadow under the header. +40px sits under the opaque sticky header in
+  // both its tall and compact states, so the cut is never visible.
   const planeBg = whiteTop
-    ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 72px), ${t.planeTop} 100%)`
+    ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 40px), ${t.planeTop} 100%)`
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
     <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,

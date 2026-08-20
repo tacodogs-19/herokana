@@ -14,7 +14,7 @@
           var m = localStorage.getItem("hk-theme");
           if (m !== "dark" && m !== "light")
             m = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-          var bg = m === "dark" ? "#0E1322" : "#F3F5FA";
+          var bg = "#0E1322"; // app bg is navy in both themes
           var ink = m === "dark" ? "#F0F2F8" : "#1E2540";
           var r = document.documentElement;
           r.style.setProperty("--hk-bg", bg);
@@ -26,7 +26,6 @@
           // theme-color change is what repaints the bar and leaves a strip
           // (most visible in dark mode, where the static meta differs).
           var chrome = "#0E1322"; // header/status-bar bar is dark navy in both themes
-          r.style.setProperty("--hk-chrome", chrome);
           var meta = document.querySelector('meta[name="theme-color"]');
           if (meta) meta.setAttribute("content", chrome);
         } catch (e) {}
@@ -44,7 +43,7 @@
   <body>
     <style>
       /* html/body track the resolved theme so no light strip shows at the top. */
-      html, body { background: var(--hk-bg, #f3f5fa); }
+      html, body { background: var(--hk-bg, #0E1322); }
 
       /* In-page splash: themed background + masked cat with a loading ring,
          shown until React mounts (main.jsx fades it out). Bg follows the live
@@ -52,7 +51,7 @@
       #splash {
         position: fixed; inset: 0; z-index: 9999;
         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-        background: var(--hk-bg, #f3f5fa);
+        background: var(--hk-bg, #0E1322);
         transition: opacity 0.4s ease;
       }
       #splash.hk-splash-hide { opacity: 0; pointer-events: none; }
@@ -66,7 +65,7 @@
       .splash-arc { stroke: #1d4fd7; stroke-linecap: round; transform-origin: center; animation: hk-dash 1.4s ease-in-out infinite; }
       .splash-word {
         font-family: "Figtree", system-ui, sans-serif; font-weight: 800; font-size: 19px;
-        letter-spacing: 0.01em; color: var(--hk-ink, #070f24);
+        letter-spacing: 0.01em; color: #F0F2F8;
         animation: hk-fade-up 0.5s ease 0.18s both;
       }
       @keyframes hk-spin { 100% { transform: rotate(360deg); } }

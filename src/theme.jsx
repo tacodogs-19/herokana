@@ -10,7 +10,7 @@ export const LIGHT = {
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
   cardShadow: "0 1px 2px -1px rgba(34,52,118,0.16), 0 20px 52px -20px rgba(34,52,118,0.20)", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
-  planeTop: "#EDF1FB", // Felix-depth: the plane's DEEP end — gentle tint (kept close to `bg` so the full-height gradient isn't too dark at the bottom); Shell gradients from `bg` DOWN to this
+  planeTop: "#EDF1FB", // deep end of the plane gradient — light, so the content pane stays light-on-white top to bottom
 };
 export const DARK = {
   bg: "#0E1322", chrome: "#0E1322", surface: "#1A2138", sunk: "#141A2C", raise: "#222B45",
@@ -110,11 +110,13 @@ export function ThemeProvider({ children }) {
     // Status bar matches the (slightly darker) header chrome, not the page bg.
     const chrome = mode === "dark" ? DARK.chrome : LIGHT.chrome;
     const r = document.documentElement;
-    r.style.setProperty("--hk-bg", bg);
+    // Root backdrop (html/body/splash/App outer) is the navy chrome, so the
+    // frame + load/splash all read navy. The light `bg` is only the Shell/modal
+    // content sheet, applied inside Shell — never at the root.
+    r.style.setProperty("--hk-bg", chrome);
     r.style.setProperty("--hk-ink", ink);
-    r.style.setProperty("--hk-chrome", chrome); // base/letterbox bg (App outer div) matches the dark header bar
-    r.style.background = bg;
-    document.body.style.background = bg;
+    r.style.background = chrome;
+    document.body.style.background = chrome;
     r.style.colorScheme = mode;
     // Replace (never mutate) the meta node — mutating doesn't reliably trigger
     // a status-bar repaint in Chrome, which leaves a stale bar colour/seam

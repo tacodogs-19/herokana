@@ -184,7 +184,7 @@ export default function App() {
   // Outer div always opaque with the correct bg so Chrome never sees a gap
   // between the status bar and the WebView during the opacity:0 animation frames.
   return (
-    <div style={{ background: "var(--hk-chrome)", minHeight: "100dvh" }}>
+    <div style={{ background: "var(--hk-bg)", minHeight: "100dvh" }}>
       <div key={navKey} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}>{content}</div>
     </div>
   );
