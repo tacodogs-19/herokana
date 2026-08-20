@@ -58,9 +58,12 @@ export function StickyHeader({ scrolled, children }) {
       background: t.chrome,
       transition: "padding 220ms var(--ease-out-quart)" }}>
       {children}
-      <span aria-hidden="true" style={{ position: "absolute", top: "100%", left: 0, width: 20, height: 20, background: t.chrome,
+      {/* top: calc(100% - 1px) overlaps the corners 1px into the header so there's
+          no subpixel gap between the header's bottom edge and the corners for the
+          white pane behind to peek through during scroll/overscroll. */}
+      <span aria-hidden="true" style={{ position: "absolute", top: "calc(100% - 1px)", left: 0, width: 20, height: 21, background: t.chrome,
         WebkitMaskImage: notchMask("100% 100%"), maskImage: notchMask("100% 100%") }} />
-      <span aria-hidden="true" style={{ position: "absolute", top: "100%", right: 0, width: 20, height: 20, background: t.chrome,
+      <span aria-hidden="true" style={{ position: "absolute", top: "calc(100% - 1px)", right: 0, width: 20, height: 21, background: t.chrome,
         WebkitMaskImage: notchMask("0% 100%"), maskImage: notchMask("0% 100%") }} />
     </div>
   );
