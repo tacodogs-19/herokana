@@ -34,10 +34,12 @@ export default defineConfig({
         lang: "en",
         categories: ["education"],
         prefer_related_applications: false,
-        background_color: "#F3F5FA",
-        // Light default; the runtime swaps the live theme-color meta per theme so
-        // the standalone status bar matches the app in both light and dark.
-        theme_color: "#F3F5FA",
+        // Navy in both — the app frame (launch splash + standalone status bar)
+        // is dark navy in every theme now. A light theme_color here made the OS
+        // paint a light standalone status-bar band that seamed against the navy
+        // page as a hairline under the status bar (both themes).
+        background_color: "#0E1322",
+        theme_color: "#0E1322",
         icons: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
