@@ -203,7 +203,7 @@ export default function App() {
           contains its fixed children; DOM-before + transformed wrapper keeps it
           beneath). Cleared on the wrapper's slide-up animationend. */}
       {snap && snap.mode === "behind" && (
-        <div key={snap.key} aria-hidden="true"
+        <div key={snap.key} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
           dangerouslySetInnerHTML={{ __html: snap.html }} />
       )}
@@ -211,7 +211,7 @@ export default function App() {
         onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp") setSnap(null); }}>{content}</div>
       {/* back: the leaving screen slides down off the bottom, on top */}
       {snap && snap.mode === "dismiss" && (
-        <div key={snap.key} aria-hidden="true"
+        <div key={snap.key} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
             animation: "hkSlideDown 360ms var(--ease-drawer) both" }}
           onAnimationEnd={() => setSnap(null)}

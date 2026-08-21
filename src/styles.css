@@ -58,6 +58,13 @@ button, input { font-family: inherit; }
    bottom, revealing the destination that's already rendered behind it. */
 @keyframes hkSlideDown { from { transform: none; } to { transform: translateY(100%); } }
 
+/* Transition snapshots (App.jsx `snap`) are static DOM clones. Their inner
+   elements still carry entrance-animation classes, which would REPLAY on
+   insertion (circles re-scaling from 0.55, sections re-rising). Freeze the
+   clone to its resting state — but not the snapshot container's OWN slide. */
+.hk-snap * { animation: none !important; transition: none !important; }
+.hk-snap .hk-grow { width: var(--to); }
+
 /* wrong-answer shake on the prompt card */
 .hk-shake { animation: hkShake 400ms var(--ease-out) both; }
 @keyframes hkShake {
