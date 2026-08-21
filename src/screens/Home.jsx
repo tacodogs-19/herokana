@@ -480,7 +480,7 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
       headerRight={progress.reviewDue > 0 && (
         <button onClick={onStartReview} className="hk-press" aria-label={`Daily review — ${progress.reviewDue} due`}
           style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, cursor: "pointer", border: "none",
-            background: "rgba(255,255,255,0.12)", color: t.onChrome, borderRadius: 999,
+            background: "rgba(255,255,255,0.12)", color: t.gold, borderRadius: 999,
             padding: "6px 12px 6px 10px", fontFamily: DISPLAY, fontWeight: 600, fontSize: 12.5, whiteSpace: "nowrap" }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
           Daily Review
