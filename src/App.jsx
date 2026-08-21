@@ -15,10 +15,10 @@ import KanaChart from "./screens/KanaChart.jsx";
 import VerbChart from "./screens/VerbChart.jsx";
 import Basics from "./screens/Basics.jsx";
 
-// Modal/takeover screens (rounded-corner sheets, or full-screen overlays). When
-// sliding up FROM one of these we don't hold it behind the new sheet: two stacked
-// rounded sheets make the incoming sheet's corners read as prominent overlaps.
-// Over the navy frame instead, those corners reveal navy and disappear.
+// Modal/takeover screens (rounded-corner sheets, or full-screen overlays). We
+// still hold one behind the incoming sheet, but DIM it (like iOS receding the
+// presenting context) so its own rounded corners fall back and only the incoming
+// sheet's corners read — instead of two rounded tops stacking as a busy overlap.
 const MODAL_SCREENS = new Set(["lesson", "result", "dialogue", "readingDrill",
   "readingPack", "kanaChart", "verbChart", "sentenceBasics", "kanaBasics"]);
 
@@ -43,7 +43,9 @@ export default function App() {
     if (!el) return;
     const scrolls = [];
     el.querySelectorAll("*").forEach((n, i) => { if (n.scrollTop || n.scrollLeft) scrolls.push([i, n.scrollTop, n.scrollLeft]); });
-    setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode });
+    // dim the held layer when it's a modal sheet (see MODAL_SCREENS) so its
+    // corners recede behind the incoming sheet's
+    setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode, dim: mode === "behind" && MODAL_SCREENS.has(scr.name) });
   };
   const applyScrolls = (node) => {
     if (!node || !snap || !snap.scrolls) return;
@@ -70,16 +72,14 @@ export default function App() {
   // go() = forward push (drill in), dir defaults to "forward" but nav() passes "tab"
   // replace() = in-place swap (lesson→result, try-again); still animates forward
   const go = (next, dir = "forward") => {
-    // hold the current screen behind the slide-up — but not when leaving a modal
-    // (its rounded corners would stack with the incoming sheet's; see MODAL_SCREENS)
-    if (dir === "forward" && !MODAL_SCREENS.has(scr.name)) snapshot("behind");
+    if (dir === "forward") snapshot("behind"); // hold the current screen behind the slide-up (dimmed if it's a modal)
     setNavDir(dir);
     setNavKey((k) => k + 1);
     window.history.pushState({ scr: next }, "");
     setScr(next);
   };
   const replace = (next) => {
-    if (!MODAL_SCREENS.has(scr.name)) snapshot("behind");
+    snapshot("behind");
     setNavDir("forward");
     setNavKey((k) => k + 1);
     window.history.replaceState({ scr: next }, "");
@@ -238,9 +238,14 @@ export default function App() {
           contains its fixed children; DOM-before + transformed wrapper keeps it
           beneath). Cleared on the wrapper's slide-up animationend. */}
       {snap && snap.mode === "behind" && (
-        <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
-          style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
-          dangerouslySetInnerHTML={{ __html: snap.html }} />
+        <>
+          <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
+            style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
+            dangerouslySetInnerHTML={{ __html: snap.html }} />
+          {/* dim over the held modal (DOM after it, before the wrapper) so its
+              corners recede; the incoming sheet paints above this scrim */}
+          {snap.dim && <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)" }} />}
+        </>
       )}
       <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}
         onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp") setSnap(null); }}>{content}</div>
