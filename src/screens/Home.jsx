@@ -558,7 +558,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                 <div style={{ position: "absolute", top: 32, left: 35.5, right: 35.5, height: 2, borderRadius: 2, background: t.line }} />
                 <div style={{ position: "absolute", top: 32, left: 35.5, height: 2, borderRadius: 2, background: t.doneMid,
                   width: `calc((100% - 71px) * ${fillPos} / ${Math.max(1, railIdx.length - 1)})` }} />
-                {railIdx.map((i) => {
+                {railIdx.map((i, pos) => {
                   const c = CHAPTERS[i];
                   const cst = (() => {
                     const df = doneFor(i);
@@ -571,9 +571,11 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
                   const dotBg = cst === "done" ? t.doneMid : cst === "current" ? t.primary : t.sunk;
                   const dotBorder = cst === "done" ? t.doneMid : dotBg;
                   return (
-                    <button key={c.id} data-rail={i} onClick={() => pick(i)} className="hk-press"
+                    <button key={c.id} data-rail={i} onClick={() => pick(i)} className={"hk-press" + (anim ? " hk-rail-in" : "")}
                       style={{ position: "relative", zIndex: 1, background: "transparent", border: "none", cursor: "pointer", padding: 0,
-                        display: "flex", flexDirection: "column", alignItems: "center", gap: 7, width: 71, flexShrink: 0 }}>
+                        display: "flex", flexDirection: "column", alignItems: "center", gap: 7, width: 71, flexShrink: 0,
+                        // right-to-left: rightmost circle enters first, sweeping left
+                        animationDelay: anim ? `${(railIdx.length - 1 - pos) * 55}ms` : undefined }}>
                       <span style={{ width: 50, height: 50, borderRadius: "50%", background: dotBg,
                         border: `2.5px solid ${dotBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {cst === "done" ? <svg width="18" height="18" viewBox="0 0 12 12" fill="none" stroke={t.done} strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5" /></svg>

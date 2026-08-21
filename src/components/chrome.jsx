@@ -256,9 +256,15 @@ export function BottomNav({ active = "Learn", onNav }) {
         </div>
         <button onClick={() => onNav && onNav("Profile")} className="hk-press" aria-label="Profile"
           style={{ width: H, height: H, flexShrink: 0, borderRadius: "50%", border: "none", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            ...frost, ...(onProfile && { background: t.primaryTint }) }}>
-          <NavIcon name="Profile" active={onProfile} c={onProfile ? t.primary : t.faint} />
+            display: "flex", alignItems: "center", justifyContent: "center", ...frost }}>
+          {/* inset inner circle (42 within 54 = 6px inset) so the active blue is
+              recessed the same way the left tabs' active pill is */}
+          <span style={{ display: "flex", alignItems: "center", justifyContent: "center",
+            width: 42, height: 42, borderRadius: "50%",
+            background: onProfile ? t.primaryTint : "transparent",
+            transition: "background 200ms var(--ease-out-quart)" }}>
+            <NavIcon name="Profile" active={onProfile} c={onProfile ? t.primary : t.faint} />
+          </span>
         </button>
       </div>
     </div>
