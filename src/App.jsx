@@ -224,8 +224,10 @@ export default function App() {
   // the fixed nav (a transform makes fixed children relative to it). Instead the
   // .hk-nav-tab class scopes a fade+rise onto each screen's .hk-rise content pane
   // (styles.css), leaving the header + nav static.
+  // Arrival settles in on the deliberate iOS sheet curve; the dismiss (below) is
+  // quicker and lighter so leaving never feels as weighty as arriving.
   const animStyle = navDir === "forward"
-    ? { animation: "hkSlideUp 360ms var(--ease-drawer) both" }
+    ? { animation: "hkSlideUp 340ms var(--ease-drawer) both" }
     : undefined;
 
   // Outer div always opaque with the correct bg so Chrome never sees a gap
@@ -246,7 +248,7 @@ export default function App() {
       {snap && snap.mode === "dismiss" && (
         <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
-            animation: "hkSlideDown 360ms var(--ease-drawer) both" }}
+            animation: "hkSlideDown 260ms var(--ease-out-quart) both" }}
           onAnimationEnd={() => setSnap(null)}
           dangerouslySetInnerHTML={{ __html: snap.html }} />
       )}
