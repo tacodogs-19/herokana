@@ -27,7 +27,32 @@ export default function App() {
   // (forward — the previous screen sits behind the slide-up) or "dismiss" (back —
   // the leaving screen slides down off the top). { html, key, mode }.
   const [snap, setSnap] = React.useState(null);
-  const snapshot = (mode) => { const el = wrapRef.current; if (el) setSnap({ html: el.innerHTML, key: Date.now(), mode }); };
+  // Snapshot the current screen's markup + the scroll offsets of every scrollable
+  // node (innerHTML clones lose scroll — the rail would snap to its left edge and
+  // the page to the top). Offsets are keyed by descendant index so they can be
+  // re-applied to the identical clone tree after it mounts (see applyScrolls).
+  const snapshot = (mode) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const scrolls = [];
+    el.querySelectorAll("*").forEach((n, i) => { if (n.scrollTop || n.scrollLeft) scrolls.push([i, n.scrollTop, n.scrollLeft]); });
+    setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode });
+  };
+  const applyScrolls = (node) => {
+    if (!node || !snap || !snap.scrolls) return;
+    const set = () => {
+      const all = node.querySelectorAll("*");
+      snap.scrolls.forEach(([i, top, left]) => {
+        const t = all[i];
+        if (t) { void t.scrollHeight; t.scrollTop = top; t.scrollLeft = left; }
+      });
+    };
+    set(); // immediate — the rail (no images) restores now
+    // re-apply after a frame: a vertical offset can clamp against a stale height
+    // while the clone's (cached) images are still sizing; by the next frame they
+    // have, so the full offset lands.
+    requestAnimationFrame(set);
+  };
   const onboardingVisible = !profile || editing;
 
   // Onboarding registers its step-back function so the back button can walk
@@ -75,8 +100,7 @@ export default function App() {
         // the exact visual — a re-mounted React screen would flash its initial
         // state (e.g. a mid-lesson would jump back to question 1). Cleared on
         // the slide-down's animationend.
-        const el = wrapRef.current;
-        if (el) setSnap({ html: el.innerHTML, key: Date.now(), mode: "dismiss" });
+        snapshot("dismiss");
         setNavDir("back");
         setNavKey((k) => k + 1);
         setScr(s);
@@ -203,7 +227,7 @@ export default function App() {
           contains its fixed children; DOM-before + transformed wrapper keeps it
           beneath). Cleared on the wrapper's slide-up animationend. */}
       {snap && snap.mode === "behind" && (
-        <div key={snap.key} aria-hidden="true" className="hk-snap"
+        <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
           dangerouslySetInnerHTML={{ __html: snap.html }} />
       )}
@@ -211,7 +235,7 @@ export default function App() {
         onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp") setSnap(null); }}>{content}</div>
       {/* back: the leaving screen slides down off the bottom, on top */}
       {snap && snap.mode === "dismiss" && (
-        <div key={snap.key} aria-hidden="true" className="hk-snap"
+        <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
             animation: "hkSlideDown 360ms var(--ease-drawer) both" }}
           onAnimationEnd={() => setSnap(null)}

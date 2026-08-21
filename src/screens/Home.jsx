@@ -270,9 +270,15 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
   React.useEffect(() => { try { localStorage.setItem("hk-home-exp", expanded ? "1" : "0"); } catch (e) {} }, [expanded]);
 
   const railRef = React.useRef(null);
+  const railScrolled = React.useRef(false);
   React.useEffect(() => {
     const el = railRef.current && railRef.current.querySelector(`[data-rail="${sel}"]`);
-    if (el && el.scrollIntoView) el.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    // Instant on mount/re-mount — the rail re-renders at scrollLeft 0, and
+    // opening+closing a lesson re-mounts Learn, so a smooth scroll here slides
+    // the track across and reads as a mispositioning. Smooth only once the user
+    // changes the selection (carousel swipe).
+    if (el && el.scrollIntoView) el.scrollIntoView({ inline: "center", block: "nearest", behavior: railScrolled.current ? "smooth" : "auto" });
+    railScrolled.current = true;
   }, [sel]);
 
   const railIdx = hard ? CHAPTERS.map((_, i) => i).filter((i) => !isAlpha(i)) : CHAPTERS.map((_, i) => i);

@@ -51,12 +51,11 @@ button, input { font-family: inherit; }
 @keyframes hkPopIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes hkSheetIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: none; } }
 @keyframes hkEnter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-/* Forward nav into a lesson/secondary screen: slide up + fade from ~40% down
-   (a shorter, softer entrance) over the previous screen held behind it. */
-@keyframes hkSlideUp { from { opacity: 0; transform: translateY(40%); } to { opacity: 1; transform: none; } }
-/* Back nav (dismiss): a snapshot of the leaving screen slides back down off the
-   bottom, revealing the destination that's already rendered behind it. */
-@keyframes hkSlideDown { from { transform: none; } to { transform: translateY(100%); } }
+/* Forward nav into a lesson/secondary screen: fade + rise ~220px over the
+   previous screen held behind it. Back nav mirrors it: the leaving screen
+   fades + drops ~220px, revealing the destination rendered behind it. */
+@keyframes hkSlideUp { from { opacity: 0; transform: translateY(220px); } to { opacity: 1; transform: none; } }
+@keyframes hkSlideDown { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(220px); } }
 
 /* Transition snapshots (App.jsx `snap`) are static DOM clones. Their inner
    elements still carry entrance-animation classes, which would REPLAY on
