@@ -23,7 +23,11 @@ export default function App() {
   const [navKey, setNavKey] = React.useState(0);
   const [navDir, setNavDir] = React.useState("none");
   const wrapRef = React.useRef(null);
-  const [dismiss, setDismiss] = React.useState(null); // { html, key } snapshot of the leaving screen during a back slide-down
+  // A held DOM snapshot of an adjacent screen during a transition: mode "behind"
+  // (forward — the previous screen sits behind the slide-up) or "dismiss" (back —
+  // the leaving screen slides down off the top). { html, key, mode }.
+  const [snap, setSnap] = React.useState(null);
+  const snapshot = (mode) => { const el = wrapRef.current; if (el) setSnap({ html: el.innerHTML, key: Date.now(), mode }); };
   const onboardingVisible = !profile || editing;
 
   // Onboarding registers its step-back function so the back button can walk
@@ -34,12 +38,14 @@ export default function App() {
   // go() = forward push (drill in), dir defaults to "forward" but nav() passes "tab"
   // replace() = in-place swap (lesson→result, try-again); still animates forward
   const go = (next, dir = "forward") => {
+    if (dir === "forward") snapshot("behind"); // hold the current screen behind the slide-up
     setNavDir(dir);
     setNavKey((k) => k + 1);
     window.history.pushState({ scr: next }, "");
     setScr(next);
   };
   const replace = (next) => {
+    snapshot("behind");
     setNavDir("forward");
     setNavKey((k) => k + 1);
     window.history.replaceState({ scr: next }, "");
@@ -70,7 +76,7 @@ export default function App() {
         // state (e.g. a mid-lesson would jump back to question 1). Cleared on
         // the slide-down's animationend.
         const el = wrapRef.current;
-        if (el) setDismiss({ html: el.innerHTML, key: Date.now() });
+        if (el) setSnap({ html: el.innerHTML, key: Date.now(), mode: "dismiss" });
         setNavDir("back");
         setNavKey((k) => k + 1);
         setScr(s);
@@ -193,13 +199,23 @@ export default function App() {
   // between the status bar and the WebView during the opacity:0 animation frames.
   return (
     <div style={{ background: "var(--hk-bg)", minHeight: "100dvh" }}>
-      <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}>{content}</div>
-      {dismiss && (
-        <div key={dismiss.key} aria-hidden="true"
+      {/* forward: hold the previous screen behind the slide-up (its own transform
+          contains its fixed children; DOM-before + transformed wrapper keeps it
+          beneath). Cleared on the wrapper's slide-up animationend. */}
+      {snap && snap.mode === "behind" && (
+        <div key={snap.key} aria-hidden="true"
+          style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
+          dangerouslySetInnerHTML={{ __html: snap.html }} />
+      )}
+      <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}
+        onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp") setSnap(null); }}>{content}</div>
+      {/* back: the leaving screen slides down off the bottom, on top */}
+      {snap && snap.mode === "dismiss" && (
+        <div key={snap.key} aria-hidden="true"
           style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
             animation: "hkSlideDown 360ms var(--ease-drawer) both" }}
-          onAnimationEnd={() => setDismiss(null)}
-          dangerouslySetInnerHTML={{ __html: dismiss.html }} />
+          onAnimationEnd={() => setSnap(null)}
+          dangerouslySetInnerHTML={{ __html: snap.html }} />
       )}
     </div>
   );
