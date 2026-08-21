@@ -320,6 +320,20 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
           ...(modal && { background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20 }) }}>
           {children}
         </div>
+        {/* Bottom notch — the mirror of the header's inverse corners: a navy strip
+            over the gesture-bar safe area, with concave TOP corners so the white
+            pane tucks into it the same way it tucks under the header. Height is the
+            bottom inset, so it collapses to nothing on devices with no gesture bar. */}
+        {whiteTop && !modal && (
+          <>
+            <div aria-hidden="true" style={{ position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 5,
+              height: "env(safe-area-inset-bottom)", background: t.chrome }} />
+            <span aria-hidden="true" style={{ position: "absolute", left: 0, bottom: "calc(env(safe-area-inset-bottom) - 1px)", width: 20, height: 21, background: t.chrome, zIndex: 5,
+              WebkitMaskImage: "radial-gradient(circle at 100% 0%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 100% 0%, transparent 0 20px, #000 20px)" }} />
+            <span aria-hidden="true" style={{ position: "absolute", right: 0, bottom: "calc(env(safe-area-inset-bottom) - 1px)", width: 20, height: 21, background: t.chrome, zIndex: 5,
+              WebkitMaskImage: "radial-gradient(circle at 0% 0%, transparent 0 20px, #000 20px)", maskImage: "radial-gradient(circle at 0% 0%, transparent 0 20px, #000 20px)" }} />
+          </>
+        )}
       </div>
       {nav && <BottomNav active={active} onNav={onNav} />}
     </div>
