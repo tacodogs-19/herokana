@@ -339,7 +339,12 @@ export function TabScreen({ active, onNav, header, children }) {
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>{header}</StickyHeader>
       <div onScroll={onHeaderScroll}
         style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
-          padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
+          // Longhand (not the `padding` shorthand + a paddingTop override): the
+          // shorthand's env()/calc value serialises to an empty style attribute
+          // when overridden, so an innerHTML snapshot clone would lose its side
+          // padding and slam content to the left edge.
+          paddingTop: headerH, paddingRight: 20, paddingLeft: 20,
+          paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
         {children}
       </div>
     </Shell>
