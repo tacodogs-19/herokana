@@ -176,7 +176,7 @@ export default function App() {
   // .hk-nav-tab class scopes a fade+rise onto each screen's .hk-rise content pane
   // (styles.css), leaving the header + nav static.
   const animStyle = navDir === "forward"
-    ? { animation: "hkEnter 280ms var(--ease-out) both" }
+    ? { animation: "hkSlideUp 360ms var(--ease-drawer) both" }
     : navDir === "back"
     ? { animation: "hkFade 180ms ease both" }
     : undefined;
