@@ -113,7 +113,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         onClick={() => st !== "locked" && (st === "done" ? onReviewChapter(chapterIdx) : onStart(chapterIdx))}
         style={{ width: "100%", marginTop: 12, padding: "15px", borderRadius: 16, fontSize: 16,
           ...(st === "locked" && { background: t.sunk, color: t.faint, boxShadow: "none", cursor: "default" }) }}>
-        {st === "locked" ? "Locked" : st === "done" ? "Review chapter" : firstUse ? "Get Started →" : "Continue lesson →"}
+        {st === "locked" ? "Locked" : st === "done" ? "Review chapter" : firstUse ? "Get Started →" : doneCount === 0 ? "Start lesson →" : "Continue lesson →"}
       </Button>
 
       {(chapter.id === "hira" || chapter.id === "kata") && st !== "locked" && (
