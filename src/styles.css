@@ -54,6 +54,9 @@ button, input { font-family: inherit; }
 /* Forward nav into a lesson/secondary screen: the whole screen slides up from
    below like an iOS sheet (the rounded modal corners ride up over the navy). */
 @keyframes hkSlideUp { from { transform: translateY(100%); } to { transform: none; } }
+/* Back nav (dismiss): a snapshot of the leaving screen slides back down off the
+   bottom, revealing the destination that's already rendered behind it. */
+@keyframes hkSlideDown { from { transform: none; } to { transform: translateY(100%); } }
 
 /* wrong-answer shake on the prompt card */
 .hk-shake { animation: hkShake 400ms var(--ease-out) both; }

@@ -22,6 +22,8 @@ export default function App() {
   const [editing, setEditing] = React.useState(false);
   const [navKey, setNavKey] = React.useState(0);
   const [navDir, setNavDir] = React.useState("none");
+  const wrapRef = React.useRef(null);
+  const [dismiss, setDismiss] = React.useState(null); // { html, key } snapshot of the leaving screen during a back slide-down
   const onboardingVisible = !profile || editing;
 
   // Onboarding registers its step-back function so the back button can walk
@@ -62,6 +64,13 @@ export default function App() {
       }
       const s = e.state && e.state.scr;
       if (s) {
+        // Snapshot the leaving screen so it can slide down off-screen while the
+        // destination (rendered behind it) is revealed. A DOM snapshot preserves
+        // the exact visual — a re-mounted React screen would flash its initial
+        // state (e.g. a mid-lesson would jump back to question 1). Cleared on
+        // the slide-down's animationend.
+        const el = wrapRef.current;
+        if (el) setDismiss({ html: el.innerHTML, key: Date.now() });
         setNavDir("back");
         setNavKey((k) => k + 1);
         setScr(s);
@@ -170,22 +179,28 @@ export default function App() {
     content = <Home onNav={nav} onStart={startUnit} onStartReview={startReview} onReviewChapter={startChapterReview} onOpenBasics={openBasics} onOpenKanaBasics={openKanaBasics} onOpenChart={openKanaChart} onStartSession={startPractice} onOpenVerbChart={openVerbChart} />;
 
   // Forward nav: slide up from below (feels like drilling in / stacking a new card)
-  // Back nav: fade in (feels like the stack is unwinding)
+  // Back nav: the destination sits still and the leaving screen (the `dismiss`
+  //   snapshot overlay below) slides down off it — a sheet dismiss.
   // Tab switch: NO whole-screen transform — that would drag the sticky header and
   // the fixed nav (a transform makes fixed children relative to it). Instead the
   // .hk-nav-tab class scopes a fade+rise onto each screen's .hk-rise content pane
   // (styles.css), leaving the header + nav static.
   const animStyle = navDir === "forward"
     ? { animation: "hkSlideUp 360ms var(--ease-drawer) both" }
-    : navDir === "back"
-    ? { animation: "hkFade 180ms ease both" }
     : undefined;
 
   // Outer div always opaque with the correct bg so Chrome never sees a gap
   // between the status bar and the WebView during the opacity:0 animation frames.
   return (
     <div style={{ background: "var(--hk-bg)", minHeight: "100dvh" }}>
-      <div key={navKey} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}>{content}</div>
+      <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}>{content}</div>
+      {dismiss && (
+        <div key={dismiss.key} aria-hidden="true"
+          style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
+            animation: "hkSlideDown 360ms var(--ease-drawer) both" }}
+          onAnimationEnd={() => setDismiss(null)}
+          dangerouslySetInnerHTML={{ __html: dismiss.html }} />
+      )}
     </div>
   );
 }
