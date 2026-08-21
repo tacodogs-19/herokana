@@ -70,7 +70,9 @@ export default function App() {
 
   // ---- History-backed navigation ----
   // go() = forward push (drill in), dir defaults to "forward" but nav() passes "tab"
-  // replace() = in-place swap (lesson→result, try-again); still animates forward
+  // replace() = in-place swap within the lesson/result flow (lesson→result,
+  //   try-again). No sheet slide — the outcome is part of the lesson, so the
+  //   destination just appears in place and its own content animates in.
   const go = (next, dir = "forward") => {
     if (dir === "forward") snapshot("behind"); // hold the current screen behind the slide-up (dimmed if it's a modal)
     setNavDir(dir);
@@ -79,8 +81,7 @@ export default function App() {
     setScr(next);
   };
   const replace = (next) => {
-    snapshot("behind");
-    setNavDir("forward");
+    setNavDir("replace"); // not "forward"/"tab"/"back" → no screen-level animation
     setNavKey((k) => k + 1);
     window.history.replaceState({ scr: next }, "");
     setScr(next);
