@@ -15,6 +15,13 @@ import KanaChart from "./screens/KanaChart.jsx";
 import VerbChart from "./screens/VerbChart.jsx";
 import Basics from "./screens/Basics.jsx";
 
+// Modal/takeover screens (rounded-corner sheets, or full-screen overlays). When
+// sliding up FROM one of these we don't hold it behind the new sheet: two stacked
+// rounded sheets make the incoming sheet's corners read as prominent overlaps.
+// Over the navy frame instead, those corners reveal navy and disappear.
+const MODAL_SCREENS = new Set(["lesson", "result", "dialogue", "readingDrill",
+  "readingPack", "kanaChart", "verbChart", "sentenceBasics", "kanaBasics"]);
+
 export default function App() {
   const progress = useProgress();
   const [scr, setScr] = React.useState({ name: "home" });
@@ -63,14 +70,16 @@ export default function App() {
   // go() = forward push (drill in), dir defaults to "forward" but nav() passes "tab"
   // replace() = in-place swap (lesson→result, try-again); still animates forward
   const go = (next, dir = "forward") => {
-    if (dir === "forward") snapshot("behind"); // hold the current screen behind the slide-up
+    // hold the current screen behind the slide-up — but not when leaving a modal
+    // (its rounded corners would stack with the incoming sheet's; see MODAL_SCREENS)
+    if (dir === "forward" && !MODAL_SCREENS.has(scr.name)) snapshot("behind");
     setNavDir(dir);
     setNavKey((k) => k + 1);
     window.history.pushState({ scr: next }, "");
     setScr(next);
   };
   const replace = (next) => {
-    snapshot("behind");
+    if (!MODAL_SCREENS.has(scr.name)) snapshot("behind");
     setNavDir("forward");
     setNavKey((k) => k + 1);
     window.history.replaceState({ scr: next }, "");
