@@ -254,7 +254,7 @@ export default function App() {
       {snap && snap.mode === "dismiss" && (
         <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
           style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
-            animation: "hkSlideDown 260ms var(--ease-out-quart) both, hkSlideOutFade 130ms var(--ease-out-quart) 130ms both" }}
+            animation: "hkSlideDown 170ms var(--ease-drawer) both" }}
           onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
           dangerouslySetInnerHTML={{ __html: snap.html }} />
       )}

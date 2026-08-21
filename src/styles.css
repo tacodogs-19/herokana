@@ -61,8 +61,7 @@ button, input { font-family: inherit; }
    Back nav mirrors the combined move: the leaving screen fades + drops ~220px. */
 @keyframes hkSlideUp { from { transform: translateY(220px); } to { transform: none; } }
 @keyframes hkSlideFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes hkSlideDown { from { transform: none; } to { transform: translateY(220px); } }
-@keyframes hkSlideOutFade { from { opacity: 1; } to { opacity: 0; } }
+@keyframes hkSlideDown { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(220px); } }
 
 /* Transition snapshots (App.jsx `snap`) are static DOM clones. Their inner
    elements still carry entrance-animation classes, which would REPLAY on
