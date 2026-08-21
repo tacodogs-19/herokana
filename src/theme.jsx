@@ -9,7 +9,7 @@ export const LIGHT = {
   gold: "#F5B225", goldSoft: "#FCF1D8", wrong: "#E5484D", wrongSoft: "#FBE7E8",
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
-  cardShadow: "rgba(34, 52, 118, 0.16) 0px 1px 8px -2px, rgba(34, 52, 118, 0.2) 0px 20px 64px -20px", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
+  cardShadow: "rgba(34, 52, 118, 0.15) 0px 1px 4px -2px, rgba(34, 52, 118, 0.2) 0px 20px 64px -20px", // Felix-depth: soft float over the header plane + a tight contact shadow that reads as a subtle edge
   planeTop: "#EDF1FB", // deep end of the plane gradient — light, so the content pane stays light-on-white top to bottom
 };
 export const DARK = {
