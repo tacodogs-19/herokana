@@ -228,7 +228,7 @@ export default function App() {
   // Arrival settles in on the deliberate iOS sheet curve; the dismiss (below) is
   // quicker and lighter so leaving never feels as weighty as arriving.
   const animStyle = navDir === "forward"
-    ? { animation: "hkSlideUp 340ms var(--ease-drawer) both" }
+    ? { animation: "hkSlideUp 340ms var(--ease-drawer) both, hkSlideFade 170ms var(--ease-drawer) both" }
     : undefined;
 
   // Outer div always opaque with the correct bg so Chrome never sees a gap

@@ -52,10 +52,15 @@ button, input { font-family: inherit; }
 @keyframes hkPopIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes hkSheetIn { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: none; } }
 @keyframes hkEnter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-/* Forward nav into a lesson/secondary screen: fade + rise ~220px over the
-   previous screen held behind it. Back nav mirrors it: the leaving screen
-   fades + drops ~220px, revealing the destination rendered behind it. */
-@keyframes hkSlideUp { from { opacity: 0; transform: translateY(220px); } to { opacity: 1; transform: none; } }
+/* Forward nav into a lesson/secondary screen: rise ~220px over the previous
+   screen held behind it, with a separate, faster fade so the incoming screen
+   turns opaque well before the rise finishes — less of the held background
+   shows through the movement. The two are decoupled: hkSlideUp (the rise) keeps
+   the position timing; hkSlideFade runs shorter. hkSlideUp stays the one whose
+   animationend clears the held snapshot, so the snapshot lives the full rise.
+   Back nav mirrors the combined move: the leaving screen fades + drops ~220px. */
+@keyframes hkSlideUp { from { transform: translateY(220px); } to { transform: none; } }
+@keyframes hkSlideFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes hkSlideDown { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(220px); } }
 
 /* Transition snapshots (App.jsx `snap`) are static DOM clones. Their inner
