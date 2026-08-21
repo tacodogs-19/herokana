@@ -70,14 +70,14 @@ export function StickyHeader({ scrolled, children, overlay = false, innerRef }) 
       display: "flex", alignItems: "center",
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
       background: t.chrome,
-      transition: "padding 220ms var(--ease-out-quart)" }}>
+      transition: "padding 300ms var(--ease-header)" }}>
       {/* The logo + title cluster nudges up and scales down when the page is
           scrolled, easing back to full size at the top. transform-origin left so
           it anchors to the left edge (title doesn't drift) instead of the centre. */}
       <div style={{ display: "flex", alignItems: "center", gap: 9,
         transformOrigin: "left center",
         transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
-        transition: "transform 220ms var(--ease-out-quart)" }}>
+        transition: "transform 300ms var(--ease-header)" }}>
         {children}
       </div>
       {/* top: calc(100% - 1px) overlaps the corners 1px into the header so there's
