@@ -325,3 +325,23 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
     </div>
   );
 }
+
+// ── TabScreen ─────────────────────────────────────────────────────────────
+// The shared frame for the four bottom-nav screens (Learn/Practice/Scenes/
+// Profile): Shell + the overlay header + the scroll box, all wired to
+// useHeaderScroll. A screen supplies its `header` content and its scrollable
+// body; the header-height spacer, overscroll containment and the compact-scroll
+// flag live here so they can't drift across screens.
+export function TabScreen({ active, onNav, header, children }) {
+  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
+  return (
+    <Shell active={active} onNav={onNav} whiteTop>
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>{header}</StickyHeader>
+      <div onScroll={onHeaderScroll}
+        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
+          padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
+        {children}
+      </div>
+    </Shell>
+  );
+}

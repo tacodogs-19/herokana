@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS, NUMBER_GROUPS } from "../data";
-import { Shell, Text, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
+import { Text, TabScreen } from "../components/chrome.jsx";
 import { useJaVoice } from "../speech.js";
 
 const PModeIcon = ({ name, c }) => {
@@ -37,9 +37,8 @@ const DIFFICULTIES = [
 const ROUND_SIZES = [5, 10, 15, 20];
 const MODE_COUNT = 10; // the one-tap practice modes use a fixed round size — no picker
 
-function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
+function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const progress = useProgress();
   const [picked, setPicked] = React.useState(() => loadSessionSet("hk-prac-chapters"));
   const [themes, setThemes] = React.useState(loadSessionThemes);
@@ -172,13 +171,12 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
   );
 
   return (
-    <>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
+    <TabScreen active="Practice" onNav={onNav} header={
+      <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Practice</h1>
-      </StickyHeader>
-      <div onScroll={onHeaderScroll}
-        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
+      </>
+    }>
 
       <div className="hk-rise">
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>REFERENCE</Text>
@@ -428,11 +426,10 @@ function PracticeBody({ onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
       </button>
       </div>{/* end custom set card */}
       </div>
-    </div>
-    </>
+    </TabScreen>
   );
 }
 
 export default function Practice({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
-  return <Shell active="Practice" onNav={onNav} whiteTop><PracticeBody onStart={onStart} onOpenChart={onOpenChart} onOpenVerbChart={onOpenVerbChart} onOpenBasics={onOpenBasics} /></Shell>;
+  return <PracticeBody onNav={onNav} onStart={onStart} onOpenChart={onOpenChart} onOpenVerbChart={onOpenVerbChart} onOpenBasics={onOpenBasics} />;
 }

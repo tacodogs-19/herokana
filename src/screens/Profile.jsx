@@ -1,12 +1,11 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Ring, Modal, Text, Card, Button, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
+import { Ring, Modal, Text, Card, Button, TabScreen } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
-function ProfileBody({ onEditProfile, onReset }) {
+function ProfileBody({ onNav, onEditProfile, onReset }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
-  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
   const days = ["M", "T", "W", "T", "F", "S", "S"];
@@ -35,13 +34,12 @@ function ProfileBody({ onEditProfile, onReset }) {
   );
 
   return (
-    <>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
+    <TabScreen active="Profile" onNav={onNav} header={
+      <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Profile</h1>
-      </StickyHeader>
-      <div onScroll={onHeaderScroll}
-        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
+      </>
+    }>
 
       <div className="hk-rise">
       {/* overall + level */}
@@ -212,11 +210,10 @@ function ProfileBody({ onEditProfile, onReset }) {
         </Modal>
       )}
       </div>
-    </div>
-    </>
+    </TabScreen>
   );
 }
 
 export default function Profile({ onNav, onEditProfile, onReset }) {
-  return <Shell active="Profile" onNav={onNav} whiteTop><ProfileBody onEditProfile={onEditProfile} onReset={onReset} /></Shell>;
+  return <ProfileBody onNav={onNav} onEditProfile={onEditProfile} onReset={onReset} />;
 }

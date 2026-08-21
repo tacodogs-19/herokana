@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Modal, Text, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
+import { Modal, Text, TabScreen } from "../components/chrome.jsx";
 import { READING_PACKS, readingUnlocked, readingGate } from "../reading.js";
 import { dialoguesForPack } from "../dialogue.js";
 
@@ -164,9 +164,8 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
   );
 }
 
-function ReadingBody({ onOpenPack }) {
+function ReadingBody({ onNav, onOpenPack }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const progress = useProgress();
   const unlocked = readingUnlocked(progress);
   // survives the trip into a pack and back (the screen remounts); resets on a
@@ -191,8 +190,8 @@ function ReadingBody({ onOpenPack }) {
   const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
 
   return (
-    <>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
+    <TabScreen active="Scenes" onNav={onNav} header={
+      <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Scenes</h1>
         <div style={{ flex: 1 }} />
@@ -207,10 +206,8 @@ function ReadingBody({ onOpenPack }) {
             <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.04em" }}>RESET</span>
           </button>
         )}
-      </StickyHeader>
-      <div onScroll={onHeaderScroll}
-        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
-
+      </>
+    }>
       <div className="hk-rise">
       <Text variant="eyebrow" color={t.ink} style={{ margin: "32px 0 12px" }}>IN THE REAL WORLD</Text>
       <Text variant="subtitle" style={{ margin: "0 0 16px" }}>
@@ -275,11 +272,10 @@ function ReadingBody({ onOpenPack }) {
         </Modal>
       )}
       </div>
-    </div>
-    </>
+    </TabScreen>
   );
 }
 
 export default function Reading({ onNav, onOpenPack }) {
-  return <Shell active="Scenes" onNav={onNav} whiteTop><ReadingBody onOpenPack={onOpenPack} /></Shell>;
+  return <ReadingBody onNav={onNav} onOpenPack={onOpenPack} />;
 }

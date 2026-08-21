@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS, BANKS } from "../data";
-import { Shell, Ring, Modal, Text, Button, StickyHeader, useHeaderScroll } from "../components/chrome.jsx";
+import { Ring, Modal, Text, Button, TabScreen } from "../components/chrome.jsx";
 import { readingUnlocked, READING_PACKS } from "../reading.js";
 
 // Play the Learn entrance once per app load — and only after the splash has
@@ -232,9 +232,8 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
   );
 }
 
-function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
+function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenScenes, onOpenVerbChart }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   const progress = useProgress();
   const hard = progress.hard;
   const isAlpha = (i) => !BANKS[CHAPTERS[i].id];
@@ -471,17 +470,16 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
   };
 
   return (
-    <>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>
+    <TabScreen active="Learn" onNav={onNav} header={
+      <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>HeroKana</span>
         {hard && (
           <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: t.wrong,
             background: t.wrongSoft, padding: "3px 8px", borderRadius: 7 }}>HARD MODE</span>
         )}
-      </StickyHeader>
-      <div onScroll={onHeaderScroll}
-        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain", padding: "0 20px calc(94px + env(safe-area-inset-bottom))", paddingTop: headerH }}>
+      </>
+    }>
 
       {/* .hk-rise: on a tab switch the whole content pane rises as one block (the
           header/nav stay put). On first load this wrapper is static and the inner
@@ -602,7 +600,7 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         {...touchHandlers} {...mouseHandlers}>
         <div ref={trackRef} style={{ display: "flex", width: "300%", alignItems: "flex-start", willChange: "transform" }}>
           {[prevIdx, sel, nextIdx].map((idx, i) => (
-            <div key={i === 1 ? `c-${sel}` : i} ref={slotRefs[i]} style={{ flex: "0 0 33.333%", minWidth: 0, padding: "0 20px 58px" }}>
+            <div key={i === 1 ? `c-${sel}` : i} ref={slotRefs[i]} style={{ flex: "0 0 33.333%", minWidth: 0, padding: "12px 20px 58px" }}>
               <ChapterCard chapterIdx={idx} {...cardProps} />
             </div>
           ))}
@@ -644,11 +642,10 @@ function HomeBody({ onStart, onStartReview, onReviewChapter, onOpenBasics, onOpe
         </Modal>
       )}
       </div>
-    </div>
-    </>
+    </TabScreen>
   );
 }
 
 export default function Home({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics, onOpenKanaBasics, onOpenChart, onStartSession, onOpenVerbChart }) {
-  return <Shell active="Learn" onNav={onNav} whiteTop><HomeBody onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} onOpenVerbChart={onOpenVerbChart} /></Shell>;
+  return <HomeBody onNav={onNav} onStart={onStart} onStartReview={onStartReview} onReviewChapter={onReviewChapter} onOpenBasics={onOpenBasics} onOpenKanaBasics={onOpenKanaBasics} onOpenChart={onOpenChart} onStartSession={onStartSession} onOpenScenes={() => onNav("Scenes")} onOpenVerbChart={onOpenVerbChart} />;
 }
