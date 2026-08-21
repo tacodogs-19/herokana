@@ -476,7 +476,17 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
   };
 
   return (
-    <TabScreen active="Learn" onNav={onNav} header={
+    <TabScreen active="Learn" onNav={onNav}
+      headerRight={progress.reviewDue > 0 && (
+        <button onClick={onStartReview} className="hk-press" aria-label={`Daily review — ${progress.reviewDue} due`}
+          style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, cursor: "pointer", border: "none",
+            background: "rgba(255,255,255,0.12)", color: t.onChrome, borderRadius: 999,
+            padding: "6px 12px 6px 10px", fontFamily: DISPLAY, fontWeight: 700, fontSize: 12.5, whiteSpace: "nowrap" }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
+          Daily Review
+        </button>
+      )}
+      header={
       <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>HeroKana</span>
@@ -492,24 +502,6 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
           blocks below play the staggered .hk-enter instead — the two never overlap
           (anim is false once homeEntered, i.e. on every tab switch back here). */}
       <div className="hk-rise">
-      {progress.reviewDue > 0 && (
-        <button onClick={onStartReview} className={"hk-press" + (anim ? " hk-enter" : "")}
-          style={{ "--i": 0, width: "100%", display: "flex", alignItems: "center", gap: 13, padding: "13px 15px", marginTop: 32, marginBottom: 48,
-            borderRadius: 18, cursor: "pointer", background: t.surface, border: "none", textAlign: "left", boxShadow: t.cardShadow }}>
-          <span style={{ display: "flex", width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: t.primarySoft,
-            alignItems: "center", justifyContent: "center" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={t.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
-          </span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Ready to review</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>
-              {progress.reviewDue} {progress.reviewDue === 1 ? "item" : "items"} to refresh — a quick warm-up
-            </div>
-          </div>
-          <span style={{ color: t.primary, fontSize: 17, flexShrink: 0 }}>›</span>
-        </button>
-      )}
-
       <div className={enterCls} style={{ "--i": 1, margin: "32px 0 20px" }}>
         <Text variant="eyebrow" color={t.ink} style={{ margin: "0 0 12px" }}>YOUR PROGRESS</Text>
 

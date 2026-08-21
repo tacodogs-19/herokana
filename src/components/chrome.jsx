@@ -53,7 +53,7 @@ export function useHeaderScroll() {
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
-export function StickyHeader({ scrolled, children, overlay = false, innerRef }) {
+export function StickyHeader({ scrolled, children, right, overlay = false, innerRef }) {
   const { t } = useTheme();
   // Solid header (same navy as the status bar, so the top strip stays seamless)
   // with concave bottom corners, so the white content pane tucks under it.
@@ -80,6 +80,10 @@ export function StickyHeader({ scrolled, children, overlay = false, innerRef }) 
         transition: "transform 300ms var(--ease-header)" }}>
         {children}
       </div>
+      {/* Right-aligned header action (e.g. Daily Review), pushed opposite the
+          logo. Sits outside the scaling cluster so it stays a stable tap target
+          as the logo shrinks on scroll. */}
+      {right && <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center" }}>{right}</div>}
       {/* top: calc(100% - 1px) overlaps the corners 1px into the header so there's
           no subpixel gap between the header's bottom edge and the corners for the
           white pane behind to peek through during scroll/overscroll. */}
@@ -340,11 +344,11 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 // useHeaderScroll. A screen supplies its `header` content and its scrollable
 // body; the header-height spacer, overscroll containment and the compact-scroll
 // flag live here so they can't drift across screens.
-export function TabScreen({ active, onNav, header, children }) {
+export function TabScreen({ active, onNav, header, headerRight, children }) {
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   return (
     <Shell active={active} onNav={onNav} whiteTop>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef}>{header}</StickyHeader>
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={headerRight}>{header}</StickyHeader>
       <div onScroll={onHeaderScroll}
         style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
           // Longhand (not the `padding` shorthand + a paddingTop override): the
