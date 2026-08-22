@@ -269,7 +269,7 @@ function LessonBody({ session, onComplete, onExit }) {
           ].map((f) => (
             <div key={f.label} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2,
               background: t.chipTint, borderRadius: 14, padding: "9px 18px", minWidth: 96 }}>
-              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", color: t.faint, fontFamily: DISPLAY }}>{f.label}</span>
+              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", color: t.sub, fontFamily: DISPLAY }}>{f.label}</span>
               <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{f.jp}</span>
               <span style={{ fontSize: 11.5, fontWeight: 700, color: t.sub, fontFamily: DISPLAY }}>{f.r}</span>
             </div>
