@@ -3,6 +3,7 @@ import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { HIRA, KATA, mnemonicFor } from "../data";
 import { speakKana } from "../speech.js";
 import STROKES from "../strokes.json";
+import { useDragDismiss } from "../components/chrome.jsx";
 
 // Animated stroke order (KanjiVG data, 109x109 viewBox). A faint full glyph
 // sits underneath as the guide; strokes draw in sequence. Tap to replay.
@@ -94,6 +95,7 @@ const CardIcon = ({ color }) => (
 
 export default function KanaChart({ onClose }) {
   const { t } = useTheme();
+  const swipe = useDragDismiss({ onDismiss: onClose });
   const [kana,      setKana]      = React.useState(() => loadPrefs().kana || "hira");
   const [view,      setView]      = React.useState(() => loadPrefs().view || "card");
   const [rowFilter, setRowFilter] = React.useState("all");
@@ -238,7 +240,7 @@ export default function KanaChart({ onClose }) {
   });
 
   return (
-    <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)", display: "flex", flexDirection: "column",
+    <div ref={swipe.rootRef} style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)", display: "flex", flexDirection: "column",
       maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
       overflow: "hidden", borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)", animation: "hkFade 160ms ease both" }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg }}>
@@ -260,7 +262,7 @@ export default function KanaChart({ onClose }) {
         </div>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: view === "card" ? "hidden" : "auto", overflowX: "hidden", padding: "4px 20px 28px", display: "flex", flexDirection: "column" }}>
+      <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, overflowY: view === "card" ? "hidden" : "auto", overflowX: "hidden", padding: "4px 20px 28px", display: "flex", flexDirection: "column" }}>
 
         {/* first-visit hint */}
         {hint && (

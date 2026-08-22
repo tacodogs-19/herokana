@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Cat, Button } from "../components/chrome.jsx";
+import { Shell, Cat, Button, useDragDismiss } from "../components/chrome.jsx";
 import { dialogueById, prepareDialogue, SUPPORT } from "../dialogue.js";
 import { speakLine, stopSpeech, useSpeechRecognition, useRecorder, looseMatch, toKana } from "../speech.js";
 
@@ -70,6 +70,10 @@ function DialogueBody({ dialogueId, onExit }) {
   const [results, setResults] = React.useState([]); // { correct } per check
   const [phase, setPhase] = React.useState("play"); // play | done
   const scrollRef = React.useRef(null);
+  const swipe = useDragDismiss({ onDismiss: onExit });
+  // transcript is both auto-scrolled (scrollRef) and the drag-dismiss scroll
+  // container (swipe), so fan the node out to both refs.
+  const setTranscript = (el) => { scrollRef.current = el; swipe.scrollProps.ref.current = el; };
 
   const line = lines[idx];
   const isCheck = !!(line && line.check);
@@ -128,8 +132,8 @@ function DialogueBody({ dialogueId, onExit }) {
     const passed = pct >= 80;
     const canStepDown = passed && levelIdx < SUPPORT.length - 1;
     return (
-      <Shell nav={false} modal>
-      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", overflowY: "auto" }}>
+      <Shell nav={false} modal outerRef={swipe.rootRef}>
+      <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", overflowY: "auto" }}>
         <div style={{ textAlign: "center" }}>
           <Cat mood={passed ? "run" : "general"} size={120} style={{ margin: "0 auto" }} />
           <p style={{ margin: "4px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 900, color: t.primary }}>
@@ -190,7 +194,7 @@ function DialogueBody({ dialogueId, onExit }) {
   const heading = isCheck ? line.ask : "Listen";
 
   return (
-    <Shell nav={false} scrollShadow={false} modal>
+    <Shell nav={false} scrollShadow={false} modal outerRef={swipe.rootRef}>
     <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px" }}>
       {/* top bar: exit + segmented progress */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 12 }}>
@@ -231,7 +235,7 @@ function DialogueBody({ dialogueId, onExit }) {
       <h2 style={{ margin: "0 0 12px", fontSize: 20, fontWeight: 800, color: t.ink }}>{heading}</h2>
 
       {/* transcript so far */}
-      <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12, padding: "2px 0 8px" }}>
+      <div ref={setTranscript} style={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12, padding: "2px 0 8px" }}>
         {lines.slice(0, idx + 1).map((ln, k) => {
           const active = k === idx;
           const answeredThis = active ? answered : true;

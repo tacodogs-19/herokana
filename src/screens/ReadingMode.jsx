@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell, Cat, Button } from "../components/chrome.jsx";
+import { Shell, Cat, Button, useDragDismiss } from "../components/chrome.jsx";
 import { packById, buildReadingSession, slowWords, band, BAND_COPY } from "../reading.js";
 
 // Maneki-neko reaction by reading speed (the brief: paw up = fast, sleepy =
@@ -11,7 +11,7 @@ const moodFor = (correct, b) => (!correct ? "sad" : b === "instant" ? "point" : 
 
 const fmt = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
-function ReadingBody({ packId, slow, onExit }) {
+function ReadingBody({ packId, slow, onExit, scrollProps }) {
   const { t } = useTheme();
   const progress = useProgress();
   const pack = packById(packId);
@@ -65,7 +65,7 @@ function ReadingBody({ packId, slow, onExit }) {
 
   if (phase === "done") {
     return (
-      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", textAlign: "center", overflowY: "auto" }}>
+      <div {...scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "18px 22px 22px", textAlign: "center", overflowY: "auto" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
           <Cat mood="run" size={132} />
           <p style={{ margin: "6px 0 0", fontSize: 12.5, letterSpacing: "0.14em", fontWeight: 900, color: t.primary }}>
@@ -93,7 +93,7 @@ function ReadingBody({ packId, slow, onExit }) {
   }
 
   return (
-    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
+    <div {...scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
       {/* top bar: close + segmented progress (same idiom as Lesson) */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 22 }}>
         <button onClick={onExit} className="hk-press" aria-label="Exit reading" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
@@ -178,5 +178,6 @@ function ReadingBody({ packId, slow, onExit }) {
 }
 
 export default function ReadingMode({ packId, slow, onExit }) {
-  return <Shell nav={false} modal><ReadingBody packId={packId} slow={slow} onExit={onExit} /></Shell>;
+  const swipe = useDragDismiss({ onDismiss: onExit });
+  return <Shell nav={false} modal outerRef={swipe.rootRef}><ReadingBody packId={packId} slow={slow} onExit={onExit} scrollProps={swipe.scrollProps} /></Shell>;
 }

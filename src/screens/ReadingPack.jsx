@@ -1,13 +1,13 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
-import { Shell } from "../components/chrome.jsx";
+import { Shell, useDragDismiss } from "../components/chrome.jsx";
 import { packById, slowWords } from "../reading.js";
 import { dialoguesForPack, checkCount, SUPPORT } from "../dialogue.js";
 
 const fmt = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
-function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
+function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue, scrollProps }) {
   const { t } = useTheme();
   const progress = useProgress();
   const pack = packById(packId);
@@ -17,7 +17,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
   const dialogues = dialoguesForPack(packId); // audio comes from bundled clips, no device voice needed
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
+    <div {...scrollProps} style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 20px 24px" }}>
       <button onClick={onBack} className="hk-press" aria-label="Back" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.ink, padding: 4, marginBottom: 8, marginLeft: -4, display: "flex" }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
       </button>
@@ -108,9 +108,10 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue }) {
 }
 
 export default function ReadingPack({ packId, onNav, onBack, onStartReading, onStartDialogue }) {
+  const swipe = useDragDismiss({ onDismiss: onBack });
   return (
-    <Shell active="Scenes" onNav={onNav} nav={false} modal>
-      <ReadingPackBody packId={packId} onBack={onBack} onStartReading={onStartReading} onStartDialogue={onStartDialogue} />
+    <Shell active="Scenes" onNav={onNav} nav={false} modal outerRef={swipe.rootRef}>
+      <ReadingPackBody packId={packId} onBack={onBack} onStartReading={onStartReading} onStartDialogue={onStartDialogue} scrollProps={swipe.scrollProps} />
     </Shell>
   );
 }
