@@ -394,7 +394,10 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
     <div ref={outerRef} style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
-      display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative" }}>
+      display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative",
+      // modal: a drop shadow on the moving frame so the sheet lifts off the navy
+      // and off the screen behind it while it slides / is dragged.
+      ...(modal && { boxShadow: "0 -8px 30px rgba(8, 12, 24, 0.45)" }) }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens
@@ -412,7 +415,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
             darker chrome (which shows through the status-bar strip + corners),
             so full-screen takeovers read like a default iOS modal. */}
         <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-          ...(modal && { background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20 }) }}>
+          ...(modal && { background: t.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28 }) }}>
           {children}
         </div>
       </div>
@@ -430,29 +433,30 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, headerRight, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
-  // The light content pane sits on the navy, with rounded top corners at the
-  // header's bottom. Its top tracks the header's compact/tall states (~22px
-  // shorter when scrolled) with the same easing, so the corners always meet the
-  // header edge and scrolled content never spills onto the navy above the pane.
+  // The light content pane sits on the navy with rounded top corners at the
+  // header's bottom. It IS the scroll container, so content clips to the rounded
+  // corners. Its top tracks the header's compact/tall states (~22px shorter when
+  // scrolled) with the same easing, so the corners always meet the header edge.
   const paneTop = headerH ? (scrolled ? Math.max(0, headerH - 22) : headerH) : 0;
+  // Skip the top-tracking transition on first mount (headerH measures from 0 to
+  // its value), so the pane doesn't slide/round in on load; enable it after.
+  const [animate, setAnimate] = React.useState(false);
+  React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
   return (
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={headerRight}>{header}</StickyHeader>
-      <div aria-hidden style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 0,
-        // white at the top of the pane, easing down to the grey planeTop. Pinned
-        // to 100vh (not the pane's own height) so it doesn't rescale as the pane
-        // top shifts on scroll or the dynamic viewport changes.
-        backgroundImage: `linear-gradient(180deg, ${t.surface}, ${t.planeTop})`,
-        backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat",
-        borderTopLeftRadius: 28, borderTopRightRadius: 28,
-        transition: "top 300ms var(--ease-header)" }} />
       <div onScroll={onHeaderScroll}
-        style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
-          // Longhand (not the `padding` shorthand + a paddingTop override): the
-          // shorthand's env()/calc value serialises to an empty style attribute
-          // when overridden, so an innerHTML snapshot clone would lose its side
-          // padding and slam content to the left edge.
-          paddingTop: headerH, paddingRight: 20, paddingLeft: 20,
+        style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
+          overflowY: "auto", overscrollBehaviorY: "contain",
+          // white at the top of the pane easing down to the grey planeTop, pinned
+          // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
+          backgroundImage: `linear-gradient(180deg, ${t.surface}, ${t.planeTop})`,
+          backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat",
+          borderTopLeftRadius: 28, borderTopRightRadius: 28,
+          transition: animate ? "top 300ms var(--ease-header)" : "none",
+          // Longhand (not the `padding` shorthand + env()/calc): the shorthand
+          // serialises to an empty style attribute in an innerHTML snapshot clone.
+          paddingRight: 20, paddingLeft: 20,
           paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
         {children}
       </div>
