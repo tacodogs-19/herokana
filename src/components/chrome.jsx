@@ -306,26 +306,28 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
   cb.current = { onDismiss, onBlocked, canDismiss };
 
   React.useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const root = rootRef.current;
+    if (!root) return;
     let g = null; // active gesture, or null
     const setT = (transform, transition) => {
       const r = rootRef.current; if (!r) return;
       r.style.transition = transition || "none";
       r.style.transform = transform;
     };
-    // Native touch-scroll and a custom vertical drag can't share the y-axis
-    // through touch-action, so we only own the gesture when the sheet fits
-    // (nothing to scroll): touch-action:none stops the browser hijacking the
-    // pull. When content overflows (e.g. keyboard open) we fall back to pan-y
-    // and let it scroll — the drag yields. Non-passive touchmove so our
-    // preventDefault actually cancels native scrolling.
-    const fits = () => el.scrollHeight <= el.clientHeight + 1;
-    const syncTA = () => { el.style.touchAction = fits() ? "none" : "pan-y"; };
+    // Listen on the stable root (not the scroll box) and read the CURRENT scroll
+    // container live — a screen's scroll element can change across its states
+    // (e.g. a reading view vs its done view). Native touch-scroll and a custom
+    // vertical drag can't share the y-axis through touch-action, so we only own
+    // the gesture when the sheet fits (touch-action:none stops the browser
+    // hijacking the pull); when it overflows we fall back to pan-y and only
+    // engage at scrollTop 0. Non-passive touchmove so preventDefault cancels scroll.
+    const scEl = () => scrollRef.current;
+    const fits = () => { const el = scEl(); return !el || el.scrollHeight <= el.clientHeight + 1; };
+    const syncTA = () => { const el = scEl(); if (el) el.style.touchAction = fits() ? "none" : "pan-y"; };
     syncTA();
     const onStart = (e) => {
       syncTA();
-      if (e.touches.length !== 1 || !fits()) { g = null; return; }
+      if (e.touches.length !== 1) { g = null; return; }
       const t = e.touches[0];
       g = { y0: t.clientY, x0: t.clientX, t0: Date.now(), on: false, dead: false };
     };
@@ -334,7 +336,8 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
       const t = e.touches[0];
       const dy = t.clientY - g.y0, dx = t.clientX - g.x0;
       if (!g.on) {
-        if (dy > 6 && dy > Math.abs(dx)) g.on = true;       // downward, mostly vertical → engage
+        if ((scEl()?.scrollTop || 0) > 0) { g.dead = true; return; } // scrolled → let it scroll, don't dismiss
+        if (dy > 6 && dy > Math.abs(dx)) g.on = true;               // at the top, pulling down → engage
         else if (dy < -2 || Math.abs(dx) > 10) { g.dead = true; return; } // up / sideways → not ours
         else return;
       }
@@ -358,18 +361,18 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
         setT("translateY(0)", "transform 260ms var(--ease-out-quart)");
       }
     };
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    el.addEventListener("touchcancel", onEnd, { passive: true });
+    root.addEventListener("touchstart", onStart, { passive: true });
+    root.addEventListener("touchmove", onMove, { passive: false });
+    root.addEventListener("touchend", onEnd, { passive: true });
+    root.addEventListener("touchcancel", onEnd, { passive: true });
     const vv = window.visualViewport;
     window.addEventListener("resize", syncTA);
     vv && vv.addEventListener("resize", syncTA);
     return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
+      root.removeEventListener("touchstart", onStart);
+      root.removeEventListener("touchmove", onMove);
+      root.removeEventListener("touchend", onEnd);
+      root.removeEventListener("touchcancel", onEnd);
       window.removeEventListener("resize", syncTA);
       vv && vv.removeEventListener("resize", syncTA);
     };
@@ -434,13 +437,15 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, headerRight, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
-  // The light content pane sits on the navy with rounded top corners at the
-  // header's bottom. It IS the scroll container, so content clips to the rounded
-  // corners. Its top tracks the header's compact/tall states (~22px shorter when
-  // scrolled) with the same easing, so the corners always meet the header edge.
-  const paneTop = headerH ? (scrolled ? Math.max(0, headerH - 22) : headerH) : 0;
-  // Skip the top-tracking transition on first mount (headerH measures from 0 to
-  // its value), so the pane doesn't slide/round in on load; enable it after.
+  // The light content pane sits on the navy with rounded top corners AT the
+  // header's bottom, and it IS the scroll container so content clips to those
+  // corners. The header shrinks by EXACTLY its padding delta on scroll —
+  // (14+24) - (9+9) = 20px; the logo's scale(0.9) is a visual transform and
+  // doesn't change layout height — so the compact top is exactly headerH - 20.
+  // A larger offset would let the header edge overlap and clip the corners.
+  const paneTop = headerH ? (scrolled ? headerH - 20 : headerH) : 0;
+  // Skip the top transition on first mount (headerH measures from 0), so the
+  // pane doesn't slide/round in on load; enable it after a frame.
   const [animate, setAnimate] = React.useState(false);
   React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
   return (
@@ -448,13 +453,13 @@ export function TabScreen({ active, onNav, header, headerRight, children }) {
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={headerRight}>{header}</StickyHeader>
       <div onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
+          transition: animate ? "top 300ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
           // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
           backgroundImage: `linear-gradient(180deg, ${t.surface}, ${t.planeTop})`,
           backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat",
           borderTopLeftRadius: 28, borderTopRightRadius: 28,
-          transition: animate ? "top 300ms var(--ease-header)" : "none",
           // Longhand (not the `padding` shorthand + env()/calc): the shorthand
           // serialises to an empty style attribute in an innerHTML snapshot clone.
           paddingRight: 20, paddingLeft: 20,
