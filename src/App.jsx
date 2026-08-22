@@ -271,9 +271,10 @@ export default function App() {
           <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
             style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", transform: "translateZ(0)" }}
             dangerouslySetInnerHTML={{ __html: snap.html }} />
-          {/* dim over the held modal (DOM after it, before the wrapper) so its
-              corners recede; the incoming sheet paints above this scrim */}
-          {snap.dim && <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)" }} />}
+          {/* dim the held screen behind the incoming sheet (DOM after it, before
+              the wrapper) — revealed during the slide-up and while dragging the
+              sheet down, for iOS-sheet depth */}
+          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)" }} />
         </>
       )}
       {/* zIndex 1 keeps the live screen above the persistent behind-snapshot
@@ -283,13 +284,18 @@ export default function App() {
       <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined}
         style={{ position: "relative", zIndex: 1, ...animStyle }}
         onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp" && !MODAL_SCREENS.has(scr.name)) setSnap(null); }}>{content}</div>
-      {/* back: the leaving screen slides down off the bottom, on top */}
+      {/* back: the leaving screen slides down off the bottom, on top. A dim over
+          the destination fades out as it's revealed — depth on the way out too. */}
       {snap && snap.mode === "dismiss" && (
-        <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
-          style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
-            animation: "hkSlideDown 170ms var(--ease-drawer) both" }}
-          onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
-          dangerouslySetInnerHTML={{ __html: snap.html }} />
+        <>
+          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 40, pointerEvents: "none",
+            background: "rgba(8,12,24,0.4)", animation: "hkDimOut 170ms var(--ease-drawer) both" }} />
+          <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
+            style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
+              animation: "hkSlideDown 170ms var(--ease-drawer) both" }}
+            onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
+            dangerouslySetInnerHTML={{ __html: snap.html }} />
+        </>
       )}
     </div>
   );
