@@ -239,8 +239,9 @@ export default function KanaChart({ onClose }) {
 
   return (
     <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)", display: "flex", flexDirection: "column",
-      maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink, animation: "hkFade 160ms ease both" }}>
-      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+      maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
+      overflow: "hidden", borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)", animation: "hkFade 160ms ease both" }}>
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg }}>
 
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"
