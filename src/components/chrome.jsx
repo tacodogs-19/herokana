@@ -1,5 +1,24 @@
 import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
+import { useProgress } from "../store.jsx";
+
+// The Daily Review pill — a subtle gold action in the top-right of every tab
+// header, opposite the logo. Shows only when there are items due; taps into
+// onReview. Lives here so all four tab screens render it identically.
+export function DailyReviewPill({ onReview }) {
+  const { t } = useTheme();
+  const progress = useProgress();
+  if (!onReview || !progress.reviewDue) return null;
+  return (
+    <button onClick={onReview} className="hk-press" aria-label={`Daily review — ${progress.reviewDue} due`}
+      style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, cursor: "pointer", border: "none",
+        background: "rgba(255,255,255,0.12)", color: t.gold, borderRadius: 999,
+        padding: "6px 12px 6px 10px", fontFamily: DISPLAY, fontWeight: 600, fontSize: 12.5, whiteSpace: "nowrap" }}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
+      Daily Review
+    </button>
+  );
+}
 
 // ── Text ──────────────────────────────────────────────────────────────────
 // One source of truth for the app's text roles. Screens use <Text variant>
@@ -434,7 +453,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 // useHeaderScroll. A screen supplies its `header` content and its scrollable
 // body; the header-height spacer, overscroll containment and the compact-scroll
 // flag live here so they can't drift across screens.
-export function TabScreen({ active, onNav, header, headerRight, children }) {
+export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
   // The light content pane sits on the navy with rounded top corners AT the
@@ -450,7 +469,7 @@ export function TabScreen({ active, onNav, header, headerRight, children }) {
   React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
   return (
     <Shell active={active} onNav={onNav} whiteTop>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={headerRight}>{header}</StickyHeader>
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
       <div onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
           transition: animate ? "top 300ms var(--ease-header)" : "none",

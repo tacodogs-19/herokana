@@ -164,7 +164,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
   );
 }
 
-function ReadingBody({ onNav, onOpenPack }) {
+function ReadingBody({ onNav, onOpenPack, onReview }) {
   const { t } = useTheme();
   const progress = useProgress();
   const unlocked = readingUnlocked(progress);
@@ -190,7 +190,7 @@ function ReadingBody({ onNav, onOpenPack }) {
   const hasScenesData = Object.keys(progress.reading).length > 0 || Object.keys(progress.dialogues).length > 0;
 
   return (
-    <TabScreen active="Scenes" onNav={onNav} header={
+    <TabScreen active="Scenes" onNav={onNav} onReview={onReview} header={
       <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Scenes</h1>
@@ -276,6 +276,6 @@ function ReadingBody({ onNav, onOpenPack }) {
   );
 }
 
-export default function Reading({ onNav, onOpenPack }) {
-  return <ReadingBody onNav={onNav} onOpenPack={onOpenPack} />;
+export default function Reading({ onNav, onOpenPack, onReview }) {
+  return <ReadingBody onNav={onNav} onOpenPack={onOpenPack} onReview={onReview} />;
 }

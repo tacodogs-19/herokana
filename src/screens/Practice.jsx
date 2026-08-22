@@ -37,7 +37,7 @@ const DIFFICULTIES = [
 const ROUND_SIZES = [5, 10, 15, 20];
 const MODE_COUNT = 10; // the one-tap practice modes use a fixed round size — no picker
 
-function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
+function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics, onReview }) {
   const { t } = useTheme();
   const progress = useProgress();
   const [picked, setPicked] = React.useState(() => loadSessionSet("hk-prac-chapters"));
@@ -171,7 +171,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
   );
 
   return (
-    <TabScreen active="Practice" onNav={onNav} header={
+    <TabScreen active="Practice" onNav={onNav} onReview={onReview} header={
       <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Practice</h1>
@@ -430,6 +430,6 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
   );
 }
 
-export default function Practice({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics }) {
-  return <PracticeBody onNav={onNav} onStart={onStart} onOpenChart={onOpenChart} onOpenVerbChart={onOpenVerbChart} onOpenBasics={onOpenBasics} />;
+export default function Practice({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasics, onReview }) {
+  return <PracticeBody onNav={onNav} onStart={onStart} onOpenChart={onOpenChart} onOpenVerbChart={onOpenVerbChart} onOpenBasics={onOpenBasics} onReview={onReview} />;
 }

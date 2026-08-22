@@ -4,7 +4,7 @@ import { useProgress } from "../store.jsx";
 import { Ring, Modal, Text, Card, Button, TabScreen } from "../components/chrome.jsx";
 import { downloadBackup, inspectBackup, applyBackup } from "../backup.js";
 
-function ProfileBody({ onNav, onEditProfile, onReset }) {
+function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
   const { t, mode, setMode, followsSystem, followSystem } = useTheme();
   const p = useProgress();
   const xpPct = Math.min(100, Math.round((p.xp / p.xpToNext) * 100));
@@ -34,7 +34,7 @@ function ProfileBody({ onNav, onEditProfile, onReset }) {
   );
 
   return (
-    <TabScreen active="Profile" onNav={onNav} header={
+    <TabScreen active="Profile" onNav={onNav} onReview={onReview} header={
       <>
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Profile</h1>
@@ -214,6 +214,6 @@ function ProfileBody({ onNav, onEditProfile, onReset }) {
   );
 }
 
-export default function Profile({ onNav, onEditProfile, onReset }) {
-  return <ProfileBody onNav={onNav} onEditProfile={onEditProfile} onReset={onReset} />;
+export default function Profile({ onNav, onEditProfile, onReset, onReview }) {
+  return <ProfileBody onNav={onNav} onEditProfile={onEditProfile} onReset={onReset} onReview={onReview} />;
 }

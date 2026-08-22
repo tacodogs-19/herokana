@@ -221,9 +221,9 @@ export default function App() {
         onReadingGrad={() => replace({ name: "reading" })} />
     );
   else if (scr.name === "profile")
-    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} />;
+    content = <Profile onNav={nav} onEditProfile={() => setEditing(true)} onReset={() => progress.resetProgress()} onReview={startReview} />;
   else if (scr.name === "practice")
-    content = <Practice onNav={nav} onStart={startPractice} onOpenChart={openKanaChart} onOpenVerbChart={openVerbChart} onOpenBasics={openBasics} />;
+    content = <Practice onNav={nav} onStart={startPractice} onOpenChart={openKanaChart} onOpenVerbChart={openVerbChart} onOpenBasics={openBasics} onReview={startReview} />;
   else if (scr.name === "kanaChart")
     content = <KanaChart onClose={goBack} />;
   else if (scr.name === "verbChart")
@@ -235,7 +235,7 @@ export default function App() {
     content = <Basics title="Kana basics" cards={KANA_BASICS} onClose={goBack}
       intro="What the Japanese writing system is, before you learn your first sounds." />;
   else if (scr.name === "reading")
-    content = <Reading onNav={nav} onOpenPack={openPack} />;
+    content = <Reading onNav={nav} onOpenPack={openPack} onReview={startReview} />;
   else if (scr.name === "readingPack")
     content = <ReadingPack packId={scr.packId} onNav={nav} onBack={goBack}
       onStartReading={startReading} onStartDialogue={startDialogue} />;
@@ -273,8 +273,10 @@ export default function App() {
             dangerouslySetInnerHTML={{ __html: snap.html }} />
           {/* dim the held screen behind the incoming sheet (DOM after it, before
               the wrapper) — revealed during the slide-up and while dragging the
-              sheet down, for iOS-sheet depth */}
-          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)" }} />
+              sheet down, for iOS-sheet depth. Fades in over the slide-up duration
+              so it ramps with the movement instead of snapping on. */}
+          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)",
+            animation: navDir === "forward" ? "hkSlideFade 340ms var(--ease-drawer) both" : undefined }} />
         </>
       )}
       {/* zIndex 1 keeps the live screen above the persistent behind-snapshot
