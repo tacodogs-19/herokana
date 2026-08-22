@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 import { CHAPTERS } from "../data";
-import { Shell, Modal } from "../components/chrome.jsx";
+import { Shell, Modal, useDragDismiss } from "../components/chrome.jsx";
 import { buildQuestions, MODE_TITLES, KANA_COMPOSE, canProduce } from "../questions.js";
 import { speakKana, kanaClipFor, wordClipFor, speakVerb, verbClipFor, useJaVoice } from "../speech.js";
 
@@ -44,6 +44,12 @@ function LessonBody({ session, onComplete, onExit }) {
   if (!q) return null;
   // confirm before leaving only if the learner is mid-round
   const tryExit = () => (results.length > 0 || i > 0 ? setConfirmExit(true) : onExit());
+  // Drag the sheet down to dismiss — mirrors tryExit: confirm mid-round, else leave.
+  const swipe = useDragDismiss({
+    onDismiss: onExit,
+    onBlocked: () => setConfirmExit(true),
+    canDismiss: () => !(results.length > 0 || i > 0),
+  });
   const isSpeed = session.kind === "mode" && session.mode === "speed";
   // lenient typed matching: case, spacing, and punctuation don't count
   const norm = (s) => s.toLowerCase().replace(/’/g, "'").replace(/[?.!,]/g, "").replace(/\s+/g, " ").trim();
@@ -164,7 +170,8 @@ function LessonBody({ session, onComplete, onExit }) {
   const longOptions = !q.input && q.options?.some((o) => o.length > 12);
 
   return (
-    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
+    <Shell nav={false} modal outerRef={swipe.rootRef}>
+    <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto", touchAction: "pan-y" }}>
       {/* top bar: close + segmented progress */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
@@ -455,9 +462,10 @@ function LessonBody({ session, onComplete, onExit }) {
         </Modal>
       )}
     </div>
+    </Shell>
   );
 }
 
 export default function Lesson({ session, onComplete, onExit }) {
-  return <Shell nav={false} modal><LessonBody session={session} onComplete={onComplete} onExit={onExit} /></Shell>;
+  return <LessonBody session={session} onComplete={onComplete} onExit={onExit} />;
 }

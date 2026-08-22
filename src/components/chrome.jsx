@@ -295,8 +295,61 @@ export function Modal({ children, onDismiss, position = "center" }) {
   );
 }
 
+// ── useDragDismiss ────────────────────────────────────────────────────────
+// Drag-down-to-dismiss for full-screen modal sheets. Attach `scrollProps` to
+// the screen's scroll container (its scrollTop gates the pull, so the gesture
+// never fights an active scroll — it only engages at the top, pulling down) and
+// `rootRef` to the Shell that should slide. Touch/pen only; mouse users keep the
+// close button. On release past 25% of the sheet height (or a fast flick) it
+// calls onDismiss — which hands off to the app's normal dismiss animation from
+// the dragged position (the snapshot captures this transform), revealing the
+// destination behind. If canDismiss() is false (e.g. mid-lesson) it snaps back
+// and calls onBlocked instead (e.g. to raise a confirm). Otherwise it snaps back.
+export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
+  const rootRef = React.useRef(null);
+  const scrollRef = React.useRef(null);
+  const g = React.useRef(null); // active gesture, or null
+  const move = (transform, transition) => {
+    const el = rootRef.current; if (!el) return;
+    el.style.transition = transition || "none";
+    el.style.transform = transform;
+  };
+  const onPointerDown = (e) => {
+    if (e.pointerType === "mouse") return; // desktop uses the close button
+    if ((scrollRef.current?.scrollTop ?? 0) > 0) return; // only from the top
+    g.current = { id: e.pointerId, y0: e.clientY, x0: e.clientX, t0: Date.now(), on: false };
+  };
+  const onPointerMove = (e) => {
+    const s = g.current; if (!s || e.pointerId !== s.id) return;
+    const dy = e.clientY - s.y0, dx = e.clientX - s.x0;
+    if (!s.on) {
+      if ((scrollRef.current?.scrollTop ?? 0) > 0) { g.current = null; return; }
+      if (dy > 8 && dy > Math.abs(dx)) { s.on = true; try { e.currentTarget.setPointerCapture(s.id); } catch (err) {} }
+      else if (dy < -4 || Math.abs(dx) > 12) { g.current = null; return; } // scroll / horizontal → not ours
+      else return;
+    }
+    move(`translateY(${Math.max(0, dy)}px)`);
+    e.preventDefault();
+  };
+  const end = (e) => {
+    const s = g.current; if (!s || (e && e.pointerId !== s.id)) return;
+    g.current = null;
+    if (!s.on) return;
+    const dy = Math.max(0, e.clientY - s.y0);
+    const vy = dy / Math.max(1, Date.now() - s.t0);
+    const H = rootRef.current?.offsetHeight || 800;
+    if (dy > H * 0.25 || vy > 0.5) {
+      if (!canDismiss || canDismiss()) { onDismiss(); return; } // leave the transform put; app dismiss continues from here
+      move("translateY(0)", "transform 260ms var(--ease-out-quart)"); onBlocked && onBlocked();
+    } else {
+      move("translateY(0)", "transform 260ms var(--ease-out-quart)");
+    }
+  };
+  return { rootRef, scrollProps: { ref: scrollRef, onPointerDown, onPointerMove, onPointerUp: end, onPointerCancel: end } };
+}
+
 // App shell — fills the viewport, phone-width on larger screens.
-export function Shell({ children, active = "Learn", onNav, nav = true, plane = nav, whiteTop = false, modal = false }) {
+export function Shell({ children, active = "Learn", onNav, nav = true, plane = nav, whiteTop = false, modal = false, outerRef }) {
   const { t } = useTheme();
   // whiteTop: the static plane turns white just below the header (so content
   // reads as a white pane tucked under the inverse corners) and fades to the
@@ -310,7 +363,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
     ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 40px), ${t.planeTop} 100%)`
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
-    <div style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
+    <div ref={outerRef} style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
       display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative" }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
