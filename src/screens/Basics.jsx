@@ -13,7 +13,7 @@ export default function Basics({ title, intro, cards, onClose }) {
       maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
       overflow: "hidden", borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)", animation: "hkFade 160ms ease both" }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg }}>
-      <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px 12px" }}>
+      <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"
           style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0, display: "flex" }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>

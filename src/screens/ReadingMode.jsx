@@ -93,7 +93,7 @@ function ReadingBody({ packId, slow, onExit, scrollProps }) {
   }
 
   return (
-    <div {...scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
+    <div {...scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "20px 20px 18px", overflowY: "auto" }}>
       {/* top bar: close + segmented progress (same idiom as Lesson) */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 22 }}>
         <button onClick={onExit} className="hk-press" aria-label="Exit reading" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>

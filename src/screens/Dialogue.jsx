@@ -195,7 +195,7 @@ function DialogueBody({ dialogueId, onExit }) {
 
   return (
     <Shell nav={false} scrollShadow={false} modal outerRef={swipe.rootRef}>
-    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px" }}>
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "20px 20px 18px" }}>
       {/* top bar: exit + segmented progress */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: 12 }}>
         <button onClick={onExit} className="hk-press" aria-label="Exit conversation" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>

@@ -171,7 +171,7 @@ function LessonBody({ session, onComplete, onExit }) {
 
   return (
     <Shell nav={false} modal outerRef={swipe.rootRef}>
-    <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
+    <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "20px 20px 18px", overflowY: "auto" }}>
       {/* top bar: close + a single progress bar filling to the % completed */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
@@ -179,7 +179,7 @@ function LessonBody({ session, onComplete, onExit }) {
         </button>
         <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.line, overflow: "hidden" }}>
           <div style={{ width: `${(results.length / qs.length) * 100}%`, height: "100%", borderRadius: 3,
-            background: t.primary, transition: "width 300ms var(--ease-out-quart)" }} />
+            background: t.primary, transition: "width 450ms var(--ease-out-expo)" }} />
         </div>
       </div>
       {isSpeed && (
