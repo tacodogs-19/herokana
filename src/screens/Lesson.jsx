@@ -268,7 +268,7 @@ function LessonBody({ session, onComplete, onExit }) {
             { label: "POLITE", jp: q.forms.politeJp, r: q.forms.politeR },
           ].map((f) => (
             <div key={f.label} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2,
-              background: t.sunk, borderRadius: 14, padding: "9px 18px", minWidth: 96 }}>
+              background: t.chipTint, borderRadius: 14, padding: "9px 18px", minWidth: 96 }}>
               <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", color: t.faint, fontFamily: DISPLAY }}>{f.label}</span>
               <span style={{ fontFamily: JP, fontSize: 19, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{f.jp}</span>
               <span style={{ fontSize: 11.5, fontWeight: 700, color: t.sub, fontFamily: DISPLAY }}>{f.r}</span>
@@ -284,7 +284,7 @@ function LessonBody({ session, onComplete, onExit }) {
         <div className="hk-reveal" style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 12 }}>
           {q.parts.map((p, k) => (
             <span key={k} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 1,
-              background: t.sunk, borderRadius: 12, padding: "6px 10px" }}>
+              background: t.chipTint, borderRadius: 12, padding: "6px 10px" }}>
               <span style={{ fontFamily: JP, fontSize: 16, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{p.jp}</span>
               <span style={{ fontSize: 9, fontWeight: 600, color: t.faint, fontFamily: DISPLAY }}>{p.romaji}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: t.sub, fontFamily: DISPLAY }}>{p.en}</span>
