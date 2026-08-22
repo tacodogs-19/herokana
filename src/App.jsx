@@ -241,15 +241,20 @@ export default function App() {
       {snap && snap.mode === "behind" && (
         <>
           <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
-            style={{ position: "fixed", inset: 0, pointerEvents: "none", transform: "translateZ(0)" }}
+            style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", transform: "translateZ(0)" }}
             dangerouslySetInnerHTML={{ __html: snap.html }} />
           {/* dim over the held modal (DOM after it, before the wrapper) so its
               corners recede; the incoming sheet paints above this scrim */}
           {snap.dim && <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)" }} />}
         </>
       )}
-      <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined} style={animStyle}
-        onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp") setSnap(null); }}>{content}</div>
+      {/* zIndex 1 keeps the live screen above the persistent behind-snapshot
+          (below). For modal screens we KEEP that snapshot after the slide-up so
+          a drag-dismiss reveals the real destination behind the sheet instead of
+          the bare app background; non-modal forwards clear it as before. */}
+      <div key={navKey} ref={wrapRef} className={navDir === "tab" ? "hk-nav-tab" : undefined}
+        style={{ position: "relative", zIndex: 1, ...animStyle }}
+        onAnimationEnd={(e) => { if (e.animationName === "hkSlideUp" && !MODAL_SCREENS.has(scr.name)) setSnap(null); }}>{content}</div>
       {/* back: the leaving screen slides down off the bottom, on top */}
       {snap && snap.mode === "dismiss" && (
         <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
