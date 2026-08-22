@@ -62,7 +62,10 @@ export function useHeaderScroll() {
   }, []);
   const onScroll = React.useCallback((e) => {
     const y = e.currentTarget.scrollTop;
-    setScrolled((s) => (y > 30 ? true : y < 6 ? false : s));
+    // Compact earlier (24) so it feels tied to the scroll; expand near the top
+    // (3). The 21px dead-zone stays wider than the ~20px height change, so the
+    // scroll-anchoring shift when it compacts can't re-cross and oscillate.
+    setScrolled((s) => (y > 24 ? true : y < 3 ? false : s));
   }, []);
   return [scrolled, onScroll, headerRef, headerH];
 }
@@ -88,14 +91,14 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
       display: "flex", alignItems: "center",
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
       background: t.chrome,
-      transition: "padding 300ms var(--ease-header)" }}>
+      transition: "padding 200ms var(--ease-header)" }}>
       {/* The logo + title cluster nudges up and scales down when the page is
           scrolled, easing back to full size at the top. transform-origin left so
           it anchors to the left edge (title doesn't drift) instead of the centre. */}
       <div style={{ display: "flex", alignItems: "center", gap: 9,
         transformOrigin: "left center",
         transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
-        transition: "transform 300ms var(--ease-header)" }}>
+        transition: "transform 200ms var(--ease-header)" }}>
         {children}
       </div>
       {/* Right-aligned header action (e.g. Daily Review), pushed opposite the
@@ -472,7 +475,7 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
       <div onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
-          transition: animate ? "top 300ms var(--ease-header)" : "none",
+          transition: animate ? "top 200ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
           // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
