@@ -81,22 +81,11 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, margin: "0 0 4px" }}>
-        <div style={{ position: "relative", width: 164, height: 164, flexShrink: 0 }}>
-          <Ring size={164} stroke={12} pct={st === "locked" ? 0 : cpct} color={ringCta} track={t.sunk}>
-            {st === "locked"
-              ? <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="1.8"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" /></svg>
-              : <span style={{ fontFamily: JP, fontSize: 68, fontWeight: 700, color: t.ink, lineHeight: 1 }}>{unit.jp}</span>}
-          </Ring>
-          {st === "done" && (
-            // sits on the ring at its top-right (45°): center 82 + 76·cos45 ≈ 136, 82 − 76·cos45 ≈ 28,
-            // less half the 51px badge → corner (110.5, 2.5). No translate: hk-tick owns transform.
-            <div className="hk-tick" style={{ position: "absolute", left: 110.5, top: 2.5,
-              width: 51, height: 51, borderRadius: "50%", background: t.done, display: "flex", alignItems: "center",
-              justifyContent: "center", boxShadow: "0 2px 8px -2px rgba(0,0,0,0.3)" }}>
-              <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
-            </div>
-          )}
-        </div>
+        <Ring size={164} stroke={12} pct={st === "locked" ? 0 : cpct} color={ringCta} track={t.sunk}>
+          {st === "locked"
+            ? <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="1.8"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" /></svg>
+            : <span style={{ fontFamily: JP, fontSize: 68, fontWeight: 700, color: t.ink, lineHeight: 1 }}>{unit.jp}</span>}
+        </Ring>
         <div style={{ textAlign: "center" }}>
           <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: t.ink }}>{chapter.name}</h2>
           <p style={{ margin: "3px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>

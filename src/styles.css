@@ -42,11 +42,6 @@ button, input { font-family: inherit; }
 @keyframes hkGrow { to { width: var(--to); } }
 
 /* feedback badge: grows from a visible shape, never from scale(0) */
-/* chapter-complete tick: slower, glassy ease-out, scales from center (no
-   translate) so it stays pinned to the ring edge it's positioned on */
-.hk-tick { animation: hkTick 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-@keyframes hkTick { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
-
 .hk-pop { animation: hkPop 360ms var(--ease-out-expo) both; }
 @keyframes hkPop {
   from { opacity: 0; transform: translate(38%,-38%) scale(0.4); }
