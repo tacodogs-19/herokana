@@ -175,7 +175,7 @@ function LessonBody({ session, onComplete, onExit }) {
       {/* top bar: close + a single progress bar filling to the % completed */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" style={{ display: "block" }}><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
         <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.line, overflow: "hidden" }}>
           <div style={{ width: `${(results.length / qs.length) * 100}%`, height: "100%", borderRadius: 3,
