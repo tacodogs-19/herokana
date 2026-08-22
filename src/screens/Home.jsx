@@ -89,11 +89,11 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
           </Ring>
           {st === "done" && (
             // sits on the ring at its top-right (45°): center 82 + 76·cos45 ≈ 136, 82 − 76·cos45 ≈ 28,
-            // less half the 34px badge → corner (119, 11). No translate: hk-rail-in owns transform.
-            <div className="hk-rail-in" style={{ position: "absolute", left: 119, top: 11,
-              width: 34, height: 34, borderRadius: "50%", background: t.done, display: "flex", alignItems: "center",
-              justifyContent: "center", border: `3px solid ${t.surface}`, boxShadow: "0 2px 8px -2px rgba(0,0,0,0.3)" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+            // less half the 51px badge → corner (110.5, 2.5). No translate: hk-tick owns transform.
+            <div className="hk-tick" style={{ position: "absolute", left: 110.5, top: 2.5,
+              width: 51, height: 51, borderRadius: "50%", background: t.done, display: "flex", alignItems: "center",
+              justifyContent: "center", boxShadow: "0 2px 8px -2px rgba(0,0,0,0.3)" }}>
+              <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
             </div>
           )}
         </div>
