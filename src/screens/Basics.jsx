@@ -22,7 +22,7 @@ export default function Basics({ title, intro, cards, onClose }) {
       </header>
 
       <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 20px 28px" }}>
-        <p style={{ margin: "0 0 16px", fontSize: 14, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>{intro}</p>
+        <p style={{ margin: "0 0 16px", fontSize: 14, color: t.sub, fontWeight: 500, lineHeight: 1.5 }}>{intro}</p>
         <div style={{ display: "grid", gap: 12 }}>
           {cards.map((c, i) => (
             <Card key={i} style={{ borderRadius: 18, padding: "16px 16px 14px" }}>
@@ -31,14 +31,14 @@ export default function Basics({ title, intro, cards, onClose }) {
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 800, marginTop: 1 }}>{i + 1}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15.5, fontWeight: 800, color: t.ink }}>{c.title}</div>
-                  <p style={{ margin: "6px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>{c.body}</p>
+                  <p style={{ margin: "6px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 500, lineHeight: 1.5 }}>{c.body}</p>
                 </div>
               </div>
               {c.ex && (
                 <div style={{ marginTop: 12, marginLeft: 34, background: t.sunk, borderRadius: 13, padding: "11px 13px" }}>
                   <div style={{ fontFamily: JP, fontSize: 17, fontWeight: 700, color: t.ink }}>{c.ex.jp}</div>
-                  <div style={{ fontSize: 12.5, color: t.sub, fontWeight: 600, marginTop: 3 }}>{c.ex.romaji}</div>
-                  <div style={{ fontSize: 12.5, color: t.faint, fontWeight: 600, marginTop: 2 }}>{c.ex.en}</div>
+                  <div style={{ fontSize: 12.5, color: t.sub, fontWeight: 500, marginTop: 3 }}>{c.ex.romaji}</div>
+                  <div style={{ fontSize: 12.5, color: t.faint, fontWeight: 500, marginTop: 2 }}>{c.ex.en}</div>
                 </div>
               )}
             </Card>

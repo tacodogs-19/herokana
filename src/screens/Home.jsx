@@ -88,7 +88,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
         </Ring>
         <div style={{ textAlign: "center" }}>
           <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: t.ink }}>{chapter.name}</h2>
-          <p style={{ margin: "3px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>
+          <p style={{ margin: "3px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 500, whiteSpace: "nowrap" }}>
             {st === "locked" ? `Finish ${CHAPTERS[Math.max(0, chapterIdx - 1)].name} to unlock`
               : st === "done" ? `All ${chapter.units.length} units mastered`
               : `${unit.label} · unit ${doneCount + 1} of ${chapter.units.length}`}
@@ -101,7 +101,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
               {upNext.map((u, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 5, background: t.sunk, padding: "5px 10px 5px 7px", borderRadius: 10, flexShrink: 0 }}>
                   <span style={{ fontFamily: JP, fontSize: 15, fontWeight: 700, color: t.sub }}>{u.jp}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: t.sub, whiteSpace: "nowrap" }}>{u.label}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: t.sub, whiteSpace: "nowrap" }}>{u.label}</span>
                 </div>
               ))}
             </>
@@ -209,7 +209,7 @@ function ChapterCard({ chapterIdx, hard, progress, t, currentChapterIdx, expande
                 })}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 2px 4px" }}>
-                <p style={{ margin: 0, flex: 1, fontSize: 11.5, fontWeight: 600, color: t.sub }}>
+                <p style={{ margin: 0, flex: 1, fontSize: 11.5, fontWeight: 500, color: t.sub }}>
                   Tap a unit to jump straight in · score 80% to mark it complete.
                 </p>
                 {canReset && (
@@ -514,7 +514,7 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
             </button>
             {hardInfoOpen && (
               <div className="hk-reveal" style={{ background: t.surface, border: "none", borderRadius: 16, padding: "14px 16px", marginTop: 8 }}>
-                <p style={{ margin: "0 0 12px", fontSize: 13, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
+                <p style={{ margin: "0 0 12px", fontSize: 13, color: t.sub, fontWeight: 500, lineHeight: 1.5 }}>
                   Replays words & sentences (not the alphabets) with answers in English and no hints — a tougher second pass for extra XP.
                 </p>
                 <button onClick={() => progress.setHard(!hard)} className="hk-press"
@@ -527,7 +527,7 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
                       background: "#fff", transition: "left 160ms", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }} />
                   </span>
                 </button>
-                <p style={{ margin: "10px 2px 0", fontSize: 11.5, color: t.faint, fontWeight: 600 }}>
+                <p style={{ margin: "10px 2px 0", fontSize: 11.5, color: t.faint, fontWeight: 500 }}>
                   You can also toggle this anytime in Profile → Settings.
                 </p>
               </div>
@@ -609,7 +609,7 @@ function HomeBody({ onNav, onStart, onStartReview, onReviewChapter, onOpenBasics
               </span>
               <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset {resetChapter.name}?</div>
             </div>
-            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "8px 0 18px", fontFamily: DISPLAY, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "8px 0 18px", fontFamily: DISPLAY, lineHeight: 1.5 }}>
               <strong style={{ color: t.ink }}>{resetChapter.name}</strong> and all chapters after it will reset to zero.
               {resetPrevName
                 ? <> <strong style={{ color: t.ink }}>{resetPrevName}</strong> and earlier chapters will be unaffected.</>

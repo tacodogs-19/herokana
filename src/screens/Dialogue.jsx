@@ -32,7 +32,7 @@ function SpeakBeat({ line, onHearModel, t }) {
     <div style={{ background: t.sunk, borderRadius: 14, padding: "12px 14px", marginBottom: 10 }}>
       <p style={{ margin: "0 0 8px", fontSize: 10, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>YOUR TURN · SAY IT</p>
       <div style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{line.jp}</div>
-      <div style={{ fontSize: 11.5, fontWeight: 600, color: t.sub, marginTop: 2 }}>{line.romaji} · {line.en}</div>
+      <div style={{ fontSize: 11.5, fontWeight: 500, color: t.sub, marginTop: 2 }}>{line.romaji} · {line.en}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 11 }}>
         {pill("Hear model", onHearModel)}
         {sr.supported
@@ -48,7 +48,7 @@ function SpeakBeat({ line, onHearModel, t }) {
         </div>
       )}
       {!sr.supported && !rec.supported && (
-        <p style={{ margin: "9px 0 0", fontSize: 11.5, fontWeight: 600, color: t.faint }}>Say it aloud, then tap Next.</p>
+        <p style={{ margin: "9px 0 0", fontSize: 11.5, fontWeight: 500, color: t.faint }}>Say it aloud, then tap Next.</p>
       )}
     </div>
   );
@@ -142,7 +142,7 @@ function DialogueBody({ dialogueId, onExit }) {
           <div style={{ margin: "8px 0 0" }}>
             <span style={{ fontSize: 52, fontWeight: 800, color: passed ? t.done : t.ink, letterSpacing: "-0.02em", lineHeight: 1 }}>{pct}%</span>
           </div>
-          <p style={{ margin: "5px 0 0", fontSize: 14, color: t.sub, fontWeight: 600 }}>
+          <p style={{ margin: "5px 0 0", fontSize: 14, color: t.sub, fontWeight: 500 }}>
             understood · {got}/{checks} caught
           </p>
         </div>
@@ -161,7 +161,7 @@ function DialogueBody({ dialogueId, onExit }) {
                 <div style={{ maxWidth: "85%", background: you ? t.primarySoft : t.surface, border: `1.5px solid ${you ? "transparent" : t.line}`,
                   borderRadius: 16, padding: "11px 14px", textAlign: "left" }}>
                   <div style={{ fontFamily: JP, fontSize: 16, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{ln.jp}</div>
-                  <div style={{ fontSize: 11.5, fontWeight: 600, color: t.sub, marginTop: 2 }}>{ln.romaji} · {ln.en}</div>
+                  <div style={{ fontSize: 11.5, fontWeight: 500, color: t.sub, marginTop: 2 }}>{ln.romaji} · {ln.en}</div>
                 </div>
               </div>
               );
@@ -229,7 +229,7 @@ function DialogueBody({ dialogueId, onExit }) {
           );
         })}
       </div>
-      <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 600, color: t.faint, textAlign: "center" }}>{level.blurb}</p>
+      <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 500, color: t.faint, textAlign: "center" }}>{level.blurb}</p>
 
       <p style={{ margin: "0 0 4px", fontSize: 11, letterSpacing: "0.12em", fontWeight: 900, color: t.primary }}>{d.title.toUpperCase()}</p>
       <h2 style={{ margin: "0 0 12px", fontSize: 20, fontWeight: 800, color: t.ink }}>{heading}</h2>
@@ -258,7 +258,7 @@ function DialogueBody({ dialogueId, onExit }) {
                 {vis ? (
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontFamily: JP, fontSize: 18, fontWeight: 700, color: t.ink, lineHeight: 1.25 }}>{ln.jp}</div>
-                    <div style={{ fontSize: 11.5, fontWeight: 600, color: t.sub, marginTop: 2 }}>{ln.romaji}{hideAnswer ? "" : ` · ${ln.en}`}</div>
+                    <div style={{ fontSize: 11.5, fontWeight: 500, color: t.sub, marginTop: 2 }}>{ln.romaji}{hideAnswer ? "" : ` · ${ln.en}`}</div>
                   </div>
                 ) : (
                   <span style={{ fontSize: 13, fontWeight: 700, color: t.faint, fontStyle: "italic" }}>

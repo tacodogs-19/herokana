@@ -29,7 +29,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue, scro
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>{pack.place}</h1>
-          <p style={{ margin: "3px 0 0", fontSize: 13, color: t.sub, fontWeight: 600, lineHeight: 1.4 }}>{pack.blurb}</p>
+          <p style={{ margin: "3px 0 0", fontSize: 13, color: t.sub, fontWeight: 500, lineHeight: 1.4 }}>{pack.blurb}</p>
         </div>
       </div>
 
@@ -40,7 +40,7 @@ function ReadingPackBody({ packId, onBack, onStartReading, onStartDialogue, scro
           <span key={w.jp} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 1,
             background: t.line, borderRadius: 12, padding: "7px 12px" }}>
             <span style={{ fontFamily: JP, fontSize: 16, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{w.jp}</span>
-            <span style={{ fontSize: 9, fontWeight: 600, color: t.faint, fontFamily: DISPLAY }}>{w.romaji}</span>
+            <span style={{ fontSize: 9, fontWeight: 500, color: t.faint, fontFamily: DISPLAY }}>{w.romaji}</span>
           </span>
         ))}
       </div>

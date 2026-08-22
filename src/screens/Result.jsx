@@ -29,7 +29,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
   const Tile = ({ label, value, color, i }) => (
     <Card className="hk-tile-enter" style={{ '--i': i, flex: 1, borderRadius: 16, padding: "13px 10px", textAlign: "center" }}>
       <div style={{ fontSize: 22, fontWeight: 800, color: color || t.ink, lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 4 }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 500, color: t.sub, marginTop: 4 }}>{label}</div>
     </Card>
   );
 
@@ -43,7 +43,7 @@ function ResultBody({ session, correct, total, onDone, onReview, onKeepGoing, on
         <h1 style={{ margin: "2px 0 0", fontSize: 27, fontWeight: 800, color: t.ink, letterSpacing: "-0.02em" }}>
           {isGraduation ? "You can read Japanese." : (passed ? "You nailed it!" : "Almost there!")}
         </h1>
-        <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 600 }}>
+        <p style={{ margin: "5px 0 0", fontSize: 14.5, color: t.sub, fontWeight: 500 }}>
           {isUnit
             ? (isGraduation
                 ? "The whole course, done. First kanji await."

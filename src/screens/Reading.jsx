@@ -15,7 +15,7 @@ function LockedState({ t, progress }) {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={t.lock} strokeWidth="1.9"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M7.5 11V8a4.5 4.5 0 0 1 9 0v3" /></svg>
       </span>
       <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: t.ink }}>Unlocks after the kana chapters</h2>
-      <p style={{ margin: "8px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, maxWidth: 280 }}>
+      <p style={{ margin: "8px 0 0", fontSize: 13.5, color: t.sub, fontWeight: 500, lineHeight: 1.5, maxWidth: 280 }}>
         Finish the <strong style={{ color: t.ink }}>{gate.name}</strong> chapter, then come back to read the real
         Japanese you'll meet on a trip — signs, konbini, cafés and more — at a glance.
       </p>
@@ -126,7 +126,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
             <span style={{ display: "block", fontSize: 15, fontWeight: 800, fontFamily: DISPLAY,
               color: s.done && !active ? t.sub : t.ink, transition: morph("color") }}>{pack.place}</span>
             <Collapse open={active}>
-              <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.4 }}>{pack.blurb}</span>
+              <span style={{ display: "block", fontSize: 12, fontWeight: 500, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.4 }}>{pack.blurb}</span>
             </Collapse>
           </span>
           {/* untouched scenes carry no label — absence means "not started" */}
@@ -147,7 +147,7 @@ function Stop({ pack, s, t, active, first, last, onSelect, onOpenPack }) {
                 <div style={{ width: `${(s.wordsRead / pack.words.length) * 100}%`, height: "100%", borderRadius: 3, background: t.primary }} />
               </div>
             )}
-            <p style={{ margin: "0 0 10px", fontSize: 11.5, fontWeight: 600, color: t.faint, fontFamily: DISPLAY }}>
+            <p style={{ margin: "0 0 10px", fontSize: 11.5, fontWeight: 500, color: t.faint, fontFamily: DISPLAY }}>
               {s.started
                 ? `${s.wordsRead} of ${pack.words.length} words read`
                 : `${pack.words.length} words · ${s.dialogues} conversation${s.dialogues === 1 ? "" : "s"}`}
@@ -252,7 +252,7 @@ function ReadingBody({ onNav, onOpenPack, onReview }) {
               </span>
               <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset Scenes?</div>
             </div>
-            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "8px 0 18px", fontFamily: DISPLAY, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "8px 0 18px", fontFamily: DISPLAY, lineHeight: 1.5 }}>
               Reading times and conversation results will be cleared, so every stop starts fresh.
               Chapter progress, XP and reviews are unaffected.
             </div>

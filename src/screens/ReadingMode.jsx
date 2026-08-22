@@ -78,7 +78,7 @@ function ReadingBody({ packId, slow, onExit, scrollProps }) {
             </span>
             <span style={{ fontSize: 20, fontWeight: 800, color: t.sub }}>s</span>
           </div>
-          <p style={{ margin: "5px 0 0", fontSize: 14, color: t.sub, fontWeight: 600 }}>
+          <p style={{ margin: "5px 0 0", fontSize: 14, color: t.sub, fontWeight: 500 }}>
             average per word · {summary.correct}/{summary.total} read
           </p>
         </div>

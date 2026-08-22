@@ -183,7 +183,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
           ABOUT YOU · {step + 1} OF {steps.length}
         </p>
         <h2 style={{ margin: "10px 0 0", fontSize: 25, fontWeight: 800, letterSpacing: "-0.02em", color: t.ink }}>{cur.title}</h2>
-        <p style={{ margin: "8px 0 22px", fontSize: 14, color: t.sub, fontWeight: 600, lineHeight: 1.45 }}>{cur.blurb}</p>
+        <p style={{ margin: "8px 0 22px", fontSize: 14, color: t.sub, fontWeight: 500, lineHeight: 1.45 }}>{cur.blurb}</p>
         {cur.render()}
       </div>
 
@@ -203,7 +203,7 @@ function OnboardingBody({ initial, onDone, registerBack }) {
 
 const inputStyle = (t) => ({
   width: "100%", padding: "14px 16px", borderRadius: 14, border: `1.5px solid ${t.line}`,
-  background: t.surface, color: t.ink, fontFamily: DISPLAY, fontSize: 16, fontWeight: 600, outline: "none",
+  background: t.surface, color: t.ink, fontFamily: DISPLAY, fontSize: 16, fontWeight: 500, outline: "none",
 });
 
 export default function Onboarding({ initial, onDone, registerBack }) {

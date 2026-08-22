@@ -31,7 +31,7 @@ export default function UpdatePrompt() {
       <div style={{ background: t.surface, color: t.ink, border: "none", borderRadius: 20,
         padding: "16px 18px", fontFamily: DISPLAY, boxShadow: t.cardShadow }}>
         <div style={{ fontSize: 15.5, fontWeight: 800 }}>A new version is available</div>
-        <div style={{ fontSize: 13, color: t.sub, fontWeight: 600, margin: "4px 0 14px" }}>
+        <div style={{ fontSize: 13, color: t.sub, fontWeight: 500, margin: "4px 0 14px" }}>
           Update now to get the latest HeroKana.
         </div>
         <div style={{ display: "flex", gap: 10 }}>

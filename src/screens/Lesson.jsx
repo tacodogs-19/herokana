@@ -227,21 +227,21 @@ function LessonBody({ session, onComplete, onExit }) {
                 </span>
               : <span style={{ fontFamily: JP, fontSize: promptSize, fontWeight: 700, lineHeight: 1.2, color: t.ink, textAlign: "center" }}>{q.prompt}</span>}
           {q.furigana && !concept && !seenKanjiRef.current.has(q.prompt) && (
-            <span style={{ fontFamily: JP, fontSize: 14, fontWeight: 600, color: t.sub, marginTop: 4 }}>{q.furigana}</span>
+            <span style={{ fontFamily: JP, fontSize: 14, fontWeight: 500, color: t.sub, marginTop: 4 }}>{q.furigana}</span>
           )}
           {!concept && (
             <div style={{ height: (q.hint || (checked && q.meaning)) ? 20 : 0, marginTop: (q.hint || (checked && q.meaning)) ? 8 : 0, overflow: "hidden", flexShrink: 0, transition: "height 200ms, margin-top 200ms", display: "flex", alignItems: "center" }}>
               {q.hint
-                ? <span style={{ fontSize: 13.5, fontWeight: 600, color: t.sub }}>"{q.hint}"</span>
+                ? <span style={{ fontSize: 13.5, fontWeight: 500, color: t.sub }}>"{q.hint}"</span>
                 : checked && q.meaning
-                  ? <span className="hk-reveal" style={{ fontSize: 13.5, fontWeight: 600, color: t.sub }}>"{q.meaning}"</span>
+                  ? <span className="hk-reveal" style={{ fontSize: 13.5, fontWeight: 500, color: t.sub }}>"{q.meaning}"</span>
                   : null}
             </div>
           )}
         </div>
         {concept ? (
           <div style={{ minHeight: 42, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-            {checked && q.meaning && <span className="hk-reveal" style={{ fontSize: 13, fontWeight: 600, color: t.sub, lineHeight: 1.4 }}>{q.meaning}</span>}
+            {checked && q.meaning && <span className="hk-reveal" style={{ fontSize: 13, fontWeight: 500, color: t.sub, lineHeight: 1.4 }}>{q.meaning}</span>}
           </div>
         ) : (
           <div style={{ height: hearSlot ? 38 : 0, marginTop: hearSlot ? 0 : -8, overflow: "hidden", flexShrink: 0, transition: "height 200ms, margin-top 200ms" }}>
@@ -286,7 +286,7 @@ function LessonBody({ session, onComplete, onExit }) {
             <span key={k} style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 1,
               background: t.chipTint, borderRadius: 12, padding: "6px 10px" }}>
               <span style={{ fontFamily: JP, fontSize: 16, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{p.jp}</span>
-              <span style={{ fontSize: 9, fontWeight: 600, color: t.faint, fontFamily: DISPLAY }}>{p.romaji}</span>
+              <span style={{ fontSize: 9, fontWeight: 500, color: t.faint, fontFamily: DISPLAY }}>{p.romaji}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: t.sub, fontFamily: DISPLAY }}>{p.en}</span>
             </span>
           ))}
@@ -297,7 +297,7 @@ function LessonBody({ session, onComplete, onExit }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "16px 0" }}>
         {q.type === "intro" ? (
           <div style={{ textAlign: "center", padding: "0 6px" }}>
-            <p style={{ margin: 0, fontSize: 15.5, fontWeight: 600, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.65 }}>{q.body}</p>
+            <p style={{ margin: 0, fontSize: 15.5, fontWeight: 500, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.65 }}>{q.body}</p>
           </div>
         ) : q.type === "word_reveal" ? (
           <div style={{ textAlign: "center" }}>
@@ -307,7 +307,7 @@ function LessonBody({ session, onComplete, onExit }) {
         ) : q.type === "teach" ? (
           <div className="hk-reveal" style={{ textAlign: "center" }}>
             <p style={{ margin: "0 0 6px", fontSize: 38, fontWeight: 800, color: t.primary, fontFamily: DISPLAY, textTransform: "lowercase", lineHeight: 1 }}>{q.reading}</p>
-            {q.meaning && <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.5 }}>{q.meaning}</p>}
+            {q.meaning && <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: t.sub, fontFamily: DISPLAY, lineHeight: 1.5 }}>{q.meaning}</p>}
           </div>
         ) : q.prod ? (
           <div>
@@ -434,7 +434,7 @@ function LessonBody({ session, onComplete, onExit }) {
           <div style={{ background: t.surface, color: t.ink, border: "none", borderRadius: 20,
             padding: "20px 20px 18px", fontFamily: DISPLAY, boxShadow: t.cardShadow }}>
             <div style={{ fontSize: 17, fontWeight: 800 }}>Leave this lesson?</div>
-            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", lineHeight: 1.45 }}>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "6px 0 16px", lineHeight: 1.45 }}>
               Your progress in this round won't be saved.
             </div>
             <div style={{ display: "grid", gap: 10 }}>

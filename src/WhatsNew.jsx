@@ -27,7 +27,7 @@ export default function WhatsNew() {
           {RELEASE_NOTES.map((n, i) => (
             <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: t.primary, marginTop: 7, flexShrink: 0 }} />
-              <span style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.45 }}>{n}</span>
+              <span style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, lineHeight: 1.45 }}>{n}</span>
             </div>
           ))}
         </div>

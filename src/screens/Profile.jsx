@@ -27,7 +27,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
       style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: danger ? t.wrong : t.ink, fontFamily: DISPLAY }}>{label}</div>
-        {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
+        {sub && <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500, fontFamily: DISPLAY, marginTop: 2 }}>{sub}</div>}
       </div>
       <span style={{ color: t.faint, fontSize: 18, flexShrink: 0 }}>›</span>
     </Card>
@@ -68,7 +68,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
             <div style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{p.totalDone}/{p.totalUnits} units</div>
             {p.hard
               ? <div style={{ fontSize: 11.5, color: t.gold, fontWeight: 700 }}>hard {p.hardDoneTotal}/{p.bankedTotal} re-mastered</div>
-              : <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600 }}>syllabary mapped</div>}
+              : <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500 }}>syllabary mapped</div>}
           </div>
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
@@ -94,7 +94,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
       <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "15px 17px 13px", marginBottom: 72, boxShadow: t.cardShadow }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 12 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: t.ink, whiteSpace: "nowrap" }}>This week</span>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 600, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
+          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500, whiteSpace: "nowrap" }}>{p.weekBars.reduce((a, b) => a + b, 0)} lessons practised</span>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 9, height: 78 }}>
           {p.weekBars.map((v, i) => (
@@ -119,7 +119,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
               background: p.hard ? t.primarySoft : t.surface, border: "none", boxShadow: t.cardShadow, textAlign: "left" }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
-              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
+              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500, fontFamily: DISPLAY, marginTop: 2 }}>
                 {p.hard ? `Words & sentences · ${p.hardDoneTotal}/${p.bankedTotal} re-mastered` : "Replay words & sentences — English answers, no hints"}
               </div>
             </div>
@@ -134,7 +134,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
             background: t.surface, border: "none", boxShadow: t.cardShadow, opacity: 0.7 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Hard mode</div>
-              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>Finish the whole track to unlock</div>
+              <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500, fontFamily: DISPLAY, marginTop: 2 }}>Finish the whole track to unlock</div>
             </div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.faint} strokeWidth="2.2" style={{ flexShrink: 0 }}><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
           </div>
@@ -144,7 +144,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
           background: t.surface, border: "none", boxShadow: t.cardShadow }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>Theme</div>
-            <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY, marginTop: 2 }}>
+            <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500, fontFamily: DISPLAY, marginTop: 2 }}>
               {followsSystem ? "Following your phone's setting" : `Pinned to ${mode}`}
             </div>
           </div>
@@ -174,7 +174,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
             {restore.ok ? (
               <>
                 <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Restore this backup?</div>
-                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
+                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
                   This replaces your current progress with the backup{restore.exportedAt ? ` from ${restore.exportedAt.slice(0, 10)}` : ""}. This can't be undone.
                 </div>
                 <div style={{ display: "grid", gap: 10 }}>
@@ -186,7 +186,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
             ) : (
               <>
                 <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Couldn't restore</div>
-                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>{restore.error}</div>
+                <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>{restore.error}</div>
                 <Button onClick={() => setRestore(null)} style={{ width: "100%", padding: "14px", borderRadius: 14, fontSize: 15 }}>OK</Button>
               </>
             )}
@@ -198,7 +198,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
         <Modal onDismiss={() => setConfirmReset(false)}>
           <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "20px 20px 18px", boxShadow: t.cardShadow }}>
             <div style={{ fontSize: 17, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Reset all progress?</div>
-            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 600, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
+            <div style={{ fontSize: 13.5, color: t.sub, fontWeight: 500, margin: "6px 0 16px", fontFamily: DISPLAY, lineHeight: 1.45 }}>
               Every chapter goes back to zero. Your {p.xp} XP and Level {p.level} stay.
             </div>
             <div style={{ display: "grid", gap: 10 }}>

@@ -33,7 +33,7 @@ export default function VerbChart({ onClose }) {
       </header>
 
       <div style={{ margin: "0 20px 14px", flexShrink: 0 }}>
-        <p style={{ margin: 0, fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: 13.5, color: t.sub, fontWeight: 500, lineHeight: 1.5 }}>
           Tap a verb to see its forms and hear it.
         </p>
       </div>
@@ -90,7 +90,7 @@ export default function VerbChart({ onClose }) {
                           border: "none" }}>
                           <div style={{ fontSize: 10, fontWeight: 700, color: t.faint, letterSpacing: "0.1em", marginBottom: 5 }}>{label.toUpperCase()}</div>
                           <div style={{ fontFamily: JP, fontSize: 20, fontWeight: 700, color: t.ink, lineHeight: 1.2 }}>{v[key]}</div>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 3 }}>{v[romKey]}</div>
+                          <div style={{ fontSize: 11, fontWeight: 500, color: t.sub, marginTop: 3 }}>{v[romKey]}</div>
                         </div>
                       ))}
                     </div>

@@ -13,7 +13,7 @@ export function DailyReviewPill({ onReview }) {
     <button onClick={onReview} className="hk-press" aria-label={`Daily review — ${progress.reviewDue} due`}
       style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, cursor: "pointer", border: "none",
         background: "rgba(255,255,255,0.12)", color: t.gold, borderRadius: 999,
-        padding: "6px 12px 6px 10px", fontFamily: DISPLAY, fontWeight: 600, fontSize: 12.5, whiteSpace: "nowrap" }}>
+        padding: "6px 12px 6px 10px", fontFamily: DISPLAY, fontWeight: 500, fontSize: 12.5, whiteSpace: "nowrap" }}>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
       Daily Review
     </button>
@@ -30,8 +30,8 @@ const TEXT_VARIANTS = {
   eyebrow:  { fontSize: 11.5, fontWeight: 900, letterSpacing: "0.14em" },
   heading:  { fontSize: 20,   fontWeight: 800 },
   title:    { fontSize: 22,   fontWeight: 800 },
-  subtitle: { fontSize: 13.5, fontWeight: 600, lineHeight: 1.5 },
-  body:     { fontSize: 14,   fontWeight: 600, lineHeight: 1.5 },
+  subtitle: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.5 },
+  body:     { fontSize: 14,   fontWeight: 500, lineHeight: 1.5 },
   caption:  { fontSize: 11.5, fontWeight: 700 },
 };
 const TEXT_DEFAULT_COLOR = { eyebrow: "sub", heading: "ink", title: "ink", subtitle: "sub", body: "ink", caption: "faint" };
@@ -175,7 +175,7 @@ const TTS_PLAY_URL = "https://play.google.com/store/apps/details?id=com.google.a
 export function NoVoiceHint({ children }) {
   const { t } = useTheme();
   return (
-    <p style={{ margin: 0, fontSize: 12.5, color: t.sub, fontWeight: 600, lineHeight: 1.5 }}>
+    <p style={{ margin: 0, fontSize: 12.5, color: t.sub, fontWeight: 500, lineHeight: 1.5 }}>
       {children || "This device has no Japanese voice, so audio here stays silent."}{" "}
       <a href={TTS_PLAY_URL} target="_blank" rel="noopener noreferrer"
         style={{ color: t.primary, fontWeight: 700, textDecoration: "underline" }}>

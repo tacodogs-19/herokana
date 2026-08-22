@@ -147,7 +147,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
                 boxShadow: dOn ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
               <span style={{ fontSize: 12.5, fontWeight: 800 }}>{d.label}</span>
-              <span style={{ fontSize: 9.5, fontWeight: 600, opacity: 0.75, whiteSpace: "nowrap" }}>{d.hint}</span>
+              <span style={{ fontSize: 9.5, fontWeight: 500, opacity: 0.75, whiteSpace: "nowrap" }}>{d.hint}</span>
             </button>
           );
         })}
@@ -191,7 +191,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Kana chart</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>Look up any kana &amp; hear it</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.sub, fontFamily: DISPLAY }}>Look up any kana &amp; hear it</div>
           </div>
           <span style={{ color: t.faint, fontSize: 17, flexShrink: 0 }}>›</span>
         </button>
@@ -204,7 +204,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14.5, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>Verb list</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, fontFamily: DISPLAY }}>Common verbs &amp; conjugation forms</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.sub, fontFamily: DISPLAY }}>Common verbs &amp; conjugation forms</div>
           </div>
           <span style={{ color: t.faint, fontSize: 17, flexShrink: 0 }}>›</span>
         </button>
@@ -235,7 +235,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
               <PModeIcon name={m.icon} c={m.color} />
             </span>
             <div style={{ fontSize: 15, fontWeight: 800, color: t.ink, fontFamily: DISPLAY }}>{m.title}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, marginTop: 2, fontFamily: DISPLAY }}>{m.sub}</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: t.sub, marginTop: 2, fontFamily: DISPLAY }}>{m.sub}</div>
           </button>
         ))}
       </div>
@@ -298,7 +298,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, fontFamily: DISPLAY }}>{g.label}</div>
-                    <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 600, fontFamily: DISPLAY }}>{g.items.length} numbers</div>
+                    <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500, fontFamily: DISPLAY }}>{g.items.length} numbers</div>
                   </div>
                   <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, border: `2px solid ${on ? t.primary : t.line}`,
                     background: on ? t.primary : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -330,7 +330,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14.5, fontWeight: 700, color: t.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: DISPLAY }}>{c.name}</div>
-                  <div style={{ fontSize: 11.5, color: missingThemes ? t.primary : t.sub, fontWeight: 600, fontFamily: DISPLAY }}>
+                  <div style={{ fontSize: 11.5, color: missingThemes ? t.primary : t.sub, fontWeight: 500, fontFamily: DISPLAY }}>
                     {banked
                       ? (on ? (sel.size ? `${sel.size} of ${c.units.length} themes · ${DIFFICULTIES.find((d) => d.id === diff).label}` : "Pick themes below") : `${c.units.length} themes`)
                       : `${c.units.length} units`}

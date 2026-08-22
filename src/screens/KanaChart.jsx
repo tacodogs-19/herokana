@@ -267,7 +267,7 @@ export default function KanaChart({ onClose }) {
         {/* first-visit hint */}
         {hint && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: t.primarySoft, borderRadius: 13, padding: "10px 14px", marginBottom: 12, flexShrink: 0 }}>
-            <span style={{ flex: 1, fontSize: 13, color: t.primary, fontWeight: 600, lineHeight: 1.4 }}>
+            <span style={{ flex: 1, fontSize: 13, color: t.primary, fontWeight: 500, lineHeight: 1.4 }}>
               Flip through the kana one card at a time — or tap the grid icon top-right to see the whole chart.
             </span>
             <button onClick={() => setHint(false)} className="hk-press"
@@ -275,7 +275,7 @@ export default function KanaChart({ onClose }) {
           </div>
         )}
 
-        <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.sub, fontWeight: 600, lineHeight: 1.5, flexShrink: 0 }}>
+        <p style={{ margin: "0 0 14px", fontSize: 13.5, color: t.sub, fontWeight: 500, lineHeight: 1.5, flexShrink: 0 }}>
           {view === "card"
             ? "Tap the card to reveal the reading. Swipe or use the arrows to move."
             : "Tap any kana to hear it."}
@@ -355,9 +355,9 @@ export default function KanaChart({ onClose }) {
                     ? <StrokeGlyph ch={map[rj]} size={110} ink={t.ink} guide={t.line} />
                     : <span style={{ fontFamily: JP, fontSize: 96, fontWeight: 700, lineHeight: 1, color: t.ink }}>{map[rj]}</span>}
                   {strokes && STROKES[map[rj]] ? (
-                    <span style={{ fontSize: 14, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>Tap the glyph to replay</span>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>Tap the glyph to replay</span>
                   ) : mnemonic && (
-                    <span style={{ fontSize: 14, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>{mnemonic}</span>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>{mnemonic}</span>
                   )}
                   <span style={{ fontSize: 11, fontWeight: 700, color: t.faint, letterSpacing: "0.08em", marginTop: 4 }}>TAP TO REVEAL</span>
                 </div>
@@ -401,7 +401,7 @@ export default function KanaChart({ onClose }) {
               </button>
               <div style={{ flex: 1, textAlign: "center" }}>
                 <span style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{cardIdx + 1}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: t.faint }}> / {visibleKana.length}</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: t.faint }}> / {visibleKana.length}</span>
               </div>
               <button onClick={() => advance(1)} className="hk-press"
                 style={{ width: 50, height: 50, borderRadius: 14, border: `1.5px solid ${t.line}`, background: t.surface,
@@ -412,7 +412,7 @@ export default function KanaChart({ onClose }) {
 
             {/* CC BY-SA attribution for the stroke data — slot is always laid out
                 so toggling strokes never shifts the card */}
-            <p aria-hidden={!strokes} style={{ margin: 0, height: 14, fontSize: 10, fontWeight: 600, color: t.faint,
+            <p aria-hidden={!strokes} style={{ margin: 0, height: 14, fontSize: 10, fontWeight: 500, color: t.faint,
               opacity: strokes ? 1 : 0, transition: "opacity 160ms" }}>
               Stroke order data: KanjiVG (CC BY-SA)
             </p>
