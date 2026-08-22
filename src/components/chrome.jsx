@@ -395,9 +395,10 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
   return (
     <div ref={outerRef} style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
       display: "flex", flexDirection: "column", fontFamily: DISPLAY, color: t.ink, overflow: "hidden", position: "relative",
-      // modal: a drop shadow on the moving frame so the sheet lifts off the navy
-      // and off the screen behind it while it slides / is dragged.
-      ...(modal && { boxShadow: "0 -8px 30px rgba(8, 12, 24, 0.45)" }) }}>
+      // modal: round + clip the WHOLE frame (status strip + content) as one shape
+      // so nothing shows a dark cutout behind the corners, and a drop shadow so
+      // the sheet lifts off the screen behind it while it slides / is dragged.
+      ...(modal && { borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)" }) }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens
@@ -415,7 +416,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
             darker chrome (which shows through the status-bar strip + corners),
             so full-screen takeovers read like a default iOS modal. */}
         <div style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
-          ...(modal && { background: t.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28 }) }}>
+          ...(modal && { background: t.bg }) }}>
           {children}
         </div>
       </div>
