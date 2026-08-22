@@ -171,7 +171,7 @@ function LessonBody({ session, onComplete, onExit }) {
 
   return (
     <Shell nav={false} modal outerRef={swipe.rootRef}>
-    <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto", touchAction: "pan-y" }}>
+    <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
       {/* top bar: close + segmented progress */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>

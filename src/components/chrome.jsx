@@ -308,44 +308,82 @@ export function Modal({ children, onDismiss, position = "center" }) {
 export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
   const rootRef = React.useRef(null);
   const scrollRef = React.useRef(null);
-  const g = React.useRef(null); // active gesture, or null
-  const move = (transform, transition) => {
-    const el = rootRef.current; if (!el) return;
-    el.style.transition = transition || "none";
-    el.style.transform = transform;
-  };
-  const onPointerDown = (e) => {
-    if (e.pointerType === "mouse") return; // desktop uses the close button
-    if ((scrollRef.current?.scrollTop ?? 0) > 0) return; // only from the top
-    g.current = { id: e.pointerId, y0: e.clientY, x0: e.clientX, t0: Date.now(), on: false };
-  };
-  const onPointerMove = (e) => {
-    const s = g.current; if (!s || e.pointerId !== s.id) return;
-    const dy = e.clientY - s.y0, dx = e.clientX - s.x0;
-    if (!s.on) {
-      if ((scrollRef.current?.scrollTop ?? 0) > 0) { g.current = null; return; }
-      if (dy > 8 && dy > Math.abs(dx)) { s.on = true; try { e.currentTarget.setPointerCapture(s.id); } catch (err) {} }
-      else if (dy < -4 || Math.abs(dx) > 12) { g.current = null; return; } // scroll / horizontal → not ours
-      else return;
-    }
-    move(`translateY(${Math.max(0, dy)}px)`);
-    e.preventDefault();
-  };
-  const end = (e) => {
-    const s = g.current; if (!s || (e && e.pointerId !== s.id)) return;
-    g.current = null;
-    if (!s.on) return;
-    const dy = Math.max(0, e.clientY - s.y0);
-    const vy = dy / Math.max(1, Date.now() - s.t0);
-    const H = rootRef.current?.offsetHeight || 800;
-    if (dy > H * 0.25 || vy > 0.5) {
-      if (!canDismiss || canDismiss()) { onDismiss(); return; } // leave the transform put; app dismiss continues from here
-      move("translateY(0)", "transform 260ms var(--ease-out-quart)"); onBlocked && onBlocked();
-    } else {
-      move("translateY(0)", "transform 260ms var(--ease-out-quart)");
-    }
-  };
-  return { rootRef, scrollProps: { ref: scrollRef, onPointerDown, onPointerMove, onPointerUp: end, onPointerCancel: end } };
+  // Latest callbacks in a ref so the listeners can attach once and still call
+  // the current closures (they capture live state like the mid-lesson guard).
+  const cb = React.useRef(null);
+  cb.current = { onDismiss, onBlocked, canDismiss };
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let g = null; // active gesture, or null
+    const setT = (transform, transition) => {
+      const r = rootRef.current; if (!r) return;
+      r.style.transition = transition || "none";
+      r.style.transform = transform;
+    };
+    // Native touch-scroll and a custom vertical drag can't share the y-axis
+    // through touch-action, so we only own the gesture when the sheet fits
+    // (nothing to scroll): touch-action:none stops the browser hijacking the
+    // pull. When content overflows (e.g. keyboard open) we fall back to pan-y
+    // and let it scroll — the drag yields. Non-passive touchmove so our
+    // preventDefault actually cancels native scrolling.
+    const fits = () => el.scrollHeight <= el.clientHeight + 1;
+    const syncTA = () => { el.style.touchAction = fits() ? "none" : "pan-y"; };
+    syncTA();
+    const onStart = (e) => {
+      syncTA();
+      if (e.touches.length !== 1 || !fits()) { g = null; return; }
+      const t = e.touches[0];
+      g = { y0: t.clientY, x0: t.clientX, t0: Date.now(), on: false, dead: false };
+    };
+    const onMove = (e) => {
+      if (!g || g.dead) return;
+      const t = e.touches[0];
+      const dy = t.clientY - g.y0, dx = t.clientX - g.x0;
+      if (!g.on) {
+        if (dy > 6 && dy > Math.abs(dx)) g.on = true;       // downward, mostly vertical → engage
+        else if (dy < -2 || Math.abs(dx) > 10) { g.dead = true; return; } // up / sideways → not ours
+        else return;
+      }
+      e.preventDefault();
+      setT(`translateY(${Math.max(0, dy)}px)`);
+    };
+    const onEnd = (e) => {
+      if (!g) return;
+      const on = g.on;
+      const endY = e.changedTouches?.[0]?.clientY ?? g.y0;
+      const dy = Math.max(0, endY - g.y0);
+      const vy = dy / Math.max(1, Date.now() - g.t0);
+      g = null;
+      if (!on) return;
+      const H = rootRef.current?.offsetHeight || 800;
+      const { canDismiss, onDismiss, onBlocked } = cb.current;
+      if (dy > H * 0.25 || vy > 0.5) {
+        if (!canDismiss || canDismiss()) { onDismiss(); return; } // leave transform put; app dismiss continues from here
+        setT("translateY(0)", "transform 260ms var(--ease-out-quart)"); onBlocked && onBlocked();
+      } else {
+        setT("translateY(0)", "transform 260ms var(--ease-out-quart)");
+      }
+    };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    el.addEventListener("touchcancel", onEnd, { passive: true });
+    const vv = window.visualViewport;
+    window.addEventListener("resize", syncTA);
+    vv && vv.addEventListener("resize", syncTA);
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+      window.removeEventListener("resize", syncTA);
+      vv && vv.removeEventListener("resize", syncTA);
+    };
+  }, []);
+
+  return { rootRef, scrollProps: { ref: scrollRef } };
 }
 
 // App shell — fills the viewport, phone-width on larger screens.
