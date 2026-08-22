@@ -62,6 +62,30 @@ export default function App() {
     // have, so the full offset lands.
     requestAnimationFrame(set);
   };
+  // Scroll memory for back-nav: capture the live screen's scroll offsets (same
+  // index-keyed shape as snapshot) so they can be stashed in the history entry
+  // we're leaving and re-applied to the freshly-mounted screen on the way back.
+  const captureScrolls = () => {
+    const el = wrapRef.current;
+    if (!el) return [];
+    const s = [];
+    el.querySelectorAll("*").forEach((n, i) => { if (n.scrollTop || n.scrollLeft) s.push([i, n.scrollTop, n.scrollLeft]); });
+    return s;
+  };
+  const pendingRestore = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const scrolls = pendingRestore.current;
+    if (!scrolls) return;
+    pendingRestore.current = null;
+    const root = wrapRef.current;
+    if (!root) return;
+    const apply = () => {
+      const all = root.querySelectorAll("*");
+      scrolls.forEach(([i, top, left]) => { const t = all[i]; if (t) { void t.scrollHeight; t.scrollTop = top; t.scrollLeft = left; } });
+    };
+    apply();
+    requestAnimationFrame(apply);
+  }, [navKey]);
   const onboardingVisible = !profile || editing;
 
   // Onboarding registers its step-back function so the back button can walk
@@ -74,6 +98,9 @@ export default function App() {
   //   try-again). No sheet slide — the outcome is part of the lesson, so the
   //   destination just appears in place and its own content animates in.
   const go = (next, dir = "forward") => {
+    // stash the leaving screen's scroll in its (current) history entry so a later
+    // back-nav here restores where we were
+    try { window.history.replaceState({ scr: scrRef.current, scrolls: captureScrolls() }, ""); } catch (e) {}
     if (dir === "forward") snapshot("behind"); // hold the current screen behind the slide-up (dimmed if it's a modal)
     setNavDir(dir);
     setNavKey((k) => k + 1);
@@ -111,6 +138,7 @@ export default function App() {
         // state (e.g. a mid-lesson would jump back to question 1). Cleared on
         // the slide-down's animationend.
         snapshot("dismiss");
+        pendingRestore.current = (e.state && e.state.scrolls) || null; // restore this screen's scroll after it re-mounts
         setNavDir("back");
         setNavKey((k) => k + 1);
         setScr(s);
