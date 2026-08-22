@@ -61,7 +61,6 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
   // bounce can't ride content over it or drag its corners out of place. The
   // scroll box pads its top by the header height (useHeaderScroll) to stand in
   // for the space this no longer reserves in the flow. Non-overlay stays sticky.
-  const notchMask = (at) => `radial-gradient(circle at ${at}, transparent 0 20px, #000 20px)`;
   const place = overlay
     ? { position: "absolute", top: 0, left: 0, right: 0, zIndex: 20 }
     : { position: "sticky", top: 0, zIndex: 10, margin: "0 -20px" };
@@ -84,13 +83,6 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
           logo. Sits outside the scaling cluster so it stays a stable tap target
           as the logo shrinks on scroll. */}
       {right && <div style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center" }}>{right}</div>}
-      {/* top: calc(100% - 1px) overlaps the corners 1px into the header so there's
-          no subpixel gap between the header's bottom edge and the corners for the
-          white pane behind to peek through during scroll/overscroll. */}
-      <span aria-hidden="true" style={{ position: "absolute", top: "calc(100% - 1px)", left: 0, width: 20, height: 21, background: t.chrome,
-        WebkitMaskImage: notchMask("100% 100%"), maskImage: notchMask("100% 100%") }} />
-      <span aria-hidden="true" style={{ position: "absolute", top: "calc(100% - 1px)", right: 0, width: 20, height: 21, background: t.chrome,
-        WebkitMaskImage: notchMask("0% 100%"), maskImage: notchMask("0% 100%") }} />
     </div>
   );
 }
@@ -398,7 +390,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
   // heavy shadow under the header. +40px sits under the opaque sticky header in
   // both its tall and compact states, so the cut is never visible.
   const planeBg = whiteTop
-    ? `linear-gradient(180deg, ${t.chrome} 0, ${t.chrome} calc(env(safe-area-inset-top) + 40px), ${t.surface} calc(env(safe-area-inset-top) + 40px), ${t.planeTop} 100%)`
+    ? `linear-gradient(180deg, ${t.chrome}, ${t.chrome})` // solid navy; TabScreen lays a rounded light pane over it
     : `linear-gradient(180deg, ${t.bg}, ${t.planeTop})`;
   return (
     <div ref={outerRef} style={{ width: "100%", maxWidth: 430, margin: "0 auto", height: "100dvh", background: modal ? t.chrome : t.bg,
@@ -436,12 +428,26 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 // body; the header-height spacer, overscroll containment and the compact-scroll
 // flag live here so they can't drift across screens.
 export function TabScreen({ active, onNav, header, headerRight, children }) {
+  const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
+  // The light content pane sits on the navy, with rounded top corners at the
+  // header's bottom. Its top tracks the header's compact/tall states (~22px
+  // shorter when scrolled) with the same easing, so the corners always meet the
+  // header edge and scrolled content never spills onto the navy above the pane.
+  const paneTop = headerH ? (scrolled ? Math.max(0, headerH - 22) : headerH) : 0;
   return (
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={headerRight}>{header}</StickyHeader>
+      <div aria-hidden style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 0,
+        // white at the top of the pane, easing down to the grey planeTop. Pinned
+        // to 100vh (not the pane's own height) so it doesn't rescale as the pane
+        // top shifts on scroll or the dynamic viewport changes.
+        backgroundImage: `linear-gradient(180deg, ${t.surface}, ${t.planeTop})`,
+        backgroundSize: "100% 100vh", backgroundRepeat: "no-repeat",
+        borderTopLeftRadius: 28, borderTopRightRadius: 28,
+        transition: "top 300ms var(--ease-header)" }} />
       <div onScroll={onHeaderScroll}
-        style={{ flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
+        style={{ position: "relative", zIndex: 1, flex: 1, minHeight: 0, overflowY: "auto", overscrollBehaviorY: "contain",
           // Longhand (not the `padding` shorthand + a paddingTop override): the
           // shorthand's env()/calc value serialises to an empty style attribute
           // when overridden, so an innerHTML snapshot clone would lose its side
