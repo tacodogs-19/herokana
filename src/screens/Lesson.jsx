@@ -172,23 +172,14 @@ function LessonBody({ session, onComplete, onExit }) {
   return (
     <Shell nav={false} modal outerRef={swipe.rootRef}>
     <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "14px 20px 18px", overflowY: "auto" }}>
-      {/* top bar: close + segmented progress */}
+      {/* top bar: close + a single progress bar filling to the % completed */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
-        <div style={{ flex: 1, display: "flex", gap: 5 }}>
-          {qs.map((_, k) => {
-            const done = k < results.length, ok = done && results[k];
-            const track = k === i ? t.primary : t.line;
-            // inner bar sweeps left-to-right to the result colour as the segment resolves
-            return (
-              <div key={k} style={{ flex: 1, height: 5, borderRadius: 3, background: track, overflow: "hidden" }}>
-                <div style={{ width: done ? "100%" : "0%", height: "100%", borderRadius: 3,
-                  background: ok ? t.done : t.wrong, transition: "width 300ms var(--ease-out-quart)" }} />
-              </div>
-            );
-          })}
+        <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.line, overflow: "hidden" }}>
+          <div style={{ width: `${(results.length / qs.length) * 100}%`, height: "100%", borderRadius: 3,
+            background: t.primary, transition: "width 300ms var(--ease-out-quart)" }} />
         </div>
       </div>
       {isSpeed && (
