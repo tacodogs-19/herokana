@@ -50,7 +50,7 @@ export default function App() {
     // ponytail: velocity→duration curve, not a real spring — swap for a spring if the ease ever needs to track drag momentum exactly.
     let dur = 240;
     if (mode === "dismiss" && Date.now() - flingState.ts < 150) {
-      dur = Math.round(Math.min(300, Math.max(140, 400 / (flingState.vy + 0.7))));
+      dur = Math.round(Math.min(340, Math.max(150, 240 / (flingState.vy + 0.35))));
       flingState.ts = 0; // one-shot
     }
     // dim the held layer when it's a modal sheet (see MODAL_SCREENS) so its

@@ -374,7 +374,7 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
       // RELEASE speed (not the whole-drag average) to the exit animation.
       const now = Date.now();
       const inst = (t.clientY - (g.lastY ?? g.y0)) / Math.max(1, now - (g.lastT ?? g.t0));
-      g.vy = g.vy != null ? g.vy * 0.6 + inst * 0.4 : inst;
+      g.vy = g.vy != null ? g.vy * 0.35 + inst * 0.65 : inst; // bias the latest sample: we want release speed, not the drag average
       g.lastY = t.clientY; g.lastT = now;
       setT(`translateY(${Math.max(0, dy)}px)`);
     };
