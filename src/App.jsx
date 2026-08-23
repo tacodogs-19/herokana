@@ -291,10 +291,10 @@ export default function App() {
       {snap && snap.mode === "dismiss" && (
         <>
           <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 40, pointerEvents: "none",
-            background: "rgba(8,12,24,0.4)", animation: "hkDimOut 170ms var(--ease-drawer) both" }} />
+            background: "rgba(8,12,24,0.4)", animation: "hkDimOut 240ms var(--ease-drawer) both" }} />
           <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
             style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
-              animation: "hkSlideDown 170ms var(--ease-drawer) both" }}
+              animation: "hkSlideDown 240ms var(--ease-drawer) both" }}
             onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
             dangerouslySetInnerHTML={{ __html: snap.html }} />
         </>
