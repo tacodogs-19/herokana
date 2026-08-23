@@ -58,10 +58,10 @@ button, input { font-family: inherit; }
    shows through the movement. The two are decoupled: hkSlideUp (the rise) keeps
    the position timing; hkSlideFade runs shorter. hkSlideUp stays the one whose
    animationend clears the held snapshot, so the snapshot lives the full rise.
-   Back nav mirrors the combined move: the leaving screen fades + drops ~220px. */
+   Back nav: the leaving screen slides straight down off-screen, no fade. */
 @keyframes hkSlideUp { from { transform: translateY(220px); } to { transform: none; } }
 @keyframes hkSlideFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes hkSlideDown { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(110px); } }
+@keyframes hkSlideDown { from { transform: none; } to { transform: translateY(100%); } }
 /* dim behind the leaving screen fades out as the destination is revealed */
 @keyframes hkDimOut { from { opacity: 1; } to { opacity: 0; } }
 
