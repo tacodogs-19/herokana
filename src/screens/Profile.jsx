@@ -54,8 +54,8 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
                 <div style={{ textAlign: "center", lineHeight: 1 }}>
                   {p.hard ? (
                     <>
-                      <div style={{ fontSize: 23, fontWeight: 800, color: t.gold }}>{hardPct}<span style={{ fontSize: 12 }}>%</span></div>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: t.gold, letterSpacing: "0.06em", marginTop: 2 }}>HARD</div>
+                      <div style={{ fontSize: 23, fontWeight: 800, color: t.goldInk }}>{hardPct}<span style={{ fontSize: 12 }}>%</span></div>
+                      <div style={{ fontSize: 9, fontWeight: 700, color: t.goldInk, letterSpacing: "0.06em", marginTop: 2 }}>HARD</div>
                     </>
                   ) : (
                     <div style={{ fontSize: 23, fontWeight: 800, color: t.ink }}>{p.overallPct}<span style={{ fontSize: 12 }}>%</span></div>
@@ -67,7 +67,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{p.totalDone}/{p.totalUnits} units</div>
             {p.hard
-              ? <div style={{ fontSize: 11.5, color: t.gold, fontWeight: 700 }}>hard {p.hardDoneTotal}/{p.bankedTotal} re-mastered</div>
+              ? <div style={{ fontSize: 11.5, color: t.goldInk, fontWeight: 700 }}>hard {p.hardDoneTotal}/{p.bankedTotal} re-mastered</div>
               : <div style={{ fontSize: 11.5, color: t.sub, fontWeight: 500 }}>syllabary mapped</div>}
           </div>
         </div>
@@ -75,7 +75,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
           <div style={{ background: t.surface, border: "none", borderRadius: 20, padding: "14px 15px", flex: 1, boxShadow: t.cardShadow }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: t.sub }}>Level</span>
-              <span style={{ width: 30, height: 30, borderRadius: 9, background: t.goldSoft, color: t.gold, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{p.level}</span>
+              <span style={{ width: 30, height: 30, borderRadius: 9, background: t.goldSoft, color: t.goldInk, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14 }}>{p.level}</span>
             </div>
             <div style={{ fontSize: 21, fontWeight: 800, color: t.ink, margin: "4px 0 8px" }}>{p.xp} XP</div>
             <div style={{ height: 6, borderRadius: 4, background: t.sunk, overflow: "hidden" }}>
