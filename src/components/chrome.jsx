@@ -2,6 +2,12 @@ import React from "react";
 import { useTheme, DISPLAY } from "../theme.jsx";
 import { useProgress } from "../store.jsx";
 
+// Release velocity handed from a pull-down dismiss to App's exit animation, so
+// the slide-off continues at the speed it was flung instead of a fixed time.
+// One-shot: App reads it right after onDismiss fires the dismiss snapshot, then
+// clears ts. Untouched by tap-back / hardware back, which keep the fixed time.
+export const flingState = { vy: 0, ts: 0 };
+
 // The Daily Review pill — a subtle gold action in the top-right of every tab
 // header, opposite the logo. Shows only when there are items due; taps into
 // onReview. Lives here so all four tab screens render it identically.
@@ -364,11 +370,17 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
         else return;
       }
       e.preventDefault();
+      // Track a smoothed instantaneous velocity (EMA) so onEnd can hand the
+      // RELEASE speed (not the whole-drag average) to the exit animation.
+      const now = Date.now();
+      const inst = (t.clientY - (g.lastY ?? g.y0)) / Math.max(1, now - (g.lastT ?? g.t0));
+      g.vy = g.vy != null ? g.vy * 0.6 + inst * 0.4 : inst;
+      g.lastY = t.clientY; g.lastT = now;
       setT(`translateY(${Math.max(0, dy)}px)`);
     };
     const onEnd = (e) => {
       if (!g) return;
-      const on = g.on;
+      const on = g.on, relVy = Math.max(0, g.vy || 0); // px/ms at release
       const endY = e.changedTouches?.[0]?.clientY ?? g.y0;
       const dy = Math.max(0, endY - g.y0);
       const vy = dy / Math.max(1, Date.now() - g.t0);
@@ -377,7 +389,10 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
       const H = rootRef.current?.offsetHeight || 800;
       const { canDismiss, onDismiss, onBlocked } = cb.current;
       if (dy > H * 0.25 || vy > 0.5) {
-        if (!canDismiss || canDismiss()) { onDismiss(); return; } // leave transform put; app dismiss continues from here
+        if (!canDismiss || canDismiss()) { // leave transform put; app dismiss continues from here
+          flingState.vy = relVy; flingState.ts = Date.now(); // hand release speed to the exit
+          onDismiss(); return;
+        }
         setT("translateY(0)", "transform 260ms var(--ease-out-quart)"); onBlocked && onBlocked();
       } else {
         setT("translateY(0)", "transform 260ms var(--ease-out-quart)");

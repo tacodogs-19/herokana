@@ -14,6 +14,7 @@ import Dialogue from "./screens/Dialogue.jsx";
 import KanaChart from "./screens/KanaChart.jsx";
 import VerbChart from "./screens/VerbChart.jsx";
 import Basics from "./screens/Basics.jsx";
+import { flingState } from "./components/chrome.jsx";
 
 // Modal/takeover screens (rounded-corner sheets, or full-screen overlays). We
 // still hold one behind the incoming sheet, but DIM it (like iOS receding the
@@ -43,9 +44,18 @@ export default function App() {
     if (!el) return;
     const scrolls = [];
     el.querySelectorAll("*").forEach((n, i) => { if (n.scrollTop || n.scrollLeft) scrolls.push([i, n.scrollTop, n.scrollLeft]); });
+    // Pull-down dismiss hands a release velocity (chrome.jsx flingState); map it
+    // to the slide-off duration so a hard flick whips off and a gentle release
+    // glides. Fixed 240ms otherwise (tap-back, hardware back).
+    // ponytail: velocity→duration curve, not a real spring — swap for a spring if the ease ever needs to track drag momentum exactly.
+    let dur = 240;
+    if (mode === "dismiss" && Date.now() - flingState.ts < 150) {
+      dur = Math.round(Math.min(300, Math.max(140, 400 / (flingState.vy + 0.7))));
+      flingState.ts = 0; // one-shot
+    }
     // dim the held layer when it's a modal sheet (see MODAL_SCREENS) so its
     // corners recede behind the incoming sheet's
-    setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode, dim: mode === "behind" && MODAL_SCREENS.has(scr.name) });
+    setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode, dim: mode === "behind" && MODAL_SCREENS.has(scr.name), dur });
   };
   const applyScrolls = (node) => {
     if (!node || !snap || !snap.scrolls) return;
@@ -291,10 +301,10 @@ export default function App() {
       {snap && snap.mode === "dismiss" && (
         <>
           <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 40, pointerEvents: "none",
-            background: "rgba(8,12,24,0.4)", animation: "hkDimOut 240ms var(--ease-drawer) both" }} />
+            background: "rgba(8,12,24,0.4)", animation: `hkDimOut ${snap.dur}ms var(--ease-drawer) both` }} />
           <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
             style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
-              animation: "hkSlideDown 240ms var(--ease-drawer) both" }}
+              animation: `hkSlideDown ${snap.dur}ms var(--ease-drawer) both` }}
             onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
             dangerouslySetInnerHTML={{ __html: snap.html }} />
         </>
