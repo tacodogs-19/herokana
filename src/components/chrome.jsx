@@ -88,58 +88,43 @@ export function useHeaderScroll() {
   return [scrolled, onScroll, headerRef, headerH];
 }
 
-// ── useScrollShrink ──────────────────────────────────────────────────────────
-// Binds the header's logo/title cluster continuously to scroll POSITION and
-// VELOCITY: it scales down as the pane scrolls (position), with a small velocity
-// lead so a fast scroll compacts it a touch ahead, easing back to the exact
-// position when the scroll settles. Transform-only on the cluster (clusterRef) —
-// no layout, no content movement. The header's ~20px height compaction stays on
-// its existing padding transition (useHeaderScroll/StickyHeader); this only makes
-// the logo shrink track the scroll instead of snapping at a threshold. Attach the
-// returned ref to the scroll pane.
-export function useScrollShrink({ clusterRef, shrinkAt = 32, minScale = 0.9, velLead = 0.09 }) {
+// ── useHeaderCollapse ────────────────────────────────────────────────────────
+// A collapsing header bound 1:1 to scroll position. Over the first `distance` px
+// of scroll it drives one CSS variable, `--collapse`, from 0 (full) to 1
+// (compact), on the scroll pane AND the header. StickyHeader/TabScreen express the
+// header padding, logo scale and pane top as calc() over that variable — so the
+// whole header collapse (height + logo together) tracks the scroll continuously,
+// with zero lag and no threshold snap. React sets the static calc() formulas once;
+// only the number changes, set imperatively (no re-renders, no inline conflict).
+// rAF-batched so scrollTop is read at paint time. Attach the returned ref to the
+// scroll pane; pass the header's ref.
+export function useHeaderCollapse({ headerRef, distance = 120 }) {
   const paneRef = React.useRef(null);
   React.useEffect(() => {
     const el = paneRef.current;
     if (!el) return;
-    const clamp01 = (x) => Math.min(1, Math.max(0, x));
-    const setP = (p) => {
-      const c = clusterRef && clusterRef.current;
-      if (c) c.style.transform = `translateY(${-2 * p}px) scale(${1 - (1 - minScale) * p})`;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const p = Math.min(1, Math.max(0, el.scrollTop / distance));
+      el.style.setProperty("--collapse", p);              // pane top calc()
+      const h = headerRef && headerRef.current;
+      if (h) h.style.setProperty("--collapse", p);          // header padding + (inherited) logo scale
     };
-    // paint straight from the live scroll position (+ velocity lead) — no spring,
-    // so there is zero lag between the finger and the logo.
-    let last = { top: el.scrollTop, t: performance.now() }, vEMA = 0, raf = 0, lastEvt = 0;
-    const paint = () => setP(clamp01(el.scrollTop / shrinkAt + velLead * vEMA));
-    // after scrolling stops, ease the velocity lead back to 0 so the logo settles
-    // to the exact position (this is the ONLY rAF, and it never runs mid-scroll).
-    const settle = () => {
-      if (performance.now() - lastEvt < 40) { raf = requestAnimationFrame(settle); return; } // still scrolling
-      vEMA *= 0.8;
-      paint();
-      raf = Math.abs(vEMA) > 0.02 ? requestAnimationFrame(settle) : 0;
-    };
-    const onScroll = () => {
-      const now = performance.now(), top = el.scrollTop;
-      const dt = now - last.t, v = dt > 0 ? (top - last.top) / dt : 0; // px/ms, + = scrolling down
-      vEMA = vEMA * 0.6 + v * 0.4;
-      last = { top, t: now }; lastEvt = now;
-      paint();                                        // immediate, tight to the scroll
-      if (!raf) raf = requestAnimationFrame(settle);  // ease the lead out once it stops
-    };
-    paint();
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    apply();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, [clusterRef, shrinkAt, minScale, velLead]);
+  }, [headerRef, distance]);
   return paneRef;
 }
 
 // ── StickyHeader ─────────────────────────────────────────────────────────────
-// The cat + screen title row. Transparent and roomy at the top of the page;
-// on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
-// compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
-// the scroll box must have paddingTop 0 so the header sits flush at the top.
-export function StickyHeader({ scrolled, children, right, overlay = false, innerRef, clusterRef }) {
+// The cat + screen title row. Roomy at the top of the page; it tightens as the
+// page scrolls — padding and logo scale map continuously to the --collapse CSS
+// variable (0=full, 1=compact) set by useHeaderCollapse on the header root. The
+// scroll box must have paddingTop 0 so the header sits flush at the top.
+export function StickyHeader({ children, right, overlay = false, innerRef }) {
   const { t } = useTheme();
   // Solid header (same navy as the status bar, so the top strip stays seamless)
   // with concave bottom corners, so the white content pane tucks under it.
@@ -153,18 +138,17 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
   return (
     <div ref={innerRef} style={{ ...place,
       display: "flex", alignItems: "center",
-      padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
-      background: t.chrome,
-      transition: "padding 200ms var(--ease-header)" }}>
-      {/* The logo + title cluster scales down as the page scrolls — driven
-          continuously (position + velocity) by useScrollShrink via clusterRef.
-          transform-origin left so it anchors to the left edge (title doesn't
-          drift) instead of the centre. Falls back to the discrete scrolled state
-          when no clusterRef is wired (non-TabScreen usages). */}
-      <div ref={clusterRef} style={{ display: "flex", alignItems: "center", gap: 9,
+      // Collapsing header: padding maps continuously to --collapse (0=full → 1=compact),
+      // set by useHeaderCollapse. No transition — the variable IS the scroll position.
+      paddingTop: "calc(14px - 5px * var(--collapse, 0))", paddingLeft: 20, paddingRight: 20,
+      paddingBottom: "calc(24px - 15px * var(--collapse, 0))",
+      background: t.chrome }}>
+      {/* The logo + title cluster scales down as the header collapses. It inherits
+          --collapse from the header root. transform-origin left so it anchors to the
+          left edge (title doesn't drift) instead of the centre. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 9,
         transformOrigin: "left center",
-        ...(clusterRef ? null : { transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
-          transition: "transform 200ms var(--ease-header)" }) }}>
+        transform: "translateY(calc(-2px * var(--collapse, 0))) scale(calc(1 - 0.1 * var(--collapse, 0)))" }}>
         {children}
       </div>
       {/* Right-aligned header action (e.g. Daily Review), pushed opposite the
@@ -533,26 +517,18 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 // flag live here so they can't drift across screens.
 export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
-  const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
-  const clusterRef = React.useRef(null);
-  const shrinkRef = useScrollShrink({ clusterRef }); // logo shrink tied to scroll position + velocity
+  const [, , headerRef, headerH] = useHeaderScroll(); // only for headerRef + measured (full) header height
+  const paneRef = useHeaderCollapse({ headerRef }); // header collapse (height + logo) bound 1:1 to scroll
   // The light content pane sits on the navy with rounded top corners AT the
   // header's bottom, and it IS the scroll container so content clips to those
-  // corners. The header shrinks by EXACTLY its padding delta on scroll —
-  // (14+24) - (9+9) = 20px; the logo's scale(0.9) is a visual transform and
-  // doesn't change layout height — so the compact top is exactly headerH - 20.
-  // A larger offset would let the header edge overlap and clip the corners.
-  const paneTop = headerH ? (scrolled ? headerH - 20 : headerH) : 0;
-  // Skip the top transition on first mount (headerH measures from 0), so the
-  // pane doesn't slide/round in on load; enable it after a frame.
-  const [animate, setAnimate] = React.useState(false);
-  React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
+  // corners. As the header collapses (padding shrinks by 20px over the scroll
+  // range), the pane top follows it continuously via --collapse, so the corners
+  // stay tucked at the header's bottom edge the whole way.
   return (
     <Shell active={active} onNav={onNav} whiteTop>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} clusterRef={clusterRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
-      <div ref={shrinkRef} onScroll={onHeaderScroll}
-        style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
-          transition: animate ? "top 200ms var(--ease-header)" : "none",
+      <StickyHeader overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
+      <div ref={paneRef}
+        style={{ position: "absolute", top: headerH ? `calc(${headerH}px - 20px * var(--collapse, 0))` : 0, left: 0, right: 0, bottom: 0, zIndex: 1,
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
           // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
