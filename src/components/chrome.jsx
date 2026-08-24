@@ -88,108 +88,12 @@ export function useHeaderScroll() {
   return [scrolled, onScroll, headerRef, headerH];
 }
 
-// ── useHeaderMotion ──────────────────────────────────────────────────────────
-// Ties the header's logo/title cluster to scroll position, continuously: it
-// shrinks as the pane scrolls down and grows past full size when you overscroll
-// (finger pull — or a momentum flick — at the very top). Transform-only on the
-// cluster: NO content translates, nothing can tear, and the shrink returns as you
-// scroll back up (there's no separate snap-back to feel abrupt). Attach the
-// returned ref to the scroll pane; pass the cluster ref (StickyHeader's inner row).
-// Touch listeners are native + non-passive so the overscroll pull can preventDefault.
-export function useHeaderMotion({ clusterRef, headerRef, shrinkAt = 26, minScale = 0.9, expand = 0.12, grow = 70, resist = 0.5 }) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const cl = () => clusterRef && clusterRef.current;
-    const hd = () => headerRef && headerRef.current;
-    const BASE_PAD = 24; // non-scrolled paddingBottom (StickyHeader)
-    let g = null, touching = false, bouncing = false;
-    // scroll-driven cluster transform: p=0 at the top → p=1 by shrinkAt px scrolled
-    const scrollTf = () => {
-      const p = Math.min(1, Math.max(0, el.scrollTop / shrinkAt));
-      return `translateY(${-2 * p}px) scale(${1 - (1 - minScale) * p})`;
-    };
-    const fromScroll = () => { const c = cl(); if (c) { c.style.transition = "none"; c.style.transform = scrollTf(); } };
-    // overscroll: grow the navy header (paddingBottom) AND scale the cluster up.
-    // The header is an overlay, so growing it downward covers the pane's top a
-    // touch during the pull — no content translates, nothing tears.
-    const setExpand = (px) => {
-      const c = cl(), h = hd();
-      if (h) { h.style.transition = "none"; h.style.paddingBottom = (BASE_PAD + px) + "px"; }
-      if (c) { c.style.transition = "none"; c.style.transform = `scale(${1 + expand * (px / grow)})`; }
-    };
-    const release = () => {
-      const c = cl(), h = hd();
-      if (h) { h.style.transition = "padding 380ms var(--ease-out-quart)"; h.style.paddingBottom = BASE_PAD + "px"; }
-      if (c) { c.style.transition = "transform 380ms var(--ease-out-quart)"; c.style.transform = scrollTf(); }
-    };
-
-    const onStart = (e) => {
-      touching = true;
-      if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
-      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false };
-    };
-    const onMove = (e) => {
-      if (!g) return;
-      const dy = e.touches[0].clientY - g.y0, dx = e.touches[0].clientX - g.x0;
-      if (!g.on) {
-        if (el.scrollTop > 0) { g = null; return; }        // scrolled → let it scroll
-        if (dy > 4 && dy > Math.abs(dx)) g.on = true;        // at top, pulling down → engage
-        else if (dy < -2 || Math.abs(dx) > 8) { g = null; return; } // up / sideways → not ours
-        else return;
-      }
-      e.preventDefault();
-      setExpand(grow * (1 - Math.exp(-(dy * resist) / grow))); // damped, rubbery near the cap
-    };
-    const onEnd = () => { touching = false; if (g && g.on) release(); g = null; };
-
-    // Momentum bounce: a flick that coasts to the top grows the header a touch,
-    // sized by arrival speed (WAAPI, no fill, reverts to base padding / scroll transform).
-    let last = { top: el.scrollTop, t: performance.now() };
-    const bounce = (v) => {
-      const c = cl(), h = hd(); if (!c && !h) return;
-      bouncing = true;
-      const amp = Math.min(grow, v * 34);
-      const opt = { duration: 380, easing: "cubic-bezier(0.22,1,0.36,1)" };
-      let done;
-      if (h) done = h.animate([{ paddingBottom: BASE_PAD + "px" }, { paddingBottom: (BASE_PAD + amp) + "px", offset: 0.34 }, { paddingBottom: BASE_PAD + "px" }], opt);
-      if (c) { const ca = c.animate([{ transform: "scale(1)" }, { transform: `scale(${1 + expand * amp / grow})`, offset: 0.34 }, { transform: "scale(1)" }], opt); done = done || ca; }
-      done.onfinish = done.oncancel = () => { bouncing = false; fromScroll(); };
-    };
-    const onScroll = () => {
-      const now = performance.now(), top = el.scrollTop;
-      const dt = now - last.t, v = dt > 0 ? (last.top - top) / dt : 0; // v>0 = toward top
-      const cameFromAbove = last.top > 0.5;
-      last = { top, t: now };
-      if (g && g.on) return;                                  // finger overscroll owns it
-      if (!touching && !bouncing && top <= 0 && cameFromAbove && v > 0.6) { bounce(v); return; }
-      if (!bouncing) fromScroll();
-    };
-
-    fromScroll();
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    el.addEventListener("touchcancel", onEnd, { passive: true });
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
-      el.removeEventListener("scroll", onScroll);
-    };
-  }, [clusterRef, shrinkAt, minScale, expand, resist]);
-  return ref;
-}
-
 // ── StickyHeader ─────────────────────────────────────────────────────────────
 // The cat + screen title row. Transparent and roomy at the top of the page;
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
-export function StickyHeader({ scrolled, children, right, overlay = false, innerRef, clusterRef }) {
+export function StickyHeader({ scrolled, children, right, overlay = false, innerRef }) {
   const { t } = useTheme();
   // Solid header (same navy as the status bar, so the top strip stays seamless)
   // with concave bottom corners, so the white content pane tucks under it.
@@ -203,16 +107,16 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
   return (
     <div ref={innerRef} style={{ ...place,
       display: "flex", alignItems: "center",
-      // longhand paddingBottom so useHeaderMotion can grow the navy on overscroll
-      paddingTop: scrolled ? 9 : 14, paddingLeft: 20, paddingRight: 20, paddingBottom: scrolled ? 9 : 24,
+      padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
       background: t.chrome,
       transition: "padding 200ms var(--ease-header)" }}>
-      {/* The logo + title cluster scales down continuously as the page scrolls and
-          grows past full size on overscroll — driven imperatively by useHeaderMotion
-          via clusterRef (transform-only). transform-origin left so it anchors to the
-          left edge (title doesn't drift) instead of the centre. */}
-      <div ref={clusterRef} style={{ display: "flex", alignItems: "center", gap: 9,
-        transformOrigin: "left center" }}>
+      {/* The logo + title cluster nudges up and scales down when the page is
+          scrolled, easing back to full size at the top. transform-origin left so
+          it anchors to the left edge (title doesn't drift) instead of the centre. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 9,
+        transformOrigin: "left center",
+        transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
+        transition: "transform 200ms var(--ease-header)" }}>
         {children}
       </div>
       {/* Right-aligned header action (e.g. Daily Review), pushed opposite the
@@ -582,9 +486,6 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
-  const clusterRef = React.useRef(null);
-  const motionRef = useHeaderMotion({ clusterRef, headerRef }); // continuous shrink on scroll + grow the navy on overscroll
-
   // The light content pane sits on the navy with rounded top corners AT the
   // header's bottom, and it IS the scroll container so content clips to those
   // corners. The header shrinks by EXACTLY its padding delta on scroll —
@@ -598,8 +499,8 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
   React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
   return (
     <Shell active={active} onNav={onNav} whiteTop>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} clusterRef={clusterRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
-      <div ref={motionRef} onScroll={onHeaderScroll}
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
+      <div onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
           transition: animate ? "top 200ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
