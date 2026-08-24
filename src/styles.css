@@ -113,11 +113,11 @@ button, input { font-family: inherit; }
    `transform`) composes with the entrance/rise transform animations rather than
    being overridden by their fill. Zero on normal scroll (max with 0). Deep sections
    are off-screen during overscroll, so the cap at 5+ is just a sane ceiling. */
-.hk-parallax .hk-rise > *               { translate: 0 max(0px, calc(-20px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(2)  { translate: 0 max(0px, calc(-40px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(3)  { translate: 0 max(0px, calc(-60px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(4)  { translate: 0 max(0px, calc(-80px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(n+5){ translate: 0 max(0px, calc(-100px * var(--collapse, 0))); }
+.hk-parallax .hk-rise > *               { translate: 0 max(0px, calc(-12px * var(--collapse, 0))); }
+.hk-parallax .hk-rise > *:nth-child(2)  { translate: 0 max(0px, calc(-24px * var(--collapse, 0))); }
+.hk-parallax .hk-rise > *:nth-child(3)  { translate: 0 max(0px, calc(-36px * var(--collapse, 0))); }
+.hk-parallax .hk-rise > *:nth-child(4)  { translate: 0 max(0px, calc(-48px * var(--collapse, 0))); }
+.hk-parallax .hk-rise > *:nth-child(n+5){ translate: 0 max(0px, calc(-60px * var(--collapse, 0))); }
 
 /* answer option entrance — staggered via --i custom property */
 .hk-opt-enter {
