@@ -180,9 +180,14 @@ function LessonBody({ session, onComplete, onExit }) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" style={{ display: "block" }}><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
         <div style={{ flex: 1, display: "flex", gap: 2 }}>
-          {qs.map((_, i) => {
+          {qs.map((x, i) => {
             const L = i === 0 ? "3px" : "0", R = i === qs.length - 1 ? "3px" : "0";
-            return <div key={i} style={{ flex: 1, height: 5, background: i < results.length ? t.primary : t.line,
+            // answered: green/red by outcome; pass-through cards a neutral brand
+            // tone (not "correct"); upcoming: empty track.
+            const bg = i >= results.length ? t.line
+              : unscoredType(x) ? t.primary
+              : results[i] ? t.done : t.wrong;
+            return <div key={i} style={{ flex: 1, height: 5, background: bg,
               borderRadius: `${L} ${R} ${R} ${L}`, transition: "background 250ms var(--ease-out-expo)" }} />;
           })}
         </div>
