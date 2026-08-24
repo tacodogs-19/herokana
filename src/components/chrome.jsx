@@ -357,7 +357,7 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
       syncTA();
       if (e.touches.length !== 1) { g = null; return; }
       const t = e.touches[0];
-      g = { y0: t.clientY, x0: t.clientX, t0: Date.now(), on: false, dead: false, samples: [{ t: Date.now(), y: t.clientY }] };
+      g = { y0: t.clientY, x0: t.clientX, t0: Date.now(), on: false, dead: false, ly: t.clientY, lt: Date.now(), vpeak: 0 };
     };
     const onMove = (e) => {
       if (!g || g.dead) return;
@@ -370,22 +370,17 @@ export function useDragDismiss({ onDismiss, onBlocked, canDismiss }) {
         else return;
       }
       e.preventDefault();
-      // Record recent (t,y) samples so onEnd can measure release velocity over a
-      // short trailing window — robust to the finger slowing for one frame before
-      // lift, which zeros a naive last-sample reading.
-      const now = Date.now();
-      g.samples.push({ t: now, y: t.clientY });
-      while (g.samples.length > 2 && now - g.samples[0].t > 100) g.samples.shift();
+      // Track the PEAK downward frame-velocity across the drag. Release-anchored
+      // measures read slow because the finger tapers right before lift; the peak
+      // captures flick intent regardless of that taper. Ignore sub-8ms frames
+      // (coalesced touch events) whose tiny dt inflates velocity.
+      const now = Date.now(), dt = now - g.lt;
+      if (dt >= 8) { g.vpeak = Math.max(g.vpeak, (t.clientY - g.ly) / dt); g.ly = t.clientY; g.lt = now; }
       setT(`translateY(${Math.max(0, dy)}px)`);
     };
     const onEnd = (e) => {
       if (!g) return;
-      const on = g.on;
-      // release velocity: vertical displacement over the last <=80ms of movement
-      const s = g.samples, last = s[s.length - 1];
-      let first = s[0];
-      for (const smp of s) { if (last.t - smp.t <= 80) { first = smp; break; } }
-      const relVy = Math.max(0, (last.y - first.y) / Math.max(1, last.t - first.t)); // px/ms at release
+      const on = g.on, relVy = Math.max(0, g.vpeak); // px/ms — peak frame-velocity across the drag
       const endY = e.changedTouches?.[0]?.clientY ?? g.y0;
       const dy = Math.max(0, endY - g.y0);
       const vy = dy / Math.max(1, Date.now() - g.t0);
