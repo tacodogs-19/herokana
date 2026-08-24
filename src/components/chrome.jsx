@@ -115,7 +115,28 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.2, res
     const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
     let raf = 0, relRaf = 0, g = null; // g: active overscroll gesture
     const applyScroll = () => { raf = 0; if (!(g && g.on) && !relRaf) setVar(scrollP()); };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(applyScroll); };
+    // momentum: a flick that coasts to the top expands the header a touch, sized
+    // by arrival speed, then settles. Reuses relRaf so it's mutually exclusive
+    // with the finger pull / spring.
+    const bounce = (v) => {
+      const peak = -Math.min(expand, v * 0.35);
+      const t0 = performance.now(), dur = 440;
+      const step = () => {
+        const k = Math.min(1, (performance.now() - t0) / dur);
+        if (k < 1) { setVar(peak * Math.sin(Math.PI * k)); relRaf = requestAnimationFrame(step); } // 0→peak→0
+        else { relRaf = 0; setVar(scrollP()); }
+      };
+      relRaf = requestAnimationFrame(step);
+    };
+    let last = { top: el.scrollTop, t: performance.now() };
+    const onScroll = () => {
+      const now = performance.now(), top = el.scrollTop;
+      const dt = now - last.t, v = dt > 0 ? (last.top - top) / dt : 0; // v>0 = coasting toward top
+      const cameFromAbove = last.top > 0.5;
+      last = { top, t: now };
+      if (!raf) raf = requestAnimationFrame(applyScroll);
+      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.4) bounce(v);
+    };
 
     // overscroll pull (touch, at the very top, pulling down)
     const cancelRel = () => { if (relRaf) { cancelAnimationFrame(relRaf); relRaf = 0; } };
