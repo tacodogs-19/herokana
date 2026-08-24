@@ -48,9 +48,9 @@ export default function App() {
     // to the slide-off duration so a hard flick whips off and a gentle release
     // glides. Fixed 240ms otherwise (tap-back, hardware back).
     // ponytail: velocity→duration curve, not a real spring — swap for a spring if the ease ever needs to track drag momentum exactly.
-    let dur = 240;
+    let dur = 280;
     if (mode === "dismiss" && Date.now() - flingState.ts < 150) {
-      dur = Math.round(Math.min(340, Math.max(150, 240 / (flingState.vy + 0.35))));
+      dur = Math.round(Math.min(380, Math.max(180, 280 / (flingState.vy + 0.35))));
       flingState.ts = 0; // one-shot
     }
     // dim the held layer when it's a modal sheet (see MODAL_SCREENS) so its
