@@ -112,7 +112,7 @@ button, input { font-family: inherit; }
    `transform`) so it composes with the entrance/rise transform animations rather
    than being overridden by their fill. Zero on normal scroll (max with 0). */
 .hk-parallax .hk-rise > * {
-  translate: 0 max(0px, calc(var(--i, 1) * -4px * var(--collapse, 0)));
+  translate: 0 max(0px, calc(var(--i, 1) * -14px * var(--collapse, 0)));
 }
 
 /* answer option entrance — staggered via --i custom property */

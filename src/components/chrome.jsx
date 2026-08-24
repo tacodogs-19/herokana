@@ -625,7 +625,7 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
             base move here (all content), plus a per-section stagger in styles.css
             (.hk-parallax .hk-rise > * uses each section's --i). Clamped to 0 on
             normal scroll (positive --collapse). */}
-        <div className="hk-parallax" style={{ transform: "translateY(max(0px, calc(-8px * var(--collapse, 0))))", willChange: "transform" }}>
+        <div className="hk-parallax" style={{ transform: "translateY(max(0px, calc(-12px * var(--collapse, 0))))", willChange: "transform" }}>
           {children}
         </div>
       </div>
