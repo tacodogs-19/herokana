@@ -98,24 +98,74 @@ export function useHeaderScroll() {
 // only the number changes, set imperatively (no re-renders, no inline conflict).
 // rAF-batched so scrollTop is read at paint time. Attach the returned ref to the
 // scroll pane; pass the header's ref.
-export function useHeaderCollapse({ headerRef, distance = 120 }) {
+// `expand`/`resist` add the reverse move: pulling DOWN past the top drives
+// --collapse NEGATIVE, so the same calc() formulas expand the header, grow the
+// logo and push the pane top down (docked to the header's taller bottom — no
+// tear, no differential). Springs back to the scroll position on release.
+export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.2, resist = 0.5 }) {
   const paneRef = React.useRef(null);
   React.useEffect(() => {
     const el = paneRef.current;
     if (!el) return;
-    let raf = 0;
-    const apply = () => {
-      raf = 0;
-      const p = Math.min(1, Math.max(0, el.scrollTop / distance));
-      el.style.setProperty("--collapse", p);              // pane top calc()
+    const setVar = (p) => {
+      el.style.setProperty("--collapse", p);               // pane top calc()
       const h = headerRef && headerRef.current;
-      if (h) h.style.setProperty("--collapse", p);          // header padding + (inherited) logo scale
+      if (h) h.style.setProperty("--collapse", p);           // header padding + (inherited) logo scale
     };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
-    apply();
+    const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
+    let raf = 0, relRaf = 0, g = null; // g: active overscroll gesture
+    const applyScroll = () => { raf = 0; if (!(g && g.on) && !relRaf) setVar(scrollP()); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(applyScroll); };
+
+    // overscroll pull (touch, at the very top, pulling down)
+    const cancelRel = () => { if (relRaf) { cancelAnimationFrame(relRaf); relRaf = 0; } };
+    const onStart = (e) => {
+      if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
+      cancelRel();
+      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false };
+    };
+    const onMove = (e) => {
+      if (!g) return;
+      const dy = e.touches[0].clientY - g.y0, dx = e.touches[0].clientX - g.x0;
+      if (!g.on) {
+        if (el.scrollTop > 0) { g = null; return; }        // scrolled → let it scroll
+        if (dy > 4 && dy > Math.abs(dx)) g.on = true;        // at top, pulling down → engage
+        else if (dy < -2 || Math.abs(dx) > 8) { g = null; return; } // up / sideways → not ours
+        else return;
+      }
+      e.preventDefault();
+      setVar(-expand * (1 - Math.exp(-(dy * resist) / 120))); // 0 → -expand, rubbery near the cap
+    };
+    const spring = (from) => { // ease --collapse back to the scroll position
+      let c = from;
+      const step = () => {
+        c += (0 - c) * 0.18;
+        if (Math.abs(c) > 0.004) { setVar(c); relRaf = requestAnimationFrame(step); }
+        else { relRaf = 0; setVar(scrollP()); }
+      };
+      relRaf = requestAnimationFrame(step);
+    };
+    const onEnd = () => {
+      if (g && g.on) { const cur = parseFloat(getComputedStyle(el).getPropertyValue("--collapse")) || 0; g = null; spring(cur); }
+      else g = null;
+    };
+
+    applyScroll();
     el.addEventListener("scroll", onScroll, { passive: true });
-    return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, [headerRef, distance]);
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    el.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+      if (raf) cancelAnimationFrame(raf);
+      if (relRaf) cancelAnimationFrame(relRaf);
+    };
+  }, [headerRef, distance, expand, resist]);
   return paneRef;
 }
 
