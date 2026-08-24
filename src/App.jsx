@@ -35,7 +35,6 @@ export default function App() {
   // (forward — the previous screen sits behind the slide-up) or "dismiss" (back —
   // the leaving screen slides down off the top). { html, key, mode }.
   const [snap, setSnap] = React.useState(null);
-  const [dbg, setDbg] = React.useState(null); // TEMP: pull-down velocity readout
   // Snapshot the current screen's markup + the scroll offsets of every scrollable
   // node (innerHTML clones lose scroll — the rail would snap to its left edge and
   // the page to the top). Offsets are keyed by descendant index so they can be
@@ -50,13 +49,10 @@ export default function App() {
     // glides. Fixed 240ms otherwise (tap-back, hardware back).
     // ponytail: velocity→duration curve, not a real spring — swap for a spring if the ease ever needs to track drag momentum exactly.
     let dur = 240;
-    const fresh = mode === "dismiss" && Date.now() - flingState.ts < 150;
-    if (fresh) {
+    if (mode === "dismiss" && Date.now() - flingState.ts < 150) {
       dur = Math.round(Math.min(340, Math.max(150, 240 / (flingState.vy + 0.35))));
       flingState.ts = 0; // one-shot
     }
-    // TEMP debug: show what the dismiss actually captured
-    if (mode === "dismiss") setDbg({ vy: flingState.vy, fresh, dur, at: Date.now() });
     // dim the held layer when it's a modal sheet (see MODAL_SCREENS) so its
     // corners recede behind the incoming sheet's
     setSnap({ html: el.innerHTML, scrolls, key: Date.now(), mode, dim: mode === "behind" && MODAL_SCREENS.has(scr.name), dur });
@@ -312,14 +308,6 @@ export default function App() {
             onAnimationEnd={(e) => { if (e.animationName === "hkSlideDown") setSnap(null); }}
             dangerouslySetInnerHTML={{ __html: snap.html }} />
         </>
-      )}
-      {/* TEMP: pull-down velocity readout — remove after tuning */}
-      {dbg && (
-        <div style={{ position: "fixed", top: "calc(env(safe-area-inset-top) + 8px)", left: "50%", transform: "translateX(-50%)",
-          zIndex: 9999, pointerEvents: "none", background: "rgba(8,12,24,0.9)", color: "#fff",
-          font: "700 13px/1.3 monospace", padding: "7px 12px", borderRadius: 10, whiteSpace: "nowrap" }}>
-          vy {dbg.vy.toFixed(2)} px/ms {dbg.fresh ? "" : "(stale→240)"} → {dbg.dur}ms
-        </div>
       )}
     </div>
   );
