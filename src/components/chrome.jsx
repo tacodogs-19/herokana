@@ -88,6 +88,95 @@ export function useHeaderScroll() {
   return [scrolled, onScroll, headerRef, headerH];
 }
 
+// Elastic overscroll amount. The pane's box is extended downward by this much
+// (bottom: -STRETCH_MAX) so the smooth `transform` pull never exposes the navy
+// plane at the bottom — the pane's own light background fills the gap instead.
+// The pane's paddingBottom is bumped by the same amount so content still clears
+// the nav. Keep the three in sync.
+export const STRETCH_MAX = 88;
+
+// ── useHeaderStretch ─────────────────────────────────────────────────────────
+// Pure-feel elastic overscroll on a tab's scroll pane, two ways in:
+//  1. Finger pull DOWN past the top → drags the pane down a damped, capped amount
+//     (revealing more of the navy header), springing back on release.
+//  2. A flick-scroll that COASTS back to the top → a momentum bounce sized by the
+//     arrival speed (finger already lifted).
+// Uses `transform` (GPU) throughout; the pane's bottom: -STRETCH_MAX extension
+// (see TabScreen) keeps the downward move from tearing the bottom open. Attach
+// the returned ref to the scroll box; pass the header ref so it follows. Touch
+// only; native non-passive listeners so we own the gesture (mirrors useDragDismiss).
+export function useHeaderStretch({ headerRef, max = STRETCH_MAX, resist = 0.42 } = {}) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let g = null;          // active finger gesture, or null
+    let touching = false;  // finger down (suppresses the momentum bounce)
+    let bouncing = false;  // a momentum bounce is playing
+    const hdr = () => headerRef && headerRef.current;
+    const apply = (s, tr) => {
+      el.style.transition = tr || "none";
+      el.style.transform = s ? `translateY(${s}px)` : "";
+      const h = hdr();
+      if (h) { h.style.transition = tr || "none"; h.style.transform = s ? `translateY(${s * 0.35}px)` : ""; }
+    };
+    const onStart = (e) => {
+      touching = true;
+      if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
+      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false };
+    };
+    const onMove = (e) => {
+      if (!g) return;
+      const dy = e.touches[0].clientY - g.y0, dx = e.touches[0].clientX - g.x0;
+      if (!g.on) {
+        if (el.scrollTop > 0) { g = null; return; }        // scrolled down → let it scroll
+        if (dy > 4 && dy > Math.abs(dx)) g.on = true;        // at top, pulling down → engage
+        else if (dy < -2 || Math.abs(dx) > 8) { g = null; return; } // up / sideways → not ours
+        else return;
+      }
+      e.preventDefault();
+      // diminishing return so it feels rubbery near the cap, not a hard stop
+      apply(max * (1 - Math.exp(-(dy * resist) / max)));
+    };
+    const onEnd = () => { touching = false; if (g && g.on) apply(0, "transform 420ms var(--ease-out-quart)"); g = null; };
+
+    // Momentum bounce via the Web Animations API (no fill, so it composites over
+    // and cleanly reverts to the inline transform the finger path uses).
+    let last = { top: el.scrollTop, t: performance.now() };
+    const bounce = (amp) => {
+      bouncing = true;
+      const opt = { duration: 240 + amp * 2.4, easing: "cubic-bezier(0.22,1,0.36,1)" };
+      const kf = (peak) => [{ transform: "translateY(0)" }, { transform: `translateY(${peak}px)`, offset: 0.34 }, { transform: "translateY(0)" }];
+      const a = el.animate(kf(amp), opt);
+      const h = hdr();
+      if (h) h.animate(kf(amp * 0.35), opt);
+      a.onfinish = a.oncancel = () => { bouncing = false; };
+    };
+    const onScroll = () => {
+      const now = performance.now(), top = el.scrollTop;
+      const dt = now - last.t, v = dt > 0 ? (last.top - top) / dt : 0; // v>0 = moving toward top
+      const cameFromAbove = last.top > 0.5;
+      last = { top, t: now };
+      if (!touching && !bouncing && top <= 0 && cameFromAbove && v > 0.6)
+        bounce(Math.min(max, v * 34));
+    };
+
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    el.addEventListener("touchcancel", onEnd, { passive: true });
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+      el.removeEventListener("scroll", onScroll);
+    };
+  }, [headerRef, max, resist]);
+  return ref;
+}
+
 // ── StickyHeader ─────────────────────────────────────────────────────────────
 // The cat + screen title row. Transparent and roomy at the top of the page;
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
@@ -486,6 +575,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
+  const stretchRef = useHeaderStretch({ headerRef }); // elastic pull / momentum bounce at the top
 
   // The light content pane sits on the navy with rounded top corners AT the
   // header's bottom, and it IS the scroll container so content clips to those
@@ -501,8 +591,8 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
   return (
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
-      <div onScroll={onHeaderScroll}
-        style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
+      <div ref={stretchRef} onScroll={onHeaderScroll}
+        style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: -STRETCH_MAX, zIndex: 1,
           transition: animate ? "top 200ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
@@ -513,7 +603,10 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
           // Longhand (not the `padding` shorthand + env()/calc): the shorthand
           // serialises to an empty style attribute in an innerHTML snapshot clone.
           paddingRight: 20, paddingLeft: 20,
-          paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
+          // box extends STRETCH_MAX below the fold (bottom: -STRETCH_MAX) so the
+          // elastic pull can't expose the plane; pad by the same extra so content
+          // still clears the nav.
+          paddingBottom: `calc(${94 + STRETCH_MAX}px + env(safe-area-inset-bottom))` }}>
         {children}
       </div>
     </Shell>
