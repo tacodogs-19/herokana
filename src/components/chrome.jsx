@@ -620,7 +620,12 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
           // serialises to an empty style attribute in an innerHTML snapshot clone.
           paddingRight: 20, paddingLeft: 20,
           paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
-        {children}
+        {/* Parallax: on overscroll/bounce (negative --collapse) the content pulls
+            an extra bit further than the card frame itself moves, so the layers
+            separate with depth. Clamped to 0 on normal scroll (positive --collapse). */}
+        <div style={{ transform: "translateY(max(0px, calc(-16px * var(--collapse, 0))))", willChange: "transform" }}>
+          {children}
+        </div>
       </div>
     </Shell>
   );
