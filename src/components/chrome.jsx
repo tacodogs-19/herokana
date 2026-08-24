@@ -115,15 +115,25 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.2, res
     const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
     let raf = 0, relRaf = 0, g = null; // g: active overscroll gesture
     const applyScroll = () => { raf = 0; if (!(g && g.on) && !relRaf) setVar(scrollP()); };
-    // momentum: a flick that coasts to the top expands the header a touch, sized
-    // by arrival speed, then settles. Reuses relRaf so it's mutually exclusive
-    // with the finger pull / spring.
+    // momentum: a flick that coasts to the top hands its velocity to a spring that
+    // expands the header (negative --collapse) and settles. Seeding the spring with
+    // the scroll speed makes the expand a fluid continuation of the scroll — it moves
+    // fast from the first frame, overshoots in proportion to the flick, then eases
+    // back gently. Reuses relRaf so it's mutually exclusive with the finger pull.
     const bounce = (v) => {
-      const peak = -Math.min(expand, v * 0.35);
-      const t0 = performance.now(), dur = 440;
+      const K = 50, D = 11.4;                       // stiffness / damping — one soft overshoot (zeta ~0.8)
+      let c = 0, vel = -Math.min(3, v) * 3.5;        // seed velocity from the scroll arrival speed
+      let tPrev = performance.now();
       const step = () => {
-        const k = Math.min(1, (performance.now() - t0) / dur);
-        if (k < 1) { setVar(peak * Math.sin(Math.PI * k)); relRaf = requestAnimationFrame(step); } // 0→peak→0
+        const now = performance.now();
+        let dt = (now - tPrev) / 1000; tPrev = now;
+        if (dt > 0.05) dt = 0.05;                    // clamp a stalled frame for stability
+        vel += (-K * c - D * vel) * dt;
+        c += vel * dt;
+        if (c < -expand) { c = -expand; if (vel < 0) vel = 0; } // cap the expansion
+        if (c > 0) { c = 0; if (vel > 0) vel = 0; }             // expand-and-return only; don't compact
+        setVar(c);
+        if (Math.abs(c) > 0.002 || Math.abs(vel) > 0.03) relRaf = requestAnimationFrame(step);
         else { relRaf = 0; setVar(scrollP()); }
       };
       relRaf = requestAnimationFrame(step);
