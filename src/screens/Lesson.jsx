@@ -186,7 +186,7 @@ function LessonBody({ session, onComplete, onExit }) {
             // tone (not "correct"); upcoming: empty track.
             const bg = i >= results.length ? t.line
               : unscoredType(x) ? t.primary
-              : results[i] ? t.doneFill : t.wrong;
+              : results[i] ? t.done : t.wrong;
             return <div key={i} style={{ flex: 1, height: 5, background: bg,
               borderRadius: `${L} ${R} ${R} ${L}`, transition: "background 250ms var(--ease-out-expo)" }} />;
           })}
