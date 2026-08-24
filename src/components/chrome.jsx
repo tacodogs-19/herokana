@@ -88,12 +88,56 @@ export function useHeaderScroll() {
   return [scrolled, onScroll, headerRef, headerH];
 }
 
+// ── useScrollShrink ──────────────────────────────────────────────────────────
+// Binds the header's logo/title cluster continuously to scroll POSITION and
+// VELOCITY: it scales down as the pane scrolls (position), with a small velocity
+// lead so a fast scroll compacts it a touch ahead, easing back to the exact
+// position when the scroll settles. Transform-only on the cluster (clusterRef) —
+// no layout, no content movement. The header's ~20px height compaction stays on
+// its existing padding transition (useHeaderScroll/StickyHeader); this only makes
+// the logo shrink track the scroll instead of snapping at a threshold. Attach the
+// returned ref to the scroll pane.
+export function useScrollShrink({ clusterRef, shrinkAt = 32, minScale = 0.9, velLead = 0.09 }) {
+  const paneRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = paneRef.current;
+    if (!el) return;
+    const setP = (p) => {
+      const c = clusterRef && clusterRef.current;
+      if (c) c.style.transform = `translateY(${-2 * p}px) scale(${1 - (1 - minScale) * p})`;
+    };
+    const clamp01 = (x) => Math.min(1, Math.max(0, x));
+    let last = { top: el.scrollTop, t: performance.now() }, vEMA = 0;
+    let cur = clamp01(el.scrollTop / shrinkAt), target = cur, raf = 0;
+    // spring the displayed value toward the (velocity-led) target so it stays
+    // smooth between scroll events and settles cleanly when scrolling stops.
+    const tick = () => {
+      cur += (target - cur) * 0.35;
+      setP(cur);
+      if (Math.abs(target - cur) > 0.002) raf = requestAnimationFrame(tick);
+      else { cur = target; setP(cur); raf = 0; }
+    };
+    const onScroll = () => {
+      const now = performance.now(), top = el.scrollTop;
+      const dt = now - last.t, v = dt > 0 ? (top - last.top) / dt : 0; // px/ms, + = scrolling down
+      vEMA = vEMA * 0.6 + v * 0.4;
+      last = { top, t: now };
+      target = clamp01(top / shrinkAt + velLead * vEMA); // position, led by velocity
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    setP(cur);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, [clusterRef, shrinkAt, minScale, velLead]);
+  return paneRef;
+}
+
 // ── StickyHeader ─────────────────────────────────────────────────────────────
 // The cat + screen title row. Transparent and roomy at the top of the page;
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
 // compact. Each screen owns the `scrolled` flag (onScroll on its scroll box);
 // the scroll box must have paddingTop 0 so the header sits flush at the top.
-export function StickyHeader({ scrolled, children, right, overlay = false, innerRef }) {
+export function StickyHeader({ scrolled, children, right, overlay = false, innerRef, clusterRef }) {
   const { t } = useTheme();
   // Solid header (same navy as the status bar, so the top strip stays seamless)
   // with concave bottom corners, so the white content pane tucks under it.
@@ -110,13 +154,15 @@ export function StickyHeader({ scrolled, children, right, overlay = false, inner
       padding: scrolled ? "9px 20px 9px" : "14px 20px 24px",
       background: t.chrome,
       transition: "padding 200ms var(--ease-header)" }}>
-      {/* The logo + title cluster nudges up and scales down when the page is
-          scrolled, easing back to full size at the top. transform-origin left so
-          it anchors to the left edge (title doesn't drift) instead of the centre. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 9,
+      {/* The logo + title cluster scales down as the page scrolls — driven
+          continuously (position + velocity) by useScrollShrink via clusterRef.
+          transform-origin left so it anchors to the left edge (title doesn't
+          drift) instead of the centre. Falls back to the discrete scrolled state
+          when no clusterRef is wired (non-TabScreen usages). */}
+      <div ref={clusterRef} style={{ display: "flex", alignItems: "center", gap: 9,
         transformOrigin: "left center",
-        transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
-        transition: "transform 200ms var(--ease-header)" }}>
+        ...(clusterRef ? null : { transform: scrolled ? "translateY(-2px) scale(0.9)" : "none",
+          transition: "transform 200ms var(--ease-header)" }) }}>
         {children}
       </div>
       {/* Right-aligned header action (e.g. Daily Review), pushed opposite the
@@ -486,6 +532,8 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
+  const clusterRef = React.useRef(null);
+  const shrinkRef = useScrollShrink({ clusterRef }); // logo shrink tied to scroll position + velocity
   // The light content pane sits on the navy with rounded top corners AT the
   // header's bottom, and it IS the scroll container so content clips to those
   // corners. The header shrinks by EXACTLY its padding delta on scroll —
@@ -499,8 +547,8 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
   React.useEffect(() => { const id = requestAnimationFrame(() => setAnimate(true)); return () => cancelAnimationFrame(id); }, []);
   return (
     <Shell active={active} onNav={onNav} whiteTop>
-      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
-      <div onScroll={onHeaderScroll}
+      <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} clusterRef={clusterRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
+      <div ref={shrinkRef} onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
           transition: animate ? "top 200ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
