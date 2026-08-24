@@ -102,7 +102,7 @@ export function useHeaderScroll() {
 // --collapse NEGATIVE, so the same calc() formulas expand the header, grow the
 // logo and push the pane top down (docked to the header's taller bottom — no
 // tear, no differential). Springs back to the scroll position on release.
-export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.4, resist = 0.5 }) {
+export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, resist = 0.5 }) {
   const paneRef = React.useRef(null);
   React.useEffect(() => {
     const el = paneRef.current;
@@ -121,8 +121,8 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.4, res
     // fast from the first frame, overshoots in proportion to the flick, then eases
     // back gently. Reuses relRaf so it's mutually exclusive with the finger pull.
     const bounce = (v) => {
-      const K = 50, D = 11.4;                       // stiffness / damping — one soft overshoot (zeta ~0.8)
-      let c = 0, vel = -Math.min(3, v) * 5.5;        // seed velocity from the scroll arrival speed
+      const K = 75, D = 14;                          // stiffness / damping — one soft overshoot (zeta ~0.8)
+      let c = 0, vel = -Math.min(3, v) * 8;          // seed velocity from the scroll arrival speed
       let tPrev = performance.now();
       const step = () => {
         const now = performance.now();
