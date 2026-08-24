@@ -114,11 +114,13 @@ export function useHeaderStretch({ headerRef, max = STRETCH_MAX, resist = 0.42 }
     let touching = false;  // finger down (suppresses the momentum bounce)
     let bouncing = false;  // a momentum bounce is playing
     const hdr = () => headerRef && headerRef.current;
+    // Header and pane move together 1:1 — the top rubber-bands as one slab, so
+    // nothing stretches apart (a differential would open a gap = the "stretch").
     const apply = (s, tr) => {
       el.style.transition = tr || "none";
       el.style.transform = s ? `translateY(${s}px)` : "";
       const h = hdr();
-      if (h) { h.style.transition = tr || "none"; h.style.transform = s ? `translateY(${s * 0.35}px)` : ""; }
+      if (h) { h.style.transition = tr || "none"; h.style.transform = s ? `translateY(${s}px)` : ""; }
     };
     const onStart = (e) => {
       touching = true;
@@ -138,7 +140,8 @@ export function useHeaderStretch({ headerRef, max = STRETCH_MAX, resist = 0.42 }
       // diminishing return so it feels rubbery near the cap, not a hard stop
       apply(max * (1 - Math.exp(-(dy * resist) / max)));
     };
-    const onEnd = () => { touching = false; if (g && g.on) apply(0, "transform 420ms var(--ease-out-quart)"); g = null; };
+    // Gentle, longer settle so the release doesn't read as a "snap" after a slow pull.
+    const onEnd = () => { touching = false; if (g && g.on) apply(0, "transform 620ms var(--ease-out-quart)"); g = null; };
 
     // Momentum bounce via the Web Animations API (no fill, so it composites over
     // and cleanly reverts to the inline transform the finger path uses).
