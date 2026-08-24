@@ -122,7 +122,7 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.2, res
     // back gently. Reuses relRaf so it's mutually exclusive with the finger pull.
     const bounce = (v) => {
       const K = 50, D = 11.4;                       // stiffness / damping — one soft overshoot (zeta ~0.8)
-      let c = 0, vel = -Math.min(3, v) * 3.5;        // seed velocity from the scroll arrival speed
+      let c = 0, vel = -Math.min(3, v) * 4;          // seed velocity from the scroll arrival speed
       let tPrev = performance.now();
       const step = () => {
         const now = performance.now();
@@ -145,7 +145,7 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.2, res
       const cameFromAbove = last.top > 0.5;
       last = { top, t: now };
       if (!raf) raf = requestAnimationFrame(applyScroll);
-      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.4) bounce(v);
+      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.15) bounce(v);
     };
 
     // overscroll pull (touch, at the very top, pulling down)
