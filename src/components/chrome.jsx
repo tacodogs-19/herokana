@@ -102,30 +102,32 @@ export function useScrollShrink({ clusterRef, shrinkAt = 32, minScale = 0.9, vel
   React.useEffect(() => {
     const el = paneRef.current;
     if (!el) return;
+    const clamp01 = (x) => Math.min(1, Math.max(0, x));
     const setP = (p) => {
       const c = clusterRef && clusterRef.current;
       if (c) c.style.transform = `translateY(${-2 * p}px) scale(${1 - (1 - minScale) * p})`;
     };
-    const clamp01 = (x) => Math.min(1, Math.max(0, x));
-    let last = { top: el.scrollTop, t: performance.now() }, vEMA = 0;
-    let cur = clamp01(el.scrollTop / shrinkAt), target = cur, raf = 0;
-    // spring the displayed value toward the (velocity-led) target so it stays
-    // smooth between scroll events and settles cleanly when scrolling stops.
-    const tick = () => {
-      cur += (target - cur) * 0.35;
-      setP(cur);
-      if (Math.abs(target - cur) > 0.002) raf = requestAnimationFrame(tick);
-      else { cur = target; setP(cur); raf = 0; }
+    // paint straight from the live scroll position (+ velocity lead) — no spring,
+    // so there is zero lag between the finger and the logo.
+    let last = { top: el.scrollTop, t: performance.now() }, vEMA = 0, raf = 0, lastEvt = 0;
+    const paint = () => setP(clamp01(el.scrollTop / shrinkAt + velLead * vEMA));
+    // after scrolling stops, ease the velocity lead back to 0 so the logo settles
+    // to the exact position (this is the ONLY rAF, and it never runs mid-scroll).
+    const settle = () => {
+      if (performance.now() - lastEvt < 40) { raf = requestAnimationFrame(settle); return; } // still scrolling
+      vEMA *= 0.8;
+      paint();
+      raf = Math.abs(vEMA) > 0.02 ? requestAnimationFrame(settle) : 0;
     };
     const onScroll = () => {
       const now = performance.now(), top = el.scrollTop;
       const dt = now - last.t, v = dt > 0 ? (top - last.top) / dt : 0; // px/ms, + = scrolling down
       vEMA = vEMA * 0.6 + v * 0.4;
-      last = { top, t: now };
-      target = clamp01(top / shrinkAt + velLead * vEMA); // position, led by velocity
-      if (!raf) raf = requestAnimationFrame(tick);
+      last = { top, t: now }; lastEvt = now;
+      paint();                                        // immediate, tight to the scroll
+      if (!raf) raf = requestAnimationFrame(settle);  // ease the lead out once it stops
     };
-    setP(cur);
+    paint();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
   }, [clusterRef, shrinkAt, minScale, velLead]);
