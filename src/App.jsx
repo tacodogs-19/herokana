@@ -285,7 +285,7 @@ export default function App() {
               the wrapper) — revealed during the slide-up and while dragging the
               sheet down, for iOS-sheet depth. Fades in over the slide-up duration
               so it ramps with the movement instead of snapping on. */}
-          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "rgba(8,12,24,0.4)",
+          <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: t.scrim,
             animation: navDir === "forward" ? "hkSlideFade 340ms var(--ease-drawer) both" : undefined }} />
         </>
       )}
@@ -301,7 +301,7 @@ export default function App() {
       {snap && snap.mode === "dismiss" && (
         <>
           <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 40, pointerEvents: "none",
-            background: "rgba(8,12,24,0.4)", animation: `hkDimOut ${snap.dur}ms var(--ease-drawer) both` }} />
+            background: t.scrim, animation: `hkDimOut ${snap.dur}ms var(--ease-drawer) both` }} />
           <div key={snap.key} ref={applyScrolls} aria-hidden="true" className="hk-snap"
             style={{ position: "fixed", inset: 0, zIndex: 50, pointerEvents: "none",
               animation: `hkSlideDown ${snap.dur}ms var(--ease-drawer) both` }}

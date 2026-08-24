@@ -144,7 +144,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
             <button key={d.id} onClick={() => setDiff(d.id)} className="hk-press"
               style={{ flex: 1, padding: "7px 4px 6px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: dOn ? t.surface : "transparent", color: dOn ? t.ink : t.sub,
-                boxShadow: dOn ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                boxShadow: dOn ? t.pillShadow : "none", fontFamily: DISPLAY,
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
               <span style={{ fontSize: 12.5, fontWeight: 800 }}>{d.label}</span>
               <span style={{ fontSize: 9.5, fontWeight: 500, opacity: 0.75, whiteSpace: "nowrap" }}>{d.hint}</span>
@@ -160,7 +160,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
             <button key={d.id} onClick={() => setDir(d.id)} className="hk-press"
               style={{ flex: 1, padding: "8px 4px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: dOn ? t.surface : "transparent", color: dOn ? t.ink : t.sub,
-                boxShadow: dOn ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                boxShadow: dOn ? t.pillShadow : "none", fontFamily: DISPLAY,
                 fontSize: 12.5, fontWeight: dOn ? 800 : 600 }}>
               {d.label}
             </button>
@@ -219,7 +219,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
             <button key={tb.id} onClick={() => setModeCategory(tb.id)} className="hk-press"
               style={{ flex: 1, padding: "9px 3px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY,
                 fontSize: 11.5, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
               {tb.label}
             </button>
@@ -254,7 +254,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
             <button key={tb.id} onClick={() => setTab(tb.id)} className="hk-press"
               style={{ flex: 1, padding: "9px 4px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY,
                 fontSize: 11.5, fontWeight: on ? 800 : 600, whiteSpace: "nowrap" }}>
               {tb.label}
             </button>
@@ -409,7 +409,7 @@ function PracticeBody({ onNav, onStart, onOpenChart, onOpenVerbChart, onOpenBasi
               <button key={n} onClick={() => setCount(n)} className="hk-press"
                 style={{ flex: 1, padding: "7px 0", borderRadius: 9, border: "none", cursor: "pointer",
                   background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                  boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                  boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY,
                   fontSize: 13, fontWeight: on ? 800 : 600 }}>
                 {n}
               </button>

@@ -223,7 +223,7 @@ function DialogueBody({ dialogueId, onExit }) {
             <button key={s.id} onClick={() => setLevel(li)} className="hk-press"
               style={{ flex: 1, padding: "7px 4px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY, fontSize: 12.5, fontWeight: on ? 800 : 600 }}>
+                boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY, fontSize: 12.5, fontWeight: on ? 800 : 600 }}>
               {s.label}
             </button>
           );

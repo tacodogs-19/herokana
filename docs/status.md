@@ -258,9 +258,11 @@ The app is a complete, shippable PWA. All core flows are implemented:
   Signs, Paying, Café, Hotel, and Airport all brought up to match Konbini). Reading rounds now draw a
   varying subset rather than always showing the whole list. Speed bands (`READING` constant) are
   beginner-tuned, not yet validated against real learner times.
-- **No automated tests, linter, or type checking.** Nothing guards regressions; all verification is
-  manual in the browser. Positional chapter/unit indexing (see [content-model.md](content-model.md))
-  is the highest-risk area to change without tests.
+- **Logic is covered by a Vitest suite (`npm test`, in `tests/`: data, questions, store reducers,
+  smoke); no linter or type checking, and no automated UI/rendering coverage.** Positional
+  chapter/unit indexing (see [content-model.md](content-model.md)) — the highest-risk area — is
+  guarded by `store.test.js`/`data.test.js`; run `npm test` after touching it. Visual/interaction
+  regressions are still only caught manually in the browser.
 - **TTS quality is device-dependent — except Conversations, kana, the Verb list, and phrase-bank
   words.** Dialogue lines, kana syllables (Kana chart + Lesson kana prompts), the Verb list's
   dictionary forms, and **every phrase-bank word (all 16 themes, ~421 clips, 2026-07)** use bundled

@@ -8,6 +8,18 @@ import { useProgress } from "../store.jsx";
 // clears ts. Untouched by tap-back / hardware back, which keep the fixed time.
 export const flingState = { vy: 0, ts: 0 };
 
+// Full-screen dismissable sheet frame — the outer div for takeover screens
+// (Basics / KanaChart / VerbChart) that ride useDragDismiss. One source of truth
+// for the sheet look; spread onto the rootRef div: style={{ ...sheetFrame(t) }}.
+export const sheetFrame = (t) => ({
+  position: "fixed", inset: 0, height: "100dvh", zIndex: 1500,
+  background: t.chrome, paddingTop: "env(safe-area-inset-top)",
+  display: "flex", flexDirection: "column", maxWidth: 430, margin: "0 auto",
+  fontFamily: DISPLAY, color: t.ink, overflow: "hidden",
+  borderTopLeftRadius: 28, borderTopRightRadius: 28,
+  boxShadow: t.sheetShadow, animation: "hkFade 160ms ease both",
+});
+
 // The Daily Review pill — a subtle gold action in the top-right of every tab
 // header, opposite the logo. Shows only when there are items due; taps into
 // onReview. Lives here so all four tab screens render it identically.
@@ -438,7 +450,7 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
       // modal: round + clip the WHOLE frame (status strip + content) as one shape
       // so nothing shows a dark cutout behind the corners, and a drop shadow so
       // the sheet lifts off the screen behind it while it slides / is dragged.
-      ...(modal && { borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)" }) }}>
+      ...(modal && { borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: t.sheetShadow }) }}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden",
         paddingTop: "env(safe-area-inset-top)", position: "relative" }}>
         {/* Felix-depth: soft tinted plane behind the header + first card so tab screens

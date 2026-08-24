@@ -155,7 +155,7 @@ function ProfileBody({ onNav, onEditProfile, onReset, onReview }) {
                 <button key={o.id} onClick={() => (o.id === "auto" ? followSystem() : setMode(o.id))} className="hk-press"
                   style={{ padding: "7px 12px", borderRadius: 9, border: "none", cursor: "pointer",
                     background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                    boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                    boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY,
                     fontSize: 12.5, fontWeight: on ? 800 : 600 }}>{o.label}</button>
               );
             })}

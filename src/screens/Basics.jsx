@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
-import { Card, Button, useDragDismiss } from "../components/chrome.jsx";
+import { Card, Button, useDragDismiss, sheetFrame } from "../components/chrome.jsx";
 
 // Generic read-through explainer. Renders a titled list of {title, body, ex?}
 // cards as a full-screen overlay. Used for both Kana basics and Sentence basics
@@ -9,9 +9,7 @@ export default function Basics({ title, intro, cards, onClose }) {
   const { t } = useTheme();
   const swipe = useDragDismiss({ onDismiss: onClose });
   return (
-    <div ref={swipe.rootRef} style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)", display: "flex", flexDirection: "column",
-      maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
-      overflow: "hidden", borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)", animation: "hkFade 160ms ease both" }}>
+    <div ref={swipe.rootRef} style={sheetFrame(t)}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 20px 12px" }}>
         <button onClick={onClose} className="hk-press" aria-label="Close"

@@ -2,7 +2,7 @@ import React from "react";
 import { useTheme, JP, DISPLAY } from "../theme.jsx";
 import { speakVerb } from "../speech.js";
 import { GROUPS, FORMS } from "../verbs.js";
-import { useDragDismiss } from "../components/chrome.jsx";
+import { useDragDismiss, sheetFrame } from "../components/chrome.jsx";
 
 export default function VerbChart({ onClose }) {
   const { t } = useTheme();
@@ -18,10 +18,7 @@ export default function VerbChart({ onClose }) {
   };
 
   return (
-    <div ref={swipe.rootRef} style={{ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, height: "100dvh", zIndex: 1500, background: t.chrome, paddingTop: "env(safe-area-inset-top)",
-      display: "flex", flexDirection: "column", maxWidth: 430, margin: "0 auto", fontFamily: DISPLAY, color: t.ink,
-      overflow: "hidden", borderTopLeftRadius: 28, borderTopRightRadius: 28, boxShadow: "0 -6px 48px rgba(8, 12, 24, 0.16)",
-      animation: "hkFade 160ms ease both" }}>
+    <div ref={swipe.rootRef} style={sheetFrame(t)}>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", background: t.bg }}>
 
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 20px 12px", flexShrink: 0 }}>
@@ -46,7 +43,7 @@ export default function VerbChart({ onClose }) {
             <button key={g.id} onClick={() => { setGroupId(g.id); setActive(null); }} className="hk-press"
               style={{ flex: 1, padding: "9px 4px", borderRadius: 9, border: "none", cursor: "pointer",
                 background: on ? t.surface : "transparent", color: on ? t.ink : t.sub,
-                boxShadow: on ? "0 1px 4px rgba(0,0,0,0.12)" : "none", fontFamily: DISPLAY,
+                boxShadow: on ? t.pillShadow : "none", fontFamily: DISPLAY,
                 fontSize: 13, fontWeight: on ? 800 : 600 }}>
               {g.label}
             </button>

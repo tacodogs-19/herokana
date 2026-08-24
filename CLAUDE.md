@@ -33,10 +33,14 @@ accounts — all state lives in `localStorage`. Deliberately small and hand-roll
 npm run dev      # Vite dev server (http://localhost:5173)
 npm run build    # production build to dist/
 npm run preview  # serve the built dist/
+npm test         # Vitest logic suite (tests/*.test.js) — run before shipping
 node scripts/make-icons.mjs   # regenerate PWA icons from public/assets/app-icon.svg
 ```
 
-**No test runner, linter, or type checker is configured** — verification is manual in the browser.
+**A Vitest suite (`npm test`) covers the logic** — data integrity, `buildQuestions`, the
+`store.logic.js` reducers/SRS, and a smoke pass (`tests/`). **No linter or type checker is
+configured**, and there is **no automated UI/rendering coverage** — visual verification is manual in
+the browser. Run `npm test` before shipping logic changes.
 
 ## Directory structure
 
