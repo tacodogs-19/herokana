@@ -172,14 +172,19 @@ function LessonBody({ session, onComplete, onExit }) {
   return (
     <Shell nav={false} modal outerRef={swipe.rootRef}>
     <div {...swipe.scrollProps} style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "20px 20px 18px", overflowY: "auto" }}>
-      {/* top bar: close + a single progress bar filling to the % completed */}
+      {/* top bar: close + a segmented progress bar — one chip per question.
+          Only the whole bar's two far ends are rounded; internal (gap-facing)
+          edges stay square, minimal spacing between chips. */}
       <div style={{ display: "flex", alignItems: "center", gap: 13, marginBottom: isSpeed ? 10 : 22 }}>
         <button onClick={tryExit} className="hk-press" aria-label="Exit lesson" style={{ background: "transparent", border: "none", cursor: "pointer", color: t.faint, padding: 4, flexShrink: 0 }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" style={{ display: "block" }}><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
-        <div style={{ flex: 1, height: 5, borderRadius: 3, background: t.line, overflow: "hidden" }}>
-          <div style={{ width: `${(results.length / qs.length) * 100}%`, height: "100%", borderRadius: 3,
-            background: t.primary, transition: "width 450ms var(--ease-out-expo)" }} />
+        <div style={{ flex: 1, display: "flex", gap: 2 }}>
+          {qs.map((_, i) => {
+            const L = i === 0 ? "3px" : "0", R = i === qs.length - 1 ? "3px" : "0";
+            return <div key={i} style={{ flex: 1, height: 5, background: i < results.length ? t.primary : t.line,
+              borderRadius: `${L} ${R} ${R} ${L}`, transition: "background 250ms var(--ease-out-expo)" }} />;
+          })}
         </div>
       </div>
       {isSpeed && (
