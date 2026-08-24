@@ -88,57 +88,6 @@ export function useHeaderScroll() {
   return [scrolled, onScroll, headerRef, headerH];
 }
 
-// ── useHeaderStretch ─────────────────────────────────────────────────────────
-// Pure-feel elastic overscroll: pulling DOWN from the top of a scroll pane drags
-// it down a damped, capped amount (revealing more of the navy header behind it)
-// and nudges the header cluster with it, then springs back on release. Attach the
-// returned ref to the scroll box; pass the header's ref to make it follow. Touch
-// only, native non-passive listeners so we own the gesture and suppress the
-// browser's own overscroll bounce (mirrors useDragDismiss). No-op for mouse.
-export function useHeaderStretch({ headerRef, max = 88, resist = 0.42 } = {}) {
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let g = null; // active gesture, or null
-    const apply = (s, tr) => {
-      el.style.transition = tr || "none";
-      el.style.transform = s ? `translateY(${s}px)` : "";
-      const h = headerRef && headerRef.current;
-      if (h) { h.style.transition = tr || "none"; h.style.transform = s ? `translateY(${s * 0.35}px)` : ""; }
-    };
-    const onStart = (e) => {
-      if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
-      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false };
-    };
-    const onMove = (e) => {
-      if (!g) return;
-      const dy = e.touches[0].clientY - g.y0, dx = e.touches[0].clientX - g.x0;
-      if (!g.on) {
-        if (el.scrollTop > 0) { g = null; return; }        // scrolled down → let it scroll
-        if (dy > 4 && dy > Math.abs(dx)) g.on = true;        // at top, pulling down → engage
-        else if (dy < -2 || Math.abs(dx) > 8) { g = null; return; } // up / sideways → not ours
-        else return;
-      }
-      e.preventDefault();
-      // diminishing return so it feels rubbery near the cap, not a hard stop
-      apply(max * (1 - Math.exp(-(dy * resist) / max)));
-    };
-    const onEnd = () => { if (g && g.on) apply(0, "transform 420ms var(--ease-out-quart)"); g = null; };
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    el.addEventListener("touchcancel", onEnd, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
-    };
-  }, [headerRef, max, resist]);
-  return ref;
-}
-
 // ── StickyHeader ─────────────────────────────────────────────────────────────
 // The cat + screen title row. Transparent and roomy at the top of the page;
 // on scroll it sticks, gains a bg + shadow, and tightens so the top area stays
@@ -537,7 +486,6 @@ export function Shell({ children, active = "Learn", onNav, nav = true, plane = n
 export function TabScreen({ active, onNav, header, onReview, children }) {
   const { t } = useTheme();
   const [scrolled, onHeaderScroll, headerRef, headerH] = useHeaderScroll();
-  const stretchRef = useHeaderStretch({ headerRef }); // elastic pull-down over the top of the pane
 
   // The light content pane sits on the navy with rounded top corners AT the
   // header's bottom, and it IS the scroll container so content clips to those
@@ -553,7 +501,7 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
   return (
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader scrolled={scrolled} overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
-      <div ref={stretchRef} onScroll={onHeaderScroll}
+      <div onScroll={onHeaderScroll}
         style={{ position: "absolute", top: paneTop, left: 0, right: 0, bottom: 0, zIndex: 1,
           transition: animate ? "top 200ms var(--ease-header)" : "none",
           overflowY: "auto", overscrollBehaviorY: "contain",
