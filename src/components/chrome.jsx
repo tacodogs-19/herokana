@@ -621,9 +621,11 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
           paddingRight: 20, paddingLeft: 20,
           paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
         {/* Parallax: on overscroll/bounce (negative --collapse) the content pulls
-            an extra bit further than the card frame itself moves, so the layers
-            separate with depth. Clamped to 0 on normal scroll (positive --collapse). */}
-        <div style={{ transform: "translateY(max(0px, calc(-12px * var(--collapse, 0))))", willChange: "transform" }}>
+            further than the card frame, so the layers separate with depth. A small
+            base move here (all content), plus a per-section stagger in styles.css
+            (.hk-parallax .hk-rise > * uses each section's --i). Clamped to 0 on
+            normal scroll (positive --collapse). */}
+        <div className="hk-parallax" style={{ transform: "translateY(max(0px, calc(-8px * var(--collapse, 0))))", willChange: "transform" }}>
           {children}
         </div>
       </div>

@@ -107,6 +107,14 @@ button, input { font-family: inherit; }
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* Overscroll parallax stagger: on overscroll/bounce (negative --collapse) each
+   section drifts a little more than the last, by its --i. Uses `translate` (not
+   `transform`) so it composes with the entrance/rise transform animations rather
+   than being overridden by their fill. Zero on normal scroll (max with 0). */
+.hk-parallax .hk-rise > * {
+  translate: 0 max(0px, calc(var(--i, 1) * -4px * var(--collapse, 0)));
+}
+
 /* answer option entrance — staggered via --i custom property */
 .hk-opt-enter {
   animation: hkOptIn 300ms var(--ease-out-expo) both;
