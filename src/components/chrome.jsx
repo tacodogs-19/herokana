@@ -170,7 +170,7 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
     const spring = (from) => { // ease --collapse back to the scroll position
       let c = from;
       const step = () => {
-        c += (0 - c) * 0.18;
+        c += (0 - c) * 0.30;   // snap-back rate: ~0.56x the settle time of 0.18
         if (Math.abs(c) > 0.004) { setVar(c); relRaf = requestAnimationFrame(step); }
         else { relRaf = 0; setVar(scrollP()); }
       };
