@@ -70,6 +70,11 @@ button, input { font-family: inherit; }
    insertion (circles re-scaling from 0.55, sections re-rising). Freeze the
    clone to its resting state — but not the snapshot container's OWN slide. */
 .hk-snap * { animation: none !important; transition: none !important; }
+/* Pin the cloned frame to the fixed inset:0 container. The real Shell is
+   height:100dvh; during Android's predictive-back settle the dynamic viewport
+   is briefly in its small state, so 100dvh renders ~50px short and the clone
+   shows a gap at the bottom before hkSlideDown plays. 100% tracks the container. */
+.hk-snap > * { height: 100% !important; }
 .hk-snap .hk-grow { width: var(--to); }
 
 /* wrong-answer shake on the prompt card */
