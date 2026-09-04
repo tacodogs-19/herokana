@@ -628,14 +628,12 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
           // serialises to an empty style attribute in an innerHTML snapshot clone.
           paddingRight: 20, paddingLeft: 20,
           paddingBottom: "calc(94px + env(safe-area-inset-bottom))" }}>
-        {/* Parallax: on overscroll/bounce (negative --collapse) the content pulls
-            further than the card frame, so the layers separate with depth. A small
-            base move here (all content), plus a per-section stagger in styles.css
-            (.hk-parallax .hk-rise > * uses each section's --i). Clamped to 0 on
-            normal scroll (positive --collapse). */}
-        <div className="hk-parallax" style={{ transform: "translateY(max(0px, calc(-12px * var(--collapse, 0))))", willChange: "transform" }}>
-          {children}
-        </div>
+        {/* The overscroll bounce is the pane sliding as one rigid layer (its
+            transform, above). Content stays put inside it — nothing moves relative
+            to the pane, so the layer never repaints mid-bounce. A per-section
+            parallax used to live here but repainting the whole pane every frame
+            was the Pixel-9a lag; a rigid slide is what native overscroll does. */}
+        {children}
       </div>
     </Shell>
   );

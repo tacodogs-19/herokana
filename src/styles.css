@@ -112,18 +112,6 @@ button, input { font-family: inherit; }
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-/* Overscroll parallax stagger: on overscroll/bounce (negative --collapse) each
-   section drifts more than the one above it, by DOM position — so it works on
-   every tab screen (all use .hk-rise) with no per-screen wiring. `translate` (not
-   `transform`) composes with the entrance/rise transform animations rather than
-   being overridden by their fill. Zero on normal scroll (max with 0). Deep sections
-   are off-screen during overscroll, so the cap at 5+ is just a sane ceiling. */
-.hk-parallax .hk-rise > *               { translate: 0 max(0px, calc(-12px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(2)  { translate: 0 max(0px, calc(-24px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(3)  { translate: 0 max(0px, calc(-36px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(4)  { translate: 0 max(0px, calc(-48px * var(--collapse, 0))); }
-.hk-parallax .hk-rise > *:nth-child(n+5){ translate: 0 max(0px, calc(-60px * var(--collapse, 0))); }
-
 /* answer option entrance — staggered via --i custom property */
 .hk-opt-enter {
   animation: hkOptIn 300ms var(--ease-out-expo) both;
