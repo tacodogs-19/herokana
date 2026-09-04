@@ -115,7 +115,22 @@ export function useHeaderCollapse({ headerRef, distance = 120 }) {
     const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
     let raf = 0;
     const apply = () => { raf = 0; setVar(scrollP()); };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    // Logo bounce: the scale is bound 1:1 to scroll, so flying back to the top
+    // snaps it to full size abruptly. On a *fast* arrival, overshoot-and-settle it
+    // with a CSS keyframe on the one small logo element (composited, no pane cost).
+    // Gentle scrolls already ease in fine, so they're left alone.
+    let last = { top: el.scrollTop, t: performance.now() };
+    const onScroll = () => {
+      const now = performance.now(), top = el.scrollTop;
+      const dt = now - last.t, v = dt > 0 ? (last.top - top) / dt : 0; // v>0 = coasting toward top
+      const cameFromAbove = last.top > 0.5;
+      last = { top, t: now };
+      if (!raf) raf = requestAnimationFrame(apply);
+      const h = headerRef && headerRef.current;
+      if (h && top <= 0 && cameFromAbove && v > 0.6) {  // restart the anim: remove, reflow, re-add
+        h.classList.remove("hk-pop"); void h.offsetWidth; h.classList.add("hk-pop");
+      }
+    };
     apply();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
@@ -150,7 +165,7 @@ export function StickyHeader({ children, right, overlay = false, innerRef }) {
       {/* The logo + title cluster scales down as the header collapses. It inherits
           --collapse from the header root. transform-origin left so it anchors to the
           left edge (title doesn't drift) instead of the centre. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 9,
+      <div className="hk-logo" style={{ display: "flex", alignItems: "center", gap: 9,
         transformOrigin: "left center",
         transform: "translateY(calc(-2px * var(--collapse, 0))) scale(calc(1 - 0.1 * var(--collapse, 0)))" }}>
         {children}

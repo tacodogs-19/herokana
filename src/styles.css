@@ -30,6 +30,13 @@ button, input { font-family: inherit; }
 
 @keyframes hkFade { from { opacity: 0; } to { opacity: 1; } }
 
+/* Logo bounce when you fly back to the top (.hk-pop set on the header by
+   useHeaderCollapse). Uses the independent `scale` property so it composes with
+   the logo's inline transform scale rather than overriding it; overshoots then
+   settles, so the abrupt snap-to-full-size lands with a little spring instead. */
+@keyframes hkLogoPop { 0% { scale: 1; } 40% { scale: 1.06; } 72% { scale: 0.99; } 100% { scale: 1; } }
+.hk-pop .hk-logo { animation: hkLogoPop 460ms var(--ease-out-quart); }
+
 .hk-reveal { animation: hkReveal 240ms var(--ease-out-expo) both; }
 @keyframes hkReveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
