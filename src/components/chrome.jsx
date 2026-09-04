@@ -218,8 +218,12 @@ export function StickyHeader({ children, right, overlay = false, innerRef }) {
       display: "flex", alignItems: "center",
       // Collapsing header: padding maps continuously to --collapse (0=full → 1=compact),
       // set by useHeaderCollapse. No transition — the variable IS the scroll position.
-      paddingTop: "calc(14px - 5px * var(--collapse, 0))", paddingLeft: 20, paddingRight: 20,
-      paddingBottom: "calc(24px - 15px * var(--collapse, 0))",
+      // max(0, --collapse): the shrink tracks scroll (0→1), but the overscroll
+      // range (negative) is clamped OUT of padding — growing padding reflows the
+      // header every spring frame. The overscroll stretch is a transform instead
+      // (logo below; pane in TabScreen), so the bounce stays on the compositor.
+      paddingTop: "calc(14px - 5px * max(0, var(--collapse, 0)))", paddingLeft: 20, paddingRight: 20,
+      paddingBottom: "calc(24px - 15px * max(0, var(--collapse, 0)))",
       background: t.chrome }}>
       {/* The logo + title cluster scales down as the header collapses. It inherits
           --collapse from the header root. transform-origin left so it anchors to the
@@ -606,7 +610,14 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
       <div ref={paneRef}
-        style={{ position: "absolute", top: headerH ? `calc(${headerH}px - 20px * var(--collapse, 0))` : 0, left: 0, right: 0, bottom: 0, zIndex: 1,
+        style={{ position: "absolute",
+          // top tracks scroll collapse only (max(0,…)) — never the overscroll
+          // range, so pulling down no longer reflows this whole scroll subtree.
+          top: headerH ? `calc(${headerH}px - 20px * max(0, var(--collapse, 0)))` : 0, left: 0, right: 0, bottom: 0, zIndex: 1,
+          // overscroll stretch = a GPU transform: the pane slides down (revealing
+          // the navy chrome behind it, same look as the old padding growth) with
+          // zero layout. min(0,…) so it only engages on the bounce, not on scroll.
+          transform: "translateY(calc(-20px * min(0, var(--collapse, 0))))", willChange: "transform",
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
           // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
