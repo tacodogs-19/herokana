@@ -115,21 +115,20 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
     const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
     let raf = 0, relRaf = 0, g = null; // g: active overscroll gesture
     const applyScroll = () => { raf = 0; if (!(g && g.on) && !relRaf) setVar(scrollP()); };
-    // momentum: a flick that coasts to the top hands its velocity to a spring that
-    // expands the header (negative --collapse) and settles. Seeding the spring with
-    // the scroll speed makes the expand a fluid continuation of the scroll — it moves
-    // fast from the first frame, overshoots in proportion to the flick, then eases
-    // back gently. Reuses relRaf so it's mutually exclusive with the finger pull.
-    const bounce = (v) => {
-      const K = 75, D = 14;                          // stiffness / damping — one soft overshoot (zeta ~0.8)
-      let c = 0, vel = -Math.min(3, v) * 8;          // seed velocity from the scroll arrival speed
-      let tPrev = performance.now();
+    // One spring drives every return-to-rest: the momentum bounce when a flick
+    // coasts to the top AND the release after a finger pull. Integrating the SAME
+    // damped spring from the current position and its *actual* velocity is what
+    // makes it feel physical — the settle is always proportional to how hard you
+    // moved, and identical on 60Hz and 120Hz. Fixed sub-step integration (not a
+    // per-frame decay) so it's frame-rate independent and stable under a stiff K.
+    // K/D → zeta ~0.8: one barely-there overshoot, settles ~0.5s.
+    const K = 75, D = 14, H = 1 / 240;
+    const settle = (c0, v0) => {
+      let c = c0, vel = v0, tPrev = performance.now(), acc = 0;
       const step = () => {
         const now = performance.now();
-        let dt = (now - tPrev) / 1000; tPrev = now;
-        if (dt > 0.05) dt = 0.05;                    // clamp a stalled frame for stability
-        vel += (-K * c - D * vel) * dt;
-        c += vel * dt;
+        acc += Math.min(0.05, (now - tPrev) / 1000); tPrev = now; // clamp a stalled frame
+        while (acc >= H) { vel += (-K * c - D * vel) * H; c += vel * H; acc -= H; }
         if (c < -expand) { c = -expand; if (vel < 0) vel = 0; } // cap the expansion
         if (c > 0) { c = 0; if (vel > 0) vel = 0; }             // expand-and-return only; don't compact
         setVar(c);
@@ -145,7 +144,7 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
       const cameFromAbove = last.top > 0.5;
       last = { top, t: now };
       if (!raf) raf = requestAnimationFrame(applyScroll);
-      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.27) bounce(v);
+      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.27) settle(0, -Math.min(3, v) * 8);
     };
 
     // overscroll pull (touch, at the very top, pulling down)
@@ -153,7 +152,7 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
     const onStart = (e) => {
       if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
       cancelRel();
-      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false };
+      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false, c: 0, cv: 0, vel: 0, lt: performance.now() };
     };
     const onMove = (e) => {
       if (!g) return;
@@ -165,19 +164,17 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
         else return;
       }
       e.preventDefault();
-      setVar(-expand * (1 - Math.exp(-(dy * resist) / 120))); // 0 → -expand, rubbery near the cap
-    };
-    const spring = (from) => { // ease --collapse back to the scroll position
-      let c = from;
-      const step = () => {
-        c += (0 - c) * 0.30;   // snap-back rate: ~0.56x the settle time of 0.18
-        if (Math.abs(c) > 0.004) { setVar(c); relRaf = requestAnimationFrame(step); }
-        else { relRaf = 0; setVar(scrollP()); }
-      };
-      relRaf = requestAnimationFrame(step);
+      const c = -expand * (1 - Math.exp(-(dy * resist) / 120)); // 0 → -expand, rubbery near the cap
+      // Sample the finger's velocity (--collapse units/sec) so the release spring
+      // continues the motion instead of restarting from rest. Skip sub-8ms frames
+      // (coalesced touch events) whose tiny dt would inflate it.
+      const now = performance.now(), dt = now - g.lt;
+      if (dt >= 8) { g.vel = (c - g.cv) / (dt / 1000); g.cv = c; g.lt = now; }
+      g.c = c;
+      setVar(c);
     };
     const onEnd = () => {
-      if (g && g.on) { const cur = parseFloat(getComputedStyle(el).getPropertyValue("--collapse")) || 0; g = null; spring(cur); }
+      if (g && g.on) { const { c, vel } = g; g = null; settle(c, vel); } // spring back carrying the release velocity
       else g = null;
     };
 
