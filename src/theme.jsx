@@ -6,7 +6,7 @@ export const LIGHT = {
   ink: "#070F24", sub: "#5F6688", faint: "#7E859E", onChrome: "#FFFFFF", // sub/faint darkened for WCAG AA contrast; onChrome: header text/logo on the dark `chrome` bar
   line: "#E6E9F2", primary: "#1D4FD7", primaryDark: "#1740B0",
   primarySoft: "#CDDBF8", primaryTint: "#CDE1FF", done: "#1E7E52", doneSoft: "#CBF4E2",
-  gold: "#F5B225", goldSoft: "#FCF1D8", goldInk: "#8A5D07", wrong: "#D0393E", wrongSoft: "#FBE7E8", // done/wrong darkened + goldInk for gold-on-tint text (AA)
+  gold: "#F5B225", goldSoft: "#FCF1D8", goldInk: "#8A5D07", wrong: "#D0393E", wrongSoft: "#FBE7E8", wrongOnChrome: "#FF6166", // done/wrong darkened + goldInk for gold-on-tint text (AA); wrongOnChrome = lighter red readable on the always-dark chrome bar
   lock: "#C3C8D8", shadow: "rgba(30,37,64,0.10)", doneMid: "#C5EBD5",
   pillShadow: "0 1px 4px rgba(0,0,0,0.12)", sheetShadow: "0 -6px 48px rgba(8,12,24,0.16)", // shared: active-toggle pill / dismissable sheet frame
   seg: "rgba(29,79,215,0.05)", // segmented-control track — faint primary-tinted wash: just a hint of blue to sit with the plane, still a step darker on white; opaque `surface` active pill pops on top
@@ -19,7 +19,7 @@ export const DARK = {
   ink: "#F0F2F8", sub: "#9098B8", faint: "#5A6286", onChrome: "#F0F2F8",
   line: "#27304C", primary: "#5A85FF", primaryDark: "#3D63D8",
   primarySoft: "#273D6E", primaryTint: "#33579D", done: "#34C07C", doneSoft: "#16301F",
-  gold: "#FFCB57", goldSoft: "#2A2410", goldInk: "#FFCB57", wrong: "#FF6166", wrongSoft: "#34191B",
+  gold: "#FFCB57", goldSoft: "#2A2410", goldInk: "#FFCB57", wrong: "#FF6166", wrongSoft: "#34191B", wrongOnChrome: "#FF6166",
   lock: "#4A5378", shadow: "rgba(0,0,0,0.4)", doneMid: "#234C35",
   pillShadow: "0 1px 4px rgba(0,0,0,0.12)", sheetShadow: "0 -6px 48px rgba(8,12,24,0.16)", // shared (kept identical to light — these were theme-agnostic inline literals)
   seg: "rgba(8,14,40,0.45)", // translucent navy-blue wash — recesses a step below ANY dark bg/surface while carrying the same blue cast as the plane; `surface` active pill lifts out of it
