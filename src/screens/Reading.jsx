@@ -195,11 +195,12 @@ function ReadingBody({ onNav, onOpenPack, onReview }) {
         <img src="/assets/cat-header.svg" alt="" aria-hidden="true" style={{ width: 34, height: 34, flexShrink: 0 }} />
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: t.onChrome }}>Scenes</h1>
         <div style={{ flex: 1 }} />
-        {/* same idiom as the chapter reset pill on Learn */}
+        {/* subtle red, mirroring the gold Daily Review pill idiom (translucent bg,
+            colour carried by the icon + label) — a quiet destructive cue */}
         {unlocked && hasScenesData && (
           <button onClick={() => setConfirmReset(true)} className="hk-press" aria-label="Reset Scenes progress"
-            style={{ padding: "5px 7px", borderRadius: 9, background: t.sunk, border: "none", cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 4, color: t.faint }}>
+            style={{ padding: "5px 10px 5px 8px", borderRadius: 999, background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 4, color: t.wrong }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
             </svg>

@@ -128,7 +128,7 @@ export function useHeaderCollapse({ headerRef, distance = 120 }) {
       if (!raf) raf = requestAnimationFrame(apply);
       const h = headerRef && headerRef.current;
       if (h && top <= 0 && cameFromAbove && v > 0.6) {  // restart the anim: remove, reflow, re-add
-        h.classList.remove("hk-pop"); void h.offsetWidth; h.classList.add("hk-pop");
+        h.classList.remove("hk-logo-bounce"); void h.offsetWidth; h.classList.add("hk-logo-bounce");
       }
     };
     apply();
