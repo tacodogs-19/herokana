@@ -98,11 +98,11 @@ export function useHeaderScroll() {
 // only the number changes, set imperatively (no re-renders, no inline conflict).
 // rAF-batched so scrollTop is read at paint time. Attach the returned ref to the
 // scroll pane; pass the header's ref.
-// `expand`/`resist` add the reverse move: pulling DOWN past the top drives
-// --collapse NEGATIVE, so the same calc() formulas expand the header, grow the
-// logo and push the pane top down (docked to the header's taller bottom — no
-// tear, no differential). Springs back to the scroll position on release.
-export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, resist = 0.5 }) {
+// Overscroll bounce removed: a custom JS spring on --collapse repainted the whole
+// pane every frame and felt slow on mid-range Android for little payoff. Pulling
+// past the top now just gets the browser's native stretch-overscroll (free, GPU,
+// smooth). This hook only does the scroll-linked collapse.
+export function useHeaderCollapse({ headerRef, distance = 120 }) {
   const paneRef = React.useRef(null);
   React.useEffect(() => {
     const el = paneRef.current;
@@ -113,87 +113,13 @@ export function useHeaderCollapse({ headerRef, distance = 120, expand = 1.8, res
       if (h) h.style.setProperty("--collapse", p);           // header padding + (inherited) logo scale
     };
     const scrollP = () => Math.min(1, Math.max(0, el.scrollTop / distance));
-    let raf = 0, relRaf = 0, g = null; // g: active overscroll gesture
-    const applyScroll = () => { raf = 0; if (!(g && g.on) && !relRaf) setVar(scrollP()); };
-    // One spring drives every return-to-rest: the momentum bounce when a flick
-    // coasts to the top AND the release after a finger pull. Integrating the SAME
-    // damped spring from the current position and its *actual* velocity is what
-    // makes it feel physical — the settle is always proportional to how hard you
-    // moved, and identical on 60Hz and 120Hz. Fixed sub-step integration (not a
-    // per-frame decay) so it's frame-rate independent and stable under a stiff K.
-    // K/D → zeta ~0.8: one barely-there overshoot, settles ~0.5s.
-    const K = 75, D = 14, H = 1 / 240;
-    const settle = (c0, v0) => {
-      let c = c0, vel = v0, tPrev = performance.now(), acc = 0;
-      const step = () => {
-        const now = performance.now();
-        acc += Math.min(0.05, (now - tPrev) / 1000); tPrev = now; // clamp a stalled frame
-        while (acc >= H) { vel += (-K * c - D * vel) * H; c += vel * H; acc -= H; }
-        if (c < -expand) { c = -expand; if (vel < 0) vel = 0; } // cap the expansion
-        if (c > 0) { c = 0; if (vel > 0) vel = 0; }             // expand-and-return only; don't compact
-        setVar(c);
-        if (Math.abs(c) > 0.002 || Math.abs(vel) > 0.03) relRaf = requestAnimationFrame(step);
-        else { relRaf = 0; setVar(scrollP()); }
-      };
-      relRaf = requestAnimationFrame(step);
-    };
-    let last = { top: el.scrollTop, t: performance.now() };
-    const onScroll = () => {
-      const now = performance.now(), top = el.scrollTop;
-      const dt = now - last.t, v = dt > 0 ? (last.top - top) / dt : 0; // v>0 = coasting toward top
-      const cameFromAbove = last.top > 0.5;
-      last = { top, t: now };
-      if (!raf) raf = requestAnimationFrame(applyScroll);
-      if (!(g && g.on) && !relRaf && top <= 0 && cameFromAbove && v > 0.27) settle(0, -Math.min(3, v) * 8);
-    };
-
-    // overscroll pull (touch, at the very top, pulling down)
-    const cancelRel = () => { if (relRaf) { cancelAnimationFrame(relRaf); relRaf = 0; } };
-    const onStart = (e) => {
-      if (e.touches.length !== 1 || el.scrollTop > 0) { g = null; return; }
-      cancelRel();
-      g = { y0: e.touches[0].clientY, x0: e.touches[0].clientX, on: false, c: 0, cv: 0, vel: 0, lt: performance.now() };
-    };
-    const onMove = (e) => {
-      if (!g) return;
-      const dy = e.touches[0].clientY - g.y0, dx = e.touches[0].clientX - g.x0;
-      if (!g.on) {
-        if (el.scrollTop > 0) { g = null; return; }        // scrolled → let it scroll
-        if (dy > 4 && dy > Math.abs(dx)) g.on = true;        // at top, pulling down → engage
-        else if (dy < -2 || Math.abs(dx) > 8) { g = null; return; } // up / sideways → not ours
-        else return;
-      }
-      e.preventDefault();
-      const c = -expand * (1 - Math.exp(-(dy * resist) / 120)); // 0 → -expand, rubbery near the cap
-      // Sample the finger's velocity (--collapse units/sec) so the release spring
-      // continues the motion instead of restarting from rest. Skip sub-8ms frames
-      // (coalesced touch events) whose tiny dt would inflate it.
-      const now = performance.now(), dt = now - g.lt;
-      if (dt >= 8) { g.vel = (c - g.cv) / (dt / 1000); g.cv = c; g.lt = now; }
-      g.c = c;
-      setVar(c);
-    };
-    const onEnd = () => {
-      if (g && g.on) { const { c, vel } = g; g = null; settle(c, vel); } // spring back carrying the release velocity
-      else g = null;
-    };
-
-    applyScroll();
+    let raf = 0;
+    const apply = () => { raf = 0; setVar(scrollP()); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    apply();
     el.addEventListener("scroll", onScroll, { passive: true });
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    el.addEventListener("touchcancel", onEnd, { passive: true });
-    return () => {
-      el.removeEventListener("scroll", onScroll);
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
-      if (raf) cancelAnimationFrame(raf);
-      if (relRaf) cancelAnimationFrame(relRaf);
-    };
-  }, [headerRef, distance, expand, resist]);
+    return () => { el.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, [headerRef, distance]);
   return paneRef;
 }
 
@@ -218,12 +144,8 @@ export function StickyHeader({ children, right, overlay = false, innerRef }) {
       display: "flex", alignItems: "center",
       // Collapsing header: padding maps continuously to --collapse (0=full → 1=compact),
       // set by useHeaderCollapse. No transition — the variable IS the scroll position.
-      // max(0, --collapse): the shrink tracks scroll (0→1), but the overscroll
-      // range (negative) is clamped OUT of padding — growing padding reflows the
-      // header every spring frame. The overscroll stretch is a transform instead
-      // (logo below; pane in TabScreen), so the bounce stays on the compositor.
-      paddingTop: "calc(14px - 5px * max(0, var(--collapse, 0)))", paddingLeft: 20, paddingRight: 20,
-      paddingBottom: "calc(24px - 15px * max(0, var(--collapse, 0)))",
+      paddingTop: "calc(14px - 5px * var(--collapse, 0))", paddingLeft: 20, paddingRight: 20,
+      paddingBottom: "calc(24px - 15px * var(--collapse, 0))",
       background: t.chrome }}>
       {/* The logo + title cluster scales down as the header collapses. It inherits
           --collapse from the header root. transform-origin left so it anchors to the
@@ -610,14 +532,7 @@ export function TabScreen({ active, onNav, header, onReview, children }) {
     <Shell active={active} onNav={onNav} whiteTop>
       <StickyHeader overlay innerRef={headerRef} right={<DailyReviewPill onReview={onReview} />}>{header}</StickyHeader>
       <div ref={paneRef}
-        style={{ position: "absolute",
-          // top tracks scroll collapse only (max(0,…)) — never the overscroll
-          // range, so pulling down no longer reflows this whole scroll subtree.
-          top: headerH ? `calc(${headerH}px - 20px * max(0, var(--collapse, 0)))` : 0, left: 0, right: 0, bottom: 0, zIndex: 1,
-          // overscroll stretch = a GPU transform: the pane slides down (revealing
-          // the navy chrome behind it, same look as the old padding growth) with
-          // zero layout. min(0,…) so it only engages on the bounce, not on scroll.
-          transform: "translateY(calc(-20px * min(0, var(--collapse, 0))))", willChange: "transform",
+        style={{ position: "absolute", top: headerH ? `calc(${headerH}px - 20px * var(--collapse, 0))` : 0, left: 0, right: 0, bottom: 0, zIndex: 1,
           overflowY: "auto", overscrollBehaviorY: "contain",
           // white at the top of the pane easing down to the grey planeTop, pinned
           // to 100vh so it doesn't rescale as the pane top shifts or dvh changes.
